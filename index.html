@@ -301,6 +301,8 @@
       <div class="sidebar-item active" onclick="adminTab('dashboard',this)">📊 Dashboard</div>
       <div class="sidebar-item" onclick="adminTab('upload',this)">📤 Upload Book</div>
       <div class="sidebar-item" onclick="adminTab('books',this)">📚 Manage Books</div>
+      <div class="sidebar-item" onclick="adminTab('upload-manga',this)">🗂 Upload Manga</div>
+      <div class="sidebar-item" onclick="adminTab('manga',this)">🎌 Manage Manga</div>
       <div class="sidebar-item" onclick="adminTab('users',this)">👤 Users</div>
     </div>
     <div class="admin-main">
@@ -359,6 +361,56 @@
           <h3>All Books</h3>
           <table class="books-admin-table" id="admin-books-table">
             <tr><th>#</th><th>Title</th><th>Author</th><th>Genre</th><th>Year</th><th>File</th><th>Action</th></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="admin-section" id="admin-upload-manga">
+        <h2 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;margin-bottom:24px">Upload New Manga</h2>
+        <div class="admin-card">
+          <h3>Manga Details</h3>
+          <div class="form-row">
+            <div class="form-field"><label>Title *</label><input type="text" id="mn-title" placeholder="e.g. Naruto"></div>
+            <div class="form-field"><label>Author *</label><input type="text" id="mn-author" placeholder="e.g. Masashi Kishimoto"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Genre</label>
+              <select id="mn-genre">
+                <option>Action</option><option>Adventure</option><option>Comedy</option>
+                <option>Drama</option><option>Fantasy</option><option>Horror</option>
+                <option>Romance</option><option>Sci-Fi</option><option>Slice of Life</option>
+                <option>Sports</option><option>Supernatural</option><option>Thriller</option>
+              </select>
+            </div>
+            <div class="form-field"><label>Chapters</label><input type="number" id="mn-chapters" placeholder="e.g. 700"></div>
+            <div class="form-field">
+              <label>Status</label>
+              <select id="mn-status">
+                <option value="Ongoing">Ongoing</option>
+                <option value="Completed">Completed</option>
+                <option value="Hiatus">Hiatus</option>
+              </select>
+            </div>
+            <div class="form-field"><label>Cover Color</label><input type="color" id="mn-color" value="#1a1a2e"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-field"><label>Description</label><textarea id="mn-desc" placeholder="Short manga description…"></textarea></div>
+          </div>
+          <div class="form-row">
+            <div class="form-field"><label>Upload File (PDF / CBZ / CBR / ZIP)</label><input type="file" id="mn-file" accept=".pdf,.cbz,.cbr,.zip"></div>
+          </div>
+          <button class="btn-admin" id="manga-upload-btn" onclick="uploadManga()">Upload Manga</button>
+          <p class="success-msg" id="manga-upload-success">✓ Manga uploaded successfully!</p>
+        </div>
+      </div>
+
+      <div class="admin-section" id="admin-manga">
+        <h2 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;margin-bottom:24px">Manage Manga</h2>
+        <div class="admin-card">
+          <h3>All Manga</h3>
+          <table class="books-admin-table" id="admin-manga-table">
+            <tr><th>#</th><th>Title</th><th>Author</th><th>Genre</th><th>Chapters</th><th>Status</th><th>File</th><th>Action</th></tr>
           </table>
         </div>
       </div>
@@ -655,6 +707,7 @@ function adminTab(section, el){
   el.classList.add('active');
   if(section==='books') loadAdminBooks();
   if(section==='users') loadAdminUsers();
+  if(section==='manga') loadAdminManga();
   if(section==='dashboard') loadAdminStats();
 }
 
@@ -731,6 +784,65 @@ async function loadAdminUsers(){
           <td><span class="tag ${u.tier===2?'tag-blue':'tag-gold'}">${u.tier===2?'Scholar':'Reader'}</span></td>
         </tr>`).join('');
   } catch(e){}
+}
+
+// ── MANGA ADMIN ────────────────────────────────────────────
+async function uploadManga(){
+  const title  = document.getElementById('mn-title').value.trim();
+  const author = document.getElementById('mn-author').value.trim();
+  if(!title||!author){ showToast('Title and author are required'); return; }
+  const btn = document.getElementById('manga-upload-btn');
+  btn.disabled=true; btn.textContent='Uploading…';
+  try {
+    const fd = new FormData();
+    fd.append('title',  title);
+    fd.append('author', author);
+    fd.append('genre',  document.getElementById('mn-genre').value);
+    fd.append('chapters', document.getElementById('mn-chapters').value);
+    fd.append('status', document.getElementById('mn-status').value);
+    fd.append('color',  document.getElementById('mn-color').value);
+    fd.append('description', document.getElementById('mn-desc').value);
+    const fileInput = document.getElementById('mn-file');
+    if(fileInput.files[0]) fd.append('file', fileInput.files[0]);
+
+    const res  = await fetch('/api/admin/manga',{method:'POST',headers:{'Authorization':'Bearer '+token},body:fd});
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error);
+
+    ['mn-title','mn-author','mn-chapters','mn-desc'].forEach(id=>document.getElementById(id).value='');
+    fileInput.value='';
+    const s = document.getElementById('manga-upload-success');
+    s.style.display='block'; setTimeout(()=>s.style.display='none',3000);
+    showToast('✓ Manga uploaded!');
+  } catch(e){ showToast('Upload failed: '+e.message); }
+  finally { btn.disabled=false; btn.textContent='Upload Manga'; }
+}
+
+async function loadAdminManga(){
+  try {
+    const items = await api('/api/manga');
+    const t = document.getElementById('admin-manga-table');
+    t.innerHTML = `<tr><th>#</th><th>Title</th><th>Author</th><th>Genre</th><th>Chapters</th><th>Status</th><th>File</th><th>Action</th></tr>`
+      + items.map((m,i)=>`
+        <tr>
+          <td>${i+1}</td>
+          <td><strong>${m.title}</strong></td>
+          <td>${m.author}</td>
+          <td>${m.genre||'—'}</td>
+          <td>${m.chapters!=null?m.chapters:'—'}</td>
+          <td><span class="tag ${m.status==='Completed'?'tag-blue':'tag-gold'}">${m.status}</span></td>
+          <td>${m.has_file?'✅ File':'—'}</td>
+          <td><button onclick="deleteManga(${m.id})" style="background:#fee;border:1px solid #fcc;color:#c00;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px">Delete</button></td>
+        </tr>`).join('');
+  } catch(e){ showToast('Failed to load manga'); }
+}
+
+async function deleteManga(id){
+  if(!confirm('Delete this manga?')) return;
+  try {
+    await api(`/api/admin/manga/${id}`,{method:'DELETE'});
+    showToast('Manga deleted'); loadAdminManga();
+  } catch(e){ showToast('Error: '+e.message); }
 }
 
 // ── INIT ──────────────────────────────────────────────
