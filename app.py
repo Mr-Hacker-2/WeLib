@@ -79,29 +79,33 @@ class Manga(db.Model):
 # ── DB Init ────────────────────────────────────────────────
 def init_db():
     db.create_all()
-    if not User.query.filter_by(email='admin@bookvault.com').first():
-        db.session.add(User(
-            name='Admin', email='admin@bookvault.com',
-            password=bcrypt.generate_password_hash('admin1').decode(),
-            tier=0, is_admin=True, status='active'
-        ))
-    if Book.query.count() == 0:
-        seeds = [
-            Book(title='The Great Gatsby',  author='F. Scott Fitzgerald', genre='Classic Literature', year=1925, color='#1a3a5c', description='A story of wealth, obsession, and the American Dream in the 1920s.'),
-            Book(title='1984',              author='George Orwell',       genre='Science Fiction',    year=1949, color='#2a2a2a', description='A chilling dystopia where Big Brother watches your every move.'),
-            Book(title='Dune',              author='Frank Herbert',       genre='Science Fiction',    year=1965, color='#7a4a00', description='Epic science fiction set on a desert planet.'),
-            Book(title='Pride & Prejudice', author='Jane Austen',         genre='Classic Literature', year=1813, color='#5c1a1a', description='A timeless tale of love, manners, and marriage in Georgian England.'),
-            Book(title='The Alchemist',     author='Paulo Coelho',        genre='Philosophy',         year=1988, color='#1a5c2a', description='A mystical journey of self-discovery.'),
-            Book(title='Sapiens',           author='Yuval Noah Harari',   genre='History',            year=2011, color='#3a3a3a', description='A brief history of humankind.'),
-            Book(title='The Hobbit',        author='J.R.R. Tolkien',      genre='Fantasy',            year=1937, color='#2a5c1a', description='A humble hobbit swept into an unexpected journey.'),
-            Book(title='Gone Girl',         author='Gillian Flynn',       genre='Thriller',           year=2012, color='#1a0a0a', description='A twisting psychological thriller about marriage and deception.'),
-            Book(title='Atomic Habits',     author='James Clear',         genre='Self-Help',          year=2018, color='#1a3a5c', description='Proven strategies for building good habits.'),
-            Book(title='Moby Dick',         author='Herman Melville',     genre='Classic Literature', year=1851, color='#001a3a', description="Captain Ahab's obsessive quest to hunt the great white whale."),
-            Book(title='The Road',          author='Cormac McCarthy',     genre='Thriller',           year=2006, color='#1a1a1a', description='A harrowing post-apocalyptic journey.'),
-            Book(title='Educated',          author='Tara Westover',       genre='Biography',          year=2018, color='#3a1a5c', description='A remarkable memoir about escaping a survivalist family.'),
-        ]
-        db.session.add_all(seeds)
-    db.session.commit()
+    try:
+        if not User.query.filter_by(email='admin@bookvault.com').first():
+            db.session.add(User(
+                name='Admin', email='admin@bookvault.com',
+                password=bcrypt.generate_password_hash('admin1').decode(),
+                tier=0, is_admin=True, status='active'
+            ))
+            db.session.flush()  # catch duplicate before books insert
+        if Book.query.count() == 0:
+            seeds = [
+                Book(title='The Great Gatsby',  author='F. Scott Fitzgerald', genre='Classic Literature', year=1925, color='#1a3a5c', description='A story of wealth, obsession, and the American Dream in the 1920s.'),
+                Book(title='1984',              author='George Orwell',       genre='Science Fiction',    year=1949, color='#2a2a2a', description='A chilling dystopia where Big Brother watches your every move.'),
+                Book(title='Dune',              author='Frank Herbert',       genre='Science Fiction',    year=1965, color='#7a4a00', description='Epic science fiction set on a desert planet.'),
+                Book(title='Pride & Prejudice', author='Jane Austen',         genre='Classic Literature', year=1813, color='#5c1a1a', description='A timeless tale of love, manners, and marriage in Georgian England.'),
+                Book(title='The Alchemist',     author='Paulo Coelho',        genre='Philosophy',         year=1988, color='#1a5c2a', description='A mystical journey of self-discovery.'),
+                Book(title='Sapiens',           author='Yuval Noah Harari',   genre='History',            year=2011, color='#3a3a3a', description='A brief history of humankind.'),
+                Book(title='The Hobbit',        author='J.R.R. Tolkien',      genre='Fantasy',            year=1937, color='#2a5c1a', description='A humble hobbit swept into an unexpected journey.'),
+                Book(title='Gone Girl',         author='Gillian Flynn',       genre='Thriller',           year=2012, color='#1a0a0a', description='A twisting psychological thriller about marriage and deception.'),
+                Book(title='Atomic Habits',     author='James Clear',         genre='Self-Help',          year=2018, color='#1a3a5c', description='Proven strategies for building good habits.'),
+                Book(title='Moby Dick',         author='Herman Melville',     genre='Classic Literature', year=1851, color='#001a3a', description="Captain Ahab's obsessive quest to hunt the great white whale."),
+                Book(title='The Road',          author='Cormac McCarthy',     genre='Thriller',           year=2006, color='#1a1a1a', description='A harrowing post-apocalyptic journey.'),
+                Book(title='Educated',          author='Tara Westover',       genre='Biography',          year=2018, color='#3a1a5c', description='A remarkable memoir about escaping a survivalist family.'),
+            ]
+            db.session.add_all(seeds)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()  # another worker already seeded — that's fine
 
 with app.app_context():
     init_db()
