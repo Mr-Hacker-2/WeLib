@@ -5,181 +5,254 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BookVault — Every Book Ever Written</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
-  :root {
-    --ink:#0a0a0a; --paper:#f5f0e8; --cream:#faf7f2;
-    --gold:#c9963c; --gold-light:#e8b84b;
-    --red:#b5341e; --sage:#4a5e52;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;overflow-x:hidden;}
-  .page{display:none;min-height:100vh;}
-  .page.active{display:block;}
+:root{--ink:#0a0a0a;--paper:#f5f0e8;--cream:#faf7f2;--gold:#c9963c;--gold-light:#e8b84b;--red:#b5341e;--sage:#4a5e52;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;overflow-x:hidden;}
+.page{display:none;min-height:100vh;}.page.active{display:block;}
 
-  /* LANDING */
-  #page-landing{background:var(--ink);color:var(--paper);}
-  .landing-nav{display:flex;justify-content:space-between;align-items:center;padding:28px 60px;border-bottom:1px solid rgba(255,255,255,0.08);}
-  .logo{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;}
-  .logo span{color:var(--gold);}
-  .nav-btns{display:flex;gap:12px;}
-  .btn{cursor:pointer;border:none;padding:10px 24px;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;transition:.2s;}
-  .btn-outline{background:transparent;border:1px solid rgba(255,255,255,0.3);color:var(--paper);}
-  .btn-outline:hover{border-color:var(--gold);color:var(--gold);}
-  .btn-gold{background:var(--gold);color:var(--ink);font-weight:700;}
-  .btn-gold:hover{background:var(--gold-light);transform:translateY(-1px);box-shadow:0 4px 20px rgba(201,150,60,0.4);}
-  .hero{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 40px 60px;}
-  .hero-eyebrow{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:24px;}
-  .hero-title{font-family:'Playfair Display',serif;font-size:clamp(52px,8vw,100px);font-weight:900;line-height:0.95;margin-bottom:28px;}
-  .hero-title em{color:var(--gold);font-style:normal;}
-  .hero-sub{font-size:17px;max-width:520px;line-height:1.7;color:rgba(245,240,232,0.7);margin-bottom:48px;}
-  .hero-cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
-  .btn-lg{padding:15px 36px;font-size:15px;border-radius:4px;}
-  .stats-bar{display:flex;justify-content:center;gap:60px;padding:48px 40px;border-top:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);flex-wrap:wrap;}
-  .stat{text-align:center;}
-  .stat-num{font-family:'Playfair Display',serif;font-size:38px;font-weight:900;color:var(--gold);}
-  .stat-label{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-top:4px;}
-  .marquee-wrap{overflow:hidden;padding:40px 0;}
-  .marquee{display:flex;gap:16px;animation:scroll 30s linear infinite;width:max-content;}
-  @keyframes scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
-  .book-card-mini{width:90px;flex-shrink:0;}
-  .book-spine{height:130px;border-radius:4px;display:flex;align-items:flex-end;padding:10px 8px;transition:.2s;}
-  .book-spine:hover{transform:translateY(-6px) scale(1.04);}
-  .pricing-section{padding:80px 40px;max-width:900px;margin:0 auto;}
-  .section-title{font-family:'Playfair Display',serif;font-size:40px;font-weight:900;text-align:center;margin-bottom:8px;}
-  .section-sub{text-align:center;color:rgba(255,255,255,0.5);font-size:15px;margin-bottom:50px;}
-  .plans{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;}
-  .plan{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:40px 36px;flex:1;min-width:280px;max-width:360px;transition:.3s;position:relative;}
-  .plan:hover{border-color:var(--gold);transform:translateY(-4px);}
-  .plan.featured{border-color:var(--gold);background:rgba(201,150,60,0.06);}
-  .plan-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--ink);font-size:11px;font-weight:700;padding:4px 16px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;}
-  .plan-tier{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
-  .plan-name{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;margin-bottom:8px;}
-  .plan-price{font-size:48px;font-weight:900;margin:20px 0 4px;}
-  .plan-price span{font-size:16px;font-weight:400;opacity:0.5;}
-  .plan-features{list-style:none;margin:24px 0 32px;}
-  .plan-features li{padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:14px;display:flex;gap:10px;align-items:center;}
-  .plan-features li::before{content:'✓';color:var(--gold);font-weight:700;}
-  .plan-features li.no::before{content:'✗';color:rgba(255,255,255,0.2);}
-  .plan-features li.no{color:rgba(255,255,255,0.3);}
+/* LANDING */
+#page-landing{background:var(--ink);color:var(--paper);}
+.landing-nav{display:flex;justify-content:space-between;align-items:center;padding:28px 60px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.logo{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;}.logo span{color:var(--gold);}
+.nav-btns{display:flex;gap:12px;}
+.btn{cursor:pointer;border:none;padding:10px 24px;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;transition:.2s;}
+.btn-outline{background:transparent;border:1px solid rgba(255,255,255,0.3);color:var(--paper);}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+.btn-gold{background:var(--gold);color:var(--ink);font-weight:700;}
+.btn-gold:hover{background:var(--gold-light);transform:translateY(-1px);box-shadow:0 4px 20px rgba(201,150,60,0.4);}
+.hero{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 40px 60px;}
+.hero-eyebrow{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:24px;}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(52px,8vw,100px);font-weight:900;line-height:0.95;margin-bottom:28px;}
+.hero-title em{color:var(--gold);font-style:normal;}
+.hero-sub{font-size:17px;max-width:520px;line-height:1.7;color:rgba(245,240,232,0.7);margin-bottom:48px;}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
+.btn-lg{padding:15px 36px;font-size:15px;border-radius:4px;}
+.stats-bar{display:flex;justify-content:center;gap:60px;padding:48px 40px;border-top:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);flex-wrap:wrap;}
+.stat{text-align:center;}.stat-num{font-family:'Playfair Display',serif;font-size:38px;font-weight:900;color:var(--gold);}
+.stat-label{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-top:4px;}
+.marquee-wrap{overflow:hidden;padding:40px 0;}
+.marquee{display:flex;gap:16px;animation:scroll 30s linear infinite;width:max-content;}
+@keyframes scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+.book-card-mini{width:90px;flex-shrink:0;}
+.book-spine{height:130px;border-radius:4px;display:flex;align-items:flex-end;padding:10px 8px;transition:.2s;}
+.book-spine:hover{transform:translateY(-6px) scale(1.04);}
+.pricing-section{padding:80px 40px;max-width:960px;margin:0 auto;}
+.section-title{font-family:'Playfair Display',serif;font-size:40px;font-weight:900;text-align:center;margin-bottom:8px;}
+.section-sub{text-align:center;color:rgba(255,255,255,0.5);font-size:15px;margin-bottom:50px;}
+.plans{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;}
+.plan{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:40px 36px;flex:1;min-width:280px;max-width:380px;transition:.3s;position:relative;}
+.plan:hover{border-color:var(--gold);transform:translateY(-4px);}
+.plan.featured{border-color:var(--gold);background:rgba(201,150,60,0.06);}
+.plan-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--ink);font-size:11px;font-weight:700;padding:4px 16px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;}
+.plan-tier{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.plan-name{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;margin-bottom:8px;}
+.plan-price{font-size:48px;font-weight:900;margin:20px 0 4px;}.plan-price span{font-size:16px;font-weight:400;opacity:0.5;}
+.plan-features{list-style:none;margin:24px 0 32px;}
+.plan-features li{padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:14px;display:flex;gap:10px;align-items:center;}
+.plan-features li::before{content:'✓';color:var(--gold);font-weight:700;}
+.plan-features li.no::before{content:'✗';color:rgba(255,255,255,0.2);}
+.plan-features li.no{color:rgba(255,255,255,0.3);}
 
-  /* MODAL */
-  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;}
-  .modal-overlay.open{display:flex;}
-  .modal{background:var(--cream);color:var(--ink);border-radius:10px;padding:48px;width:100%;max-width:420px;position:relative;animation:fadeUp .25s ease;}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
-  .modal-close{position:absolute;top:16px;right:20px;background:none;border:none;font-size:22px;cursor:pointer;color:#888;}
-  .modal-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;margin-bottom:6px;}
-  .modal-sub{font-size:13px;color:#777;margin-bottom:28px;}
-  .form-group{margin-bottom:18px;}
-  .form-group label{display:block;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;color:#555;}
-  .form-group input,.form-group select{width:100%;padding:12px 14px;border:1.5px solid #ddd;border-radius:5px;font-family:'DM Sans',sans-serif;font-size:15px;transition:.2s;background:#fff;}
-  .form-group input:focus,.form-group select:focus{outline:none;border-color:var(--gold);}
-  .btn-ink{background:var(--ink);color:var(--paper);width:100%;padding:14px;font-size:15px;border-radius:5px;font-weight:600;margin-top:8px;cursor:pointer;border:none;transition:.2s;}
-  .btn-ink:hover{background:#222;}
-  .btn-ink:disabled{opacity:0.5;cursor:not-allowed;}
-  .modal-err{color:var(--red);font-size:13px;margin-top:8px;display:none;}
-  .modal-switch{text-align:center;margin-top:18px;font-size:13px;color:#888;}
-  .modal-switch a{color:var(--ink);font-weight:700;cursor:pointer;text-decoration:underline;}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--cream);color:var(--ink);border-radius:10px;padding:48px;width:100%;max-width:420px;position:relative;animation:fadeUp .25s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.modal-close{position:absolute;top:16px;right:20px;background:none;border:none;font-size:22px;cursor:pointer;color:#888;}
+.modal-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;margin-bottom:6px;}
+.modal-sub{font-size:13px;color:#777;margin-bottom:28px;}
+.form-group{margin-bottom:18px;}
+.form-group label{display:block;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;color:#555;}
+.form-group input,.form-group select{width:100%;padding:12px 14px;border:1.5px solid #ddd;border-radius:5px;font-family:'DM Sans',sans-serif;font-size:15px;transition:.2s;background:#fff;}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--gold);}
+.btn-ink{background:var(--ink);color:var(--paper);width:100%;padding:14px;font-size:15px;border-radius:5px;font-weight:600;margin-top:8px;cursor:pointer;border:none;transition:.2s;}
+.btn-ink:hover{background:#222;}.btn-ink:disabled{opacity:0.5;cursor:not-allowed;}
+.modal-err{color:var(--red);font-size:13px;margin-top:8px;display:none;}
+.modal-switch{text-align:center;margin-top:18px;font-size:13px;color:#888;}
+.modal-switch a{color:var(--ink);font-weight:700;cursor:pointer;text-decoration:underline;}
 
-  /* LIBRARY */
-  #page-library{background:var(--cream);}
-  .lib-header{background:var(--ink);color:var(--paper);padding:20px 48px;display:flex;align-items:center;justify-content:space-between;}
-  .lib-logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;}
-  .lib-logo span{color:var(--gold);}
-  .user-info{display:flex;align-items:center;gap:16px;font-size:14px;}
-  .user-badge{background:var(--gold);color:var(--ink);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;}
-  .btn-sm{padding:7px 16px;font-size:13px;border-radius:4px;cursor:pointer;}
-  .lib-hero{background:linear-gradient(135deg,var(--ink) 0%,#1c1208 100%);color:var(--paper);padding:64px 48px;text-align:center;}
-  .lib-hero h2{font-family:'Playfair Display',serif;font-size:clamp(32px,5vw,56px);font-weight:900;margin-bottom:10px;}
-  .lib-hero p{color:rgba(255,255,255,0.6);font-size:16px;}
-  .search-bar-wrap{max-width:640px;margin:28px auto 0;display:flex;gap:10px;}
-  .search-bar-wrap input{flex:1;padding:14px 18px;border-radius:5px;border:none;font-size:15px;font-family:'DM Sans',sans-serif;}
-  .lib-content{padding:48px;max-width:1300px;margin:0 auto;}
-  .lib-tabs{display:flex;gap:0;margin-bottom:32px;border-bottom:2px solid #e0dbd0;}
-  .lib-tab{padding:12px 32px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;color:#999;transition:.2s;}
-  .lib-tab.active{border-bottom-color:var(--ink);color:var(--ink);}
-  .genre-filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:36px;}
-  .genre-btn{padding:7px 18px;border-radius:20px;border:1.5px solid #ccc;font-size:13px;cursor:pointer;background:transparent;transition:.2s;font-family:'DM Sans',sans-serif;}
-  .genre-btn:hover,.genre-btn.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
-  .books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:28px;}
-  .book-item{cursor:pointer;transition:.25s;}
-  .book-item:hover{transform:translateY(-6px);}
-  .book-cover{width:100%;aspect-ratio:2/3;border-radius:5px;display:flex;flex-direction:column;justify-content:flex-end;padding:14px;position:relative;overflow:hidden;box-shadow:4px 6px 20px rgba(0,0,0,0.22);}
-  .book-cover::before{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,transparent 60%);}
-  .book-title-cover{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:#fff;position:relative;line-height:1.3;}
-  .book-author-cover{font-size:10px;color:rgba(255,255,255,0.7);position:relative;margin-top:3px;}
-  .book-meta{padding:10px 2px 0;}
-  .book-meta-title{font-size:13px;font-weight:600;}
-  .book-meta-genre{font-size:11px;color:#888;}
-  .hover-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:5px;opacity:0;transition:.2s;}
-  .book-item:hover .hover-overlay{opacity:1;}
-  .hover-icon{font-size:28px;margin-bottom:6px;}
-  .hover-text{font-size:11px;color:#fff;text-align:center;font-weight:600;text-transform:uppercase;letter-spacing:1px;}
-  .upsell-banner{background:linear-gradient(135deg,#1c1208,#0a0a0a);color:var(--paper);padding:28px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
-  .upsell-text strong{font-family:'Playfair Display',serif;font-size:20px;display:block;}
-  .upsell-text span{font-size:14px;color:rgba(255,255,255,0.6);}
+/* LIBRARY */
+#page-library{background:var(--cream);}
+.lib-header{background:var(--ink);color:var(--paper);padding:20px 48px;display:flex;align-items:center;justify-content:space-between;}
+.lib-logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;}.lib-logo span{color:var(--gold);}
+.user-info{display:flex;align-items:center;gap:16px;font-size:14px;}
+.user-badge{background:var(--gold);color:var(--ink);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;}
+.user-badge.scholar{background:linear-gradient(135deg,#c9963c,#e8b84b);box-shadow:0 2px 12px rgba(201,150,60,0.5);}
+.btn-sm{padding:7px 16px;font-size:13px;border-radius:4px;cursor:pointer;}
+.lib-hero{background:linear-gradient(135deg,var(--ink) 0%,#1c1208 100%);color:var(--paper);padding:64px 48px;text-align:center;}
+.lib-hero h2{font-family:'Playfair Display',serif;font-size:clamp(32px,5vw,56px);font-weight:900;margin-bottom:10px;}
+.lib-hero p{color:rgba(255,255,255,0.6);font-size:16px;}
+.search-bar-wrap{max-width:640px;margin:28px auto 0;display:flex;gap:10px;}
+.search-bar-wrap input{flex:1;padding:14px 18px;border-radius:5px;border:none;font-size:15px;font-family:'DM Sans',sans-serif;}
+.lib-content{padding:48px;max-width:1300px;margin:0 auto;}
+.lib-tabs{display:flex;gap:0;margin-bottom:32px;border-bottom:2px solid #e0dbd0;}
+.lib-tab{padding:12px 32px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;color:#999;transition:.2s;}
+.lib-tab.active{border-bottom-color:var(--ink);color:var(--ink);}
+.genre-filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:36px;}
+.genre-btn{padding:7px 18px;border-radius:20px;border:1.5px solid #ccc;font-size:13px;cursor:pointer;background:transparent;transition:.2s;font-family:'DM Sans',sans-serif;}
+.genre-btn:hover,.genre-btn.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+.books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:28px;}
+.book-item{cursor:pointer;transition:.25s;}.book-item:hover{transform:translateY(-6px);}
+.book-cover{width:100%;aspect-ratio:2/3;border-radius:5px;display:flex;flex-direction:column;justify-content:flex-end;padding:14px;position:relative;overflow:hidden;box-shadow:4px 6px 20px rgba(0,0,0,0.22);}
+.book-cover::before{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,transparent 60%);}
+.book-title-cover{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:#fff;position:relative;line-height:1.3;}
+.book-author-cover{font-size:10px;color:rgba(255,255,255,0.7);position:relative;margin-top:3px;}
+.book-meta{padding:10px 2px 0;}.book-meta-title{font-size:13px;font-weight:600;}.book-meta-genre{font-size:11px;color:#888;}
+.hover-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:5px;opacity:0;transition:.2s;}
+.book-item:hover .hover-overlay{opacity:1;}
+.hover-icon{font-size:28px;margin-bottom:6px;}
+.hover-text{font-size:11px;color:#fff;text-align:center;font-weight:600;text-transform:uppercase;letter-spacing:1px;}
+.upsell-banner{background:linear-gradient(135deg,#1c1208,#0a0a0a);color:var(--paper);padding:28px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.upsell-text strong{font-family:'Playfair Display',serif;font-size:20px;display:block;}
+.upsell-text span{font-size:14px;color:rgba(255,255,255,0.6);}
 
-  /* READER */
-  .reader-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:2000;align-items:center;justify-content:center;}
-  .reader-modal.open{display:flex;}
-  .reader-box{background:var(--cream);border-radius:8px;width:96vw;max-width:1000px;height:92vh;display:flex;flex-direction:column;animation:fadeUp .25s ease;overflow:hidden;}
-  .reader-header{background:var(--ink);color:var(--paper);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-  .reader-book-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;}
-  .reader-book-author{font-size:11px;color:rgba(255,255,255,0.6);}
-  .reader-body{flex:1;overflow:hidden;display:flex;flex-direction:column;}
-  .reader-body iframe{width:100%;height:100%;border:none;flex:1;}
-  .reader-placeholder{padding:40px 48px;font-size:15px;color:#888;line-height:1.8;}
-  .download-btn{background:var(--gold);border:none;padding:8px 18px;border-radius:4px;font-weight:700;font-size:13px;cursor:pointer;color:var(--ink);transition:.2s;}
-  .download-btn:hover{background:var(--gold-light);}
-  .close-reader{background:rgba(255,255,255,0.1);border:none;color:#fff;padding:7px 14px;border-radius:4px;cursor:pointer;font-size:13px;}
-  .reader-actions{display:flex;gap:10px;align-items:center;}
+/* ══ READER MODAL ══ */
+.reader-modal{display:none;position:fixed;inset:0;z-index:2000;align-items:stretch;justify-content:stretch;}
+.reader-modal.open{display:flex;}
+/* Night mode wrapper */
+.reader-shell{display:flex;flex-direction:column;width:100%;height:100%;background:#1a1209;transition:background .3s;}
+.reader-shell.day{background:#f5f0e8;}
+.reader-shell.sepia{background:#2a1f10;}
 
-  /* ADMIN */
-  #page-admin{background:#f9f9f9;}
-  .admin-header{background:var(--ink);color:var(--paper);padding:18px 40px;display:flex;align-items:center;justify-content:space-between;}
-  .admin-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;}
-  .admin-title span{color:var(--gold);}
-  .admin-body{display:flex;min-height:calc(100vh - 60px);}
-  .admin-sidebar{width:220px;background:var(--ink);padding:24px 0;flex-shrink:0;}
-  .sidebar-item{padding:13px 28px;color:rgba(255,255,255,0.6);cursor:pointer;font-size:14px;transition:.15s;display:flex;gap:12px;align-items:center;border-left:3px solid transparent;}
-  .sidebar-item:hover,.sidebar-item.active{color:var(--paper);background:rgba(255,255,255,0.06);border-left-color:var(--gold);}
-  .admin-main{flex:1;padding:40px;}
-  .admin-section{display:none;}
-  .admin-section.active{display:block;}
-  .admin-card{background:#fff;border-radius:8px;padding:28px;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:24px;}
-  .admin-card h3{font-family:'Playfair Display',serif;font-size:22px;margin-bottom:20px;font-weight:700;}
-  .form-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;}
-  .form-field{flex:1;min-width:200px;}
-  .form-field label{display:block;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#666;margin-bottom:6px;}
-  .form-field input,.form-field select,.form-field textarea{width:100%;padding:10px 12px;border:1.5px solid #e0e0e0;border-radius:5px;font-family:'DM Sans',sans-serif;font-size:14px;}
-  .form-field textarea{resize:vertical;min-height:80px;}
-  .form-field input:focus,.form-field select:focus{outline:none;border-color:var(--gold);}
-  .btn-admin{background:var(--ink);color:#fff;border:none;padding:11px 26px;border-radius:5px;font-size:14px;font-weight:600;cursor:pointer;transition:.2s;font-family:'DM Sans',sans-serif;}
-  .btn-admin:hover{background:#222;}
-  .btn-admin:disabled{opacity:0.5;cursor:not-allowed;}
-  .books-admin-table{width:100%;border-collapse:collapse;font-size:14px;}
-  .books-admin-table th{text-align:left;padding:10px 14px;background:#f3f3f3;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#666;}
-  .books-admin-table td{padding:12px 14px;border-bottom:1px solid #f0f0f0;vertical-align:middle;}
-  .books-admin-table tr:hover td{background:#fafafa;}
-  .tag{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;}
-  .tag-gold{background:#fef3d9;color:#9a6e00;}
-  .tag-blue{background:#ddf0ff;color:#005a99;}
-  .stat-cards{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:28px;}
-  .stat-card{background:#fff;border-radius:8px;padding:24px 28px;box-shadow:0 2px 12px rgba(0,0,0,0.06);flex:1;min-width:160px;}
-  .stat-card .num{font-family:'Playfair Display',serif;font-size:36px;font-weight:900;color:var(--ink);}
-  .stat-card .lbl{font-size:12px;color:#999;text-transform:uppercase;letter-spacing:1.5px;margin-top:4px;}
-  .success-msg{color:#4a5e52;font-size:13px;margin-top:10px;display:none;font-weight:600;}
-  .toast{position:fixed;bottom:28px;right:28px;background:var(--ink);color:#fff;padding:14px 22px;border-radius:7px;font-size:14px;z-index:9999;display:none;animation:fadeUp .2s ease;}
+/* Header */
+.rdr-header{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);flex-shrink:0;z-index:10;}
+.reader-shell.day .rdr-header{background:rgba(245,240,232,0.9);}
+.rdr-title-block .rdr-book-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#fff;}
+.reader-shell.day .rdr-book-title{color:var(--ink);}
+.rdr-book-author{font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px;}
+.reader-shell.day .rdr-book-author{color:#888;}
+.rdr-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.rdr-btn{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:6px 13px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;transition:.2s;white-space:nowrap;}
+.rdr-btn:hover{background:rgba(255,255,255,0.2);}
+.reader-shell.day .rdr-btn{background:rgba(0,0,0,0.07);border-color:rgba(0,0,0,0.15);color:var(--ink);}
+.rdr-btn.gold{background:var(--gold);border-color:var(--gold);color:var(--ink);}
+.rdr-btn.gold:hover{background:var(--gold-light);}
+.rdr-btn.active{background:rgba(201,150,60,0.3);border-color:var(--gold);color:var(--gold-light);}
 
-  @media(max-width:700px){
-    .landing-nav{padding:20px 24px;}
-    .hero{padding:60px 24px 40px;}
-    .stats-bar{gap:30px;padding:32px 20px;}
-    .lib-header,.lib-content,.upsell-banner{padding-left:20px;padding-right:20px;}
-    .books-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}
-    .admin-sidebar{display:none;}
-    .lib-tab{padding:10px 18px;font-size:13px;}
-  }
+/* Progress bar */
+.rdr-progress-bar{height:3px;background:rgba(255,255,255,0.1);flex-shrink:0;}
+.rdr-progress-fill{height:100%;background:var(--gold);transition:width .3s;}
+.reader-shell.day .rdr-progress-bar{background:rgba(0,0,0,0.1);}
+
+/* Scholar feature bar */
+.scholar-bar{background:linear-gradient(90deg,rgba(201,150,60,0.15),rgba(232,184,75,0.08));border-bottom:1px solid rgba(201,150,60,0.2);padding:8px 24px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;flex-shrink:0;}
+.scholar-bar-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:700;margin-right:4px;}
+.scholar-feat-btn{background:rgba(201,150,60,0.12);border:1px solid rgba(201,150,60,0.3);color:var(--gold-light);padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;transition:.2s;}
+.scholar-feat-btn:hover{background:rgba(201,150,60,0.25);}
+.scholar-feat-btn.active{background:rgba(201,150,60,0.3);color:#fff;}
+
+/* Canvas area */
+.rdr-canvas-area{flex:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:20px;}
+.rdr-canvas-wrap{position:relative;display:flex;align-items:center;justify-content:center;}
+canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-radius:3px;max-width:calc(100vw - 160px);max-height:calc(100vh - 200px);}
+.reader-shell.day canvas#rdr-canvas{box-shadow:0 8px 40px rgba(0,0,0,0.2);}
+
+/* Page flip animation */
+@keyframes flipForward{
+  0%{transform:perspective(1400px) rotateY(0deg);opacity:1;}
+  50%{transform:perspective(1400px) rotateY(-12deg);opacity:0.7;}
+  100%{transform:perspective(1400px) rotateY(0deg);opacity:1;}
+}
+@keyframes flipBack{
+  0%{transform:perspective(1400px) rotateY(0deg);opacity:1;}
+  50%{transform:perspective(1400px) rotateY(12deg);opacity:0.7;}
+  100%{transform:perspective(1400px) rotateY(0deg);opacity:1;}
+}
+.flip-fwd{animation:flipForward 0.35s ease;}
+.flip-bck{animation:flipBack 0.35s ease;}
+
+/* Nav arrows */
+.rdr-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.15);color:#fff;width:46px;height:56px;border-radius:6px;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;transition:.2s;backdrop-filter:blur(4px);}
+.rdr-nav:hover{background:rgba(0,0,0,0.7);}
+.rdr-nav:disabled{opacity:0.2;cursor:default;}
+.rdr-nav-prev{left:10px;}.rdr-nav-next{right:10px;}
+.reader-shell.day .rdr-nav{background:rgba(255,255,255,0.7);color:var(--ink);border-color:rgba(0,0,0,0.1);}
+
+/* Footer bar */
+.rdr-footer{padding:10px 24px;display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,0.4);backdrop-filter:blur(6px);flex-shrink:0;}
+.reader-shell.day .rdr-footer{background:rgba(245,240,232,0.9);}
+.rdr-page-info{font-size:13px;color:rgba(255,255,255,0.7);font-weight:600;}
+.reader-shell.day .rdr-page-info{color:#666;}
+.rdr-jump{display:flex;gap:6px;align-items:center;}
+.rdr-jump input{width:52px;padding:5px 8px;border-radius:4px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#fff;font-size:13px;text-align:center;font-family:'DM Sans',sans-serif;}
+.reader-shell.day .rdr-jump input{background:rgba(0,0,0,0.06);border-color:rgba(0,0,0,0.15);color:var(--ink);}
+.rdr-time{font-size:11px;color:rgba(255,255,255,0.4);}.reader-shell.day .rdr-time{color:#aaa;}
+
+/* Loading / placeholder */
+.rdr-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,0.6);gap:16px;font-size:15px;}
+.rdr-spinner{width:40px;height:40px;border:3px solid rgba(201,150,60,0.3);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.rdr-placeholder{padding:60px 48px;text-align:center;color:rgba(255,255,255,0.5);}
+.reader-shell.day .rdr-placeholder{color:#888;}
+.rdr-placeholder h3{font-family:'Playfair Display',serif;font-size:24px;color:#fff;margin-bottom:12px;}
+.reader-shell.day .rdr-placeholder h3{color:var(--ink);}
+
+/* Bookmarks panel */
+.bookmarks-panel{position:absolute;right:0;top:0;bottom:0;width:260px;background:rgba(20,14,6,0.95);border-left:1px solid rgba(201,150,60,0.2);padding:20px;overflow-y:auto;transform:translateX(100%);transition:transform .25s;z-index:20;}
+.bookmarks-panel.open{transform:translateX(0);}
+.reader-shell.day .bookmarks-panel{background:rgba(250,247,242,0.97);border-color:rgba(0,0,0,0.1);}
+.bm-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--gold);margin-bottom:16px;}
+.bm-item{padding:10px 12px;background:rgba(255,255,255,0.06);border-radius:5px;margin-bottom:8px;cursor:pointer;border:1px solid rgba(255,255,255,0.08);transition:.15s;}
+.bm-item:hover{background:rgba(201,150,60,0.15);border-color:var(--gold);}
+.reader-shell.day .bm-item{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.08);}
+.bm-pg{font-size:11px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.bm-label{font-size:13px;color:#fff;margin-top:2px;}.reader-shell.day .bm-label{color:var(--ink);}
+.bm-empty{font-size:13px;color:rgba(255,255,255,0.3);text-align:center;margin-top:20px;}
+
+/* Zoom controls */
+.zoom-controls{display:flex;gap:4px;align-items:center;}
+.zoom-val{font-size:12px;color:rgba(255,255,255,0.6);min-width:38px;text-align:center;}
+.reader-shell.day .zoom-val{color:#666;}
+
+/* Scholar upsell (shown to tier 1 inside reader) */
+.tier1-lock{background:linear-gradient(135deg,rgba(201,150,60,0.12),rgba(232,184,75,0.06));border:1px solid rgba(201,150,60,0.25);border-radius:6px;padding:12px 16px;margin:0 8px;display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(255,255,255,0.6);}
+.tier1-lock strong{color:var(--gold);}
+
+/* ADMIN */
+#page-admin{background:#f9f9f9;}
+.admin-header{background:var(--ink);color:var(--paper);padding:18px 40px;display:flex;align-items:center;justify-content:space-between;}
+.admin-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;}.admin-title span{color:var(--gold);}
+.admin-body{display:flex;min-height:calc(100vh - 60px);}
+.admin-sidebar{width:220px;background:var(--ink);padding:24px 0;flex-shrink:0;}
+.sidebar-item{padding:13px 28px;color:rgba(255,255,255,0.6);cursor:pointer;font-size:14px;transition:.15s;display:flex;gap:12px;align-items:center;border-left:3px solid transparent;}
+.sidebar-item:hover,.sidebar-item.active{color:var(--paper);background:rgba(255,255,255,0.06);border-left-color:var(--gold);}
+.admin-main{flex:1;padding:40px;}
+.admin-section{display:none;}.admin-section.active{display:block;}
+.admin-card{background:#fff;border-radius:8px;padding:28px;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:24px;}
+.admin-card h3{font-family:'Playfair Display',serif;font-size:22px;margin-bottom:20px;font-weight:700;}
+.form-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;}
+.form-field{flex:1;min-width:200px;}
+.form-field label{display:block;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#666;margin-bottom:6px;}
+.form-field input,.form-field select,.form-field textarea{width:100%;padding:10px 12px;border:1.5px solid #e0e0e0;border-radius:5px;font-family:'DM Sans',sans-serif;font-size:14px;}
+.form-field textarea{resize:vertical;min-height:80px;}
+.form-field input:focus,.form-field select:focus{outline:none;border-color:var(--gold);}
+.btn-admin{background:var(--ink);color:#fff;border:none;padding:11px 26px;border-radius:5px;font-size:14px;font-weight:600;cursor:pointer;transition:.2s;font-family:'DM Sans',sans-serif;}
+.btn-admin:hover{background:#222;}.btn-admin:disabled{opacity:0.5;cursor:not-allowed;}
+.books-admin-table{width:100%;border-collapse:collapse;font-size:14px;}
+.books-admin-table th{text-align:left;padding:10px 14px;background:#f3f3f3;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#666;}
+.books-admin-table td{padding:12px 14px;border-bottom:1px solid #f0f0f0;vertical-align:middle;}
+.books-admin-table tr:hover td{background:#fafafa;}
+.tag{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.tag-gold{background:#fef3d9;color:#9a6e00;}.tag-blue{background:#ddf0ff;color:#005a99;}
+.stat-cards{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:28px;}
+.stat-card{background:#fff;border-radius:8px;padding:24px 28px;box-shadow:0 2px 12px rgba(0,0,0,0.06);flex:1;min-width:160px;}
+.stat-card .num{font-family:'Playfair Display',serif;font-size:36px;font-weight:900;color:var(--ink);}
+.stat-card .lbl{font-size:12px;color:#999;text-transform:uppercase;letter-spacing:1.5px;margin-top:4px;}
+.success-msg{color:#4a5e52;font-size:13px;margin-top:10px;display:none;font-weight:600;}
+.toast{position:fixed;bottom:28px;right:28px;background:var(--ink);color:#fff;padding:14px 22px;border-radius:7px;font-size:14px;z-index:9999;display:none;animation:fadeUp .2s ease;}
+
+@media(max-width:700px){
+  .landing-nav{padding:20px 24px;}.hero{padding:60px 24px 40px;}
+  .stats-bar{gap:30px;padding:32px 20px;}
+  .lib-header,.lib-content,.upsell-banner{padding-left:20px;padding-right:20px;}
+  .books-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}
+  .admin-sidebar{display:none;}.lib-tab{padding:10px 18px;font-size:13px;}
+  canvas#rdr-canvas{max-width:calc(100vw - 80px);}
+  .rdr-tools{gap:4px;}.rdr-btn{padding:5px 9px;font-size:11px;}
+  .scholar-bar{padding:6px 12px;}
+}
 </style>
 </head>
 <body>
@@ -213,20 +286,22 @@
   <div class="marquee-wrap"><div class="marquee" id="marquee1"></div></div>
   <div class="pricing-section" id="pricing">
     <h2 class="section-title">Choose Your Plan</h2>
-    <p class="section-sub">Unlimited access to every book we carry — no ads, no queues.</p>
+    <p class="section-sub">Unlimited access to every book in the vault — no ads, no queues.</p>
     <div class="plans">
       <div class="plan">
         <div class="plan-tier">Tier 1</div>
         <div class="plan-name">Reader</div>
-        <p style="font-size:13px;color:rgba(255,255,255,0.5)">For bookworms who love reading online</p>
+        <p style="font-size:13px;color:rgba(255,255,255,0.5)">Read online, one page at a time</p>
         <div class="plan-price">$10<span>/mo</span></div>
         <ul class="plan-features">
-          <li>Unlimited online reading</li>
+          <li>Page-by-page book reader</li>
           <li>Books &amp; Manga library</li>
           <li>All genres &amp; languages</li>
           <li>Mobile &amp; desktop</li>
           <li class="no">PDF downloads</li>
-          <li class="no">Offline access</li>
+          <li class="no">Night / Sepia modes</li>
+          <li class="no">Bookmarks &amp; Jump-to-page</li>
+          <li class="no">Zoom controls</li>
         </ul>
         <button class="btn btn-gold" style="width:100%;padding:13px" onclick="openModal('signup')">Get Reader</button>
       </div>
@@ -234,15 +309,17 @@
         <div class="plan-badge">Most Popular</div>
         <div class="plan-tier">Tier 2</div>
         <div class="plan-name">Scholar</div>
-        <p style="font-size:13px;color:rgba(255,255,255,0.5)">For those who want to own their library</p>
+        <p style="font-size:13px;color:rgba(255,255,255,0.5)">The full experience — own your library</p>
         <div class="plan-price">$20<span>/mo</span></div>
         <ul class="plan-features">
           <li>Everything in Reader</li>
-          <li>PDF downloads — keep forever</li>
-          <li>Offline reading</li>
-          <li>Priority new releases</li>
-          <li>Early access to new titles</li>
-          <li>Exclusive author content</li>
+          <li>⬇ Download PDFs — keep forever</li>
+          <li>🌙 Night mode &amp; Sepia mode</li>
+          <li>🔖 Save bookmarks per book</li>
+          <li>🔍 Zoom in / out controls</li>
+          <li>↗ Jump to any page instantly</li>
+          <li>⏱ Reading time remaining</li>
+          <li>📊 Progress saved automatically</li>
         </ul>
         <button class="btn btn-gold" style="width:100%;padding:13px" onclick="openModal('signup')">Get Scholar</button>
       </div>
@@ -256,7 +333,7 @@
   <div class="upsell-banner" id="upsell-banner" style="display:none">
     <div class="upsell-text">
       <strong>Upgrade to Scholar — $20/month</strong>
-      <span>Download any book or manga as a PDF and keep it forever.</span>
+      <span>Download PDFs, night mode, bookmarks, zoom, and more.</span>
     </div>
     <button class="btn btn-gold btn-sm" onclick="showToast('Contact admin to upgrade your plan!')">Upgrade Now →</button>
   </div>
@@ -277,17 +354,14 @@
     </div>
   </div>
   <div class="lib-content">
-    <!-- Tabs -->
     <div class="lib-tabs">
       <button class="lib-tab active" id="tab-books" onclick="switchTab('books')">📚 Books</button>
       <button class="lib-tab" id="tab-manga" onclick="switchTab('manga')">🎌 Manga</button>
     </div>
-    <!-- Books section -->
     <div id="section-books">
       <div class="genre-filters" id="genre-filters"></div>
       <div id="books-grid" class="books-grid"></div>
     </div>
-    <!-- Manga section -->
     <div id="section-manga" style="display:none">
       <div class="genre-filters" id="manga-genre-filters"></div>
       <div id="manga-grid" class="books-grid"></div>
@@ -303,13 +377,13 @@
   </div>
   <div class="admin-body">
     <div class="admin-sidebar">
-      <div class="sidebar-item active" data-sec="dashboard"    onclick="adminTab('dashboard',this)">📊 Dashboard</div>
-      <div class="sidebar-item"        data-sec="requests"     onclick="adminTab('requests',this)">🔔 Requests <span id="req-badge" style="background:#c9963c;color:#000;border-radius:20px;padding:1px 8px;font-size:11px;font-weight:900;margin-left:4px;display:none"></span></div>
-      <div class="sidebar-item"        data-sec="upload"       onclick="adminTab('upload',this)">📤 Upload Book</div>
-      <div class="sidebar-item"        data-sec="books"        onclick="adminTab('books',this)">📚 Manage Books</div>
-      <div class="sidebar-item"        data-sec="upload-manga" onclick="adminTab('upload-manga',this)">🗂 Upload Manga</div>
-      <div class="sidebar-item"        data-sec="manga"        onclick="adminTab('manga',this)">🎌 Manage Manga</div>
-      <div class="sidebar-item"        data-sec="users"        onclick="adminTab('users',this)">👤 Users</div>
+      <div class="sidebar-item active" data-sec="dashboard" onclick="adminTab('dashboard',this)">📊 Dashboard</div>
+      <div class="sidebar-item" data-sec="requests" onclick="adminTab('requests',this)">🔔 Requests <span id="req-badge" style="background:#c9963c;color:#000;border-radius:20px;padding:1px 8px;font-size:11px;font-weight:900;margin-left:4px;display:none"></span></div>
+      <div class="sidebar-item" data-sec="upload" onclick="adminTab('upload',this)">📤 Upload Book</div>
+      <div class="sidebar-item" data-sec="books" onclick="adminTab('books',this)">📚 Manage Books</div>
+      <div class="sidebar-item" data-sec="upload-manga" onclick="adminTab('upload-manga',this)">🗂 Upload Manga</div>
+      <div class="sidebar-item" data-sec="manga" onclick="adminTab('manga',this)">🎌 Manage Manga</div>
+      <div class="sidebar-item" data-sec="users" onclick="adminTab('users',this)">👤 Users</div>
     </div>
     <div class="admin-main">
 
@@ -338,9 +412,7 @@
         <div class="admin-card">
           <h3>Account Requests — Awaiting Approval</h3>
           <p style="font-size:13px;color:#888;margin-bottom:20px">Verify the CashApp payment to <strong id="admin-cashapp-label">…</strong> with description "Requesting to make an account in BookVault", then approve or decline.</p>
-          <table class="books-admin-table" id="admin-requests-table">
-            <tr><th>Name</th><th>Email</th><th>Plan</th><th>Actions</th></tr>
-          </table>
+          <table class="books-admin-table" id="admin-requests-table"><tr><th>Name</th><th>Email</th><th>Plan</th><th>Actions</th></tr></table>
           <p id="no-requests-msg" style="color:#aaa;font-size:14px;margin-top:16px;display:none">No pending requests. 🎉</p>
         </div>
       </div>
@@ -354,22 +426,12 @@
             <div class="form-field"><label>Author *</label><input type="text" id="up-author" placeholder="e.g. Frank Herbert"></div>
           </div>
           <div class="form-row">
-            <div class="form-field"><label>Genre</label>
-              <select id="up-genre">
-                <option>Classic Literature</option><option>Science Fiction</option><option>Fantasy</option>
-                <option>Mystery</option><option>Romance</option><option>History</option>
-                <option>Philosophy</option><option>Self-Help</option><option>Biography</option><option>Thriller</option>
-              </select>
-            </div>
+            <div class="form-field"><label>Genre</label><select id="up-genre"><option>Classic Literature</option><option>Science Fiction</option><option>Fantasy</option><option>Mystery</option><option>Romance</option><option>History</option><option>Philosophy</option><option>Self-Help</option><option>Biography</option><option>Thriller</option></select></div>
             <div class="form-field"><label>Year Published</label><input type="number" id="up-year" placeholder="e.g. 1965"></div>
             <div class="form-field"><label>Cover Color</label><input type="color" id="up-color" value="#1a3a5c"></div>
           </div>
-          <div class="form-row">
-            <div class="form-field"><label>Description</label><textarea id="up-desc" placeholder="Short description…"></textarea></div>
-          </div>
-          <div class="form-row">
-            <div class="form-field"><label>Upload File (PDF / EPUB / TXT)</label><input type="file" id="up-file" accept=".pdf,.epub,.txt"></div>
-          </div>
+          <div class="form-row"><div class="form-field"><label>Description</label><textarea id="up-desc" placeholder="Short description…"></textarea></div></div>
+          <div class="form-row"><div class="form-field"><label>Upload File (PDF / EPUB / TXT)</label><input type="file" id="up-file" accept=".pdf,.epub,.txt"></div></div>
           <button class="btn-admin" id="upload-btn" onclick="uploadBook()">Upload Book</button>
           <p class="success-msg" id="upload-success">✓ Book uploaded successfully!</p>
         </div>
@@ -377,11 +439,8 @@
 
       <div class="admin-section" id="admin-books">
         <h2 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;margin-bottom:24px">Manage Books</h2>
-        <div class="admin-card">
-          <h3>All Books</h3>
-          <table class="books-admin-table" id="admin-books-table">
-            <tr><th>#</th><th>Title</th><th>Author</th><th>Genre</th><th>Year</th><th>File</th><th>Action</th></tr>
-          </table>
+        <div class="admin-card"><h3>All Books</h3>
+          <table class="books-admin-table" id="admin-books-table"><tr><th>#</th><th>Title</th><th>Author</th><th>Genre</th><th>Year</th><th>File</th><th>Action</th></tr></table>
         </div>
       </div>
 
@@ -394,29 +453,13 @@
             <div class="form-field"><label>Author *</label><input type="text" id="mn-author" placeholder="e.g. Masashi Kishimoto"></div>
           </div>
           <div class="form-row">
-            <div class="form-field"><label>Genre</label>
-              <select id="mn-genre">
-                <option>Action</option><option>Adventure</option><option>Comedy</option><option>Drama</option>
-                <option>Fantasy</option><option>Horror</option><option>Romance</option><option>Sci-Fi</option>
-                <option>Slice of Life</option><option>Sports</option><option>Supernatural</option><option>Thriller</option>
-              </select>
-            </div>
+            <div class="form-field"><label>Genre</label><select id="mn-genre"><option>Action</option><option>Adventure</option><option>Comedy</option><option>Drama</option><option>Fantasy</option><option>Horror</option><option>Romance</option><option>Sci-Fi</option><option>Slice of Life</option><option>Sports</option><option>Supernatural</option><option>Thriller</option></select></div>
             <div class="form-field"><label>Chapters</label><input type="number" id="mn-chapters" placeholder="e.g. 700"></div>
-            <div class="form-field"><label>Status</label>
-              <select id="mn-status">
-                <option value="Ongoing">Ongoing</option>
-                <option value="Completed">Completed</option>
-                <option value="Hiatus">Hiatus</option>
-              </select>
-            </div>
+            <div class="form-field"><label>Status</label><select id="mn-status"><option value="Ongoing">Ongoing</option><option value="Completed">Completed</option><option value="Hiatus">Hiatus</option></select></div>
             <div class="form-field"><label>Cover Color</label><input type="color" id="mn-color" value="#1a1a2e"></div>
           </div>
-          <div class="form-row">
-            <div class="form-field"><label>Description</label><textarea id="mn-desc" placeholder="Short description…"></textarea></div>
-          </div>
-          <div class="form-row">
-            <div class="form-field"><label>Upload File (PDF / CBZ / CBR / ZIP)</label><input type="file" id="mn-file" accept=".pdf,.cbz,.cbr,.zip"></div>
-          </div>
+          <div class="form-row"><div class="form-field"><label>Description</label><textarea id="mn-desc" placeholder="Short description…"></textarea></div></div>
+          <div class="form-row"><div class="form-field"><label>Upload File (PDF / CBZ / CBR / ZIP)</label><input type="file" id="mn-file" accept=".pdf,.cbz,.cbr,.zip"></div></div>
           <button class="btn-admin" id="manga-upload-btn" onclick="uploadManga()">Upload Manga</button>
           <p class="success-msg" id="manga-upload-success">✓ Manga uploaded successfully!</p>
         </div>
@@ -424,24 +467,17 @@
 
       <div class="admin-section" id="admin-manga">
         <h2 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;margin-bottom:24px">Manage Manga</h2>
-        <div class="admin-card">
-          <h3>All Manga</h3>
-          <table class="books-admin-table" id="admin-manga-table">
-            <tr><th>#</th><th>Title</th><th>Author</th><th>Genre</th><th>Chapters</th><th>Status</th><th>File</th><th>Action</th></tr>
-          </table>
+        <div class="admin-card"><h3>All Manga</h3>
+          <table class="books-admin-table" id="admin-manga-table"><tr><th>#</th><th>Title</th><th>Author</th><th>Genre</th><th>Chapters</th><th>Status</th><th>File</th><th>Action</th></tr></table>
         </div>
       </div>
 
       <div class="admin-section" id="admin-users">
         <h2 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;margin-bottom:24px">Users</h2>
-        <div class="admin-card">
-          <h3>Registered Users</h3>
-          <table class="books-admin-table" id="admin-users-table">
-            <tr><th>Name</th><th>Email</th><th>Plan</th><th>Status</th><th>Action</th></tr>
-          </table>
+        <div class="admin-card"><h3>Registered Users</h3>
+          <table class="books-admin-table" id="admin-users-table"><tr><th>Name</th><th>Email</th><th>Plan</th><th>Status</th><th>Action</th></tr></table>
         </div>
       </div>
-
     </div>
   </div>
 </div>
@@ -466,11 +502,10 @@
         <div class="form-group"><label>Full Name</label><input type="text" id="reg-name" placeholder="Your Name"></div>
         <div class="form-group"><label>Email</label><input type="email" id="reg-email" placeholder="your@email.com"></div>
         <div class="form-group"><label>Password</label><input type="password" id="reg-pass" placeholder="Min 4 characters"></div>
-        <div class="form-group">
-          <label>Choose Plan</label>
+        <div class="form-group"><label>Choose Plan</label>
           <select id="reg-plan" onchange="updateCashAppAmount()">
             <option value="1">Reader — $10/month (Read online)</option>
-            <option value="2">Scholar — $20/month (Read + PDF Downloads)</option>
+            <option value="2">Scholar — $20/month (Read + Download + Premium)</option>
           </select>
         </div>
         <p class="modal-err" id="signup-err"></p>
@@ -485,10 +520,7 @@
           <div style="font-size:13px;color:#555;margin-bottom:6px;font-weight:700;text-transform:uppercase;letter-spacing:1px">Send to CashApp</div>
           <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:#0a0a0a;margin-bottom:4px" id="cashapp-handle-display">…</div>
           <div style="font-size:22px;font-weight:900;color:#4a5e52;margin-bottom:12px" id="cashapp-amount">$10.00</div>
-          <div style="background:#fff;border:1px solid #ddd;border-radius:5px;padding:10px;font-size:13px;color:#333">
-            <strong>Description (required):</strong><br>
-            <span style="font-family:monospace;font-size:14px;color:#1a3a5c">Requesting to make an account in BookVault</span>
-          </div>
+          <div style="background:#fff;border:1px solid #ddd;border-radius:5px;padding:10px;font-size:13px;color:#333"><strong>Description (required):</strong><br><span style="font-family:monospace;font-size:14px;color:#1a3a5c">Requesting to make an account in BookVault</span></div>
         </div>
         <div style="font-size:13px;color:#666;margin-bottom:20px;line-height:1.6">⚠️ After sending payment, click <strong>Submit Request</strong>. Admin will verify and activate your account.</div>
         <p class="modal-err" id="signup-err2"></p>
@@ -498,10 +530,7 @@
       <div id="signup-step3" style="display:none;text-align:center">
         <div style="font-size:48px;margin-bottom:16px">⏳</div>
         <div class="modal-title" style="font-size:22px">Request Submitted!</div>
-        <div style="margin:16px 0;font-size:15px;line-height:1.7;color:#555">
-          Your account request has been received.<br>
-          The admin will review your CashApp payment and activate your account.
-        </div>
+        <div style="margin:16px 0;font-size:15px;line-height:1.7;color:#555">Your account request has been received.<br>Admin will review your CashApp payment and activate your account.</div>
         <button class="btn-ink" onclick="closeModal()">Close</button>
       </div>
     </div>
@@ -510,42 +539,119 @@
 
 <!-- ══ READER MODAL ══ -->
 <div class="reader-modal" id="reader-modal">
-  <div class="reader-box">
-    <div class="reader-header">
-      <div>
-        <div class="reader-book-title" id="rdr-title"></div>
-        <div class="reader-book-author" id="rdr-author"></div>
+  <div class="reader-shell" id="reader-shell">
+
+    <!-- Header -->
+    <div class="rdr-header">
+      <div class="rdr-title-block">
+        <div class="rdr-book-title" id="rdr-title">—</div>
+        <div class="rdr-book-author" id="rdr-author"></div>
       </div>
-      <div class="reader-actions">
-        <button class="download-btn" id="rdr-dl" onclick="doDownload()" style="display:none">⬇ Download PDF</button>
-        <button class="close-reader" onclick="closeReader()">✕ Close</button>
+      <div class="rdr-tools">
+        <!-- Scholar-only tools (hidden for tier 1) -->
+        <div id="scholar-tools" style="display:none;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <div class="zoom-controls">
+            <button class="rdr-btn" onclick="adjustZoom(-0.15)" title="Zoom out">−</button>
+            <span class="zoom-val" id="zoom-val">100%</span>
+            <button class="rdr-btn" onclick="adjustZoom(0.15)" title="Zoom in">+</button>
+          </div>
+          <button class="rdr-btn" id="btn-mode-day" onclick="setMode('day')" title="Day mode">☀️</button>
+          <button class="rdr-btn active" id="btn-mode-night" onclick="setMode('night')" title="Night mode">🌙</button>
+          <button class="rdr-btn" id="btn-mode-sepia" onclick="setMode('sepia')" title="Sepia mode">📜</button>
+          <button class="rdr-btn" id="btn-bookmarks" onclick="toggleBookmarks()" title="Bookmarks">🔖</button>
+          <button class="rdr-btn gold" id="rdr-dl" onclick="doDownload()" style="display:none">⬇ Download</button>
+        </div>
+        <button class="rdr-btn" onclick="closeReader()" style="margin-left:4px">✕ Close</button>
       </div>
     </div>
-    <div class="reader-body" id="rdr-body"></div>
+
+    <!-- Progress bar -->
+    <div class="rdr-progress-bar"><div class="rdr-progress-fill" id="rdr-progress" style="width:0%"></div></div>
+
+    <!-- Scholar feature bar (tier 1 sees upsell instead) -->
+    <div class="scholar-bar" id="scholar-bar" style="display:none">
+      <span class="scholar-bar-label">✦ Scholar</span>
+      <button class="scholar-feat-btn" onclick="addBookmark()">🔖 Bookmark This Page</button>
+      <button class="scholar-feat-btn" id="btn-scroll-toggle" onclick="toggleScrollMode()">📜 Scroll Mode</button>
+    </div>
+    <div class="tier1-lock" id="tier1-upsell" style="display:none">
+      🔒 <span><strong>Upgrade to Scholar ($20/mo)</strong> to unlock night mode, bookmarks, zoom, download, and more.</span>
+    </div>
+
+    <!-- Canvas area -->
+    <div class="rdr-canvas-area" id="rdr-canvas-area">
+      <div class="rdr-loading" id="rdr-loading" style="display:none">
+        <div class="rdr-spinner"></div>
+        <span>Loading…</span>
+      </div>
+      <div id="rdr-placeholder" class="rdr-placeholder" style="display:none">
+        <h3 id="ph-title"></h3>
+        <p id="ph-desc" style="margin-top:12px;line-height:1.7"></p>
+        <p style="margin-top:20px;font-size:13px;color:rgba(255,255,255,0.3)">No file has been uploaded for this item yet.</p>
+      </div>
+      <div class="rdr-canvas-wrap" id="rdr-canvas-wrap" style="display:none">
+        <button class="rdr-nav rdr-nav-prev" id="rdr-prev" onclick="changePage(-1)">‹</button>
+        <canvas id="rdr-canvas"></canvas>
+        <button class="rdr-nav rdr-nav-next" id="rdr-next" onclick="changePage(1)">›</button>
+      </div>
+      <!-- Scroll mode container (Scholar only) -->
+      <div id="rdr-scroll-container" style="display:none;overflow-y:auto;width:100%;height:100%;padding:20px;gap:16px;flex-direction:column;align-items:center"></div>
+    </div>
+
+    <!-- Footer -->
+    <div class="rdr-footer">
+      <div class="rdr-page-info" id="rdr-page-info">Page — of —</div>
+      <div class="rdr-jump" id="rdr-jump-wrap" style="display:none">
+        <span style="font-size:12px;color:rgba(255,255,255,0.5)">Go to:</span>
+        <input type="number" id="rdr-jump-input" min="1" placeholder="pg" onkeydown="if(event.key==='Enter')jumpToPage()">
+        <button class="rdr-btn" onclick="jumpToPage()" style="padding:5px 10px">Go</button>
+      </div>
+      <div class="rdr-time" id="rdr-time"></div>
+    </div>
+
+    <!-- Bookmarks panel -->
+    <div class="bookmarks-panel" id="bookmarks-panel">
+      <div class="bm-title">🔖 Bookmarks</div>
+      <div id="bm-list"></div>
+    </div>
+
   </div>
 </div>
 
 <script>
+// ── PDF.js worker ──────────────────────────────────────────
+if(typeof pdfjsLib !== 'undefined'){
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
 const API = '';
 let token       = localStorage.getItem('bv_token') || null;
 let currentUser = JSON.parse(localStorage.getItem('bv_user') || 'null');
-let allBooks    = [];
-let allManga    = [];
-let activeGenre      = 'All';
-let activeMangaGenre = 'All';
-let activeTab   = 'books';
-let currentItem = null;   // {type:'book'|'manga', data}
+let allBooks    = [], allManga = [];
+let activeGenre = 'All', activeMangaGenre = 'All', activeTab = 'books';
 let appConfig   = {};
 
+// ── Reader state ───────────────────────────────────────────
+let pdfDoc      = null;
+let currentPage = 1;
+let totalPages  = 0;
+let currentZoom = 1.0;
+let readerMode  = 'night';   // night | day | sepia
+let isScrollMode = false;
+let currentItemMeta = null;  // {type, id, tier, title}
+let renderTask  = null;
+let bookmarks   = {};        // key: `${type}:${id}` → [pageNums]
+let readingStart = null;
+
 // ── Toast ──────────────────────────────────────────────────
-function showToast(msg, dur=3000){
+function showToast(msg,dur=3000){
   const t=document.getElementById('toast');
-  t.textContent=msg; t.style.display='block';
+  t.textContent=msg;t.style.display='block';
   setTimeout(()=>t.style.display='none',dur);
 }
 
 // ── API helper ─────────────────────────────────────────────
-async function api(path, opts={}){
+async function api(path,opts={}){
   const h={'Content-Type':'application/json',...(opts.headers||{})};
   if(token) h['Authorization']='Bearer '+token;
   const res=await fetch(API+path,{...opts,headers:h});
@@ -554,7 +660,6 @@ async function api(path, opts={}){
   return data;
 }
 
-// ── Load public config ──────────────────────────────────────
 async function loadConfig(){
   try{
     appConfig=await fetch('/api/config').then(r=>r.json());
@@ -567,31 +672,29 @@ async function loadConfig(){
 // ── Auth ───────────────────────────────────────────────────
 function openModal(view){
   document.getElementById('auth-modal').classList.add('open');
-  document.getElementById('modal-login').style.display   = view==='login'  ?'block':'none';
-  document.getElementById('modal-signup').style.display  = view==='signup' ?'block':'none';
+  document.getElementById('modal-login').style.display   = view==='login' ?'block':'none';
+  document.getElementById('modal-signup').style.display  = view==='signup'?'block':'none';
   document.getElementById('login-err').style.display='none';
   document.getElementById('signup-err').style.display='none';
   document.getElementById('signup-step1').style.display='block';
   document.getElementById('signup-step2').style.display='none';
   document.getElementById('signup-step3').style.display='none';
-  // show cashapp handle
   document.getElementById('cashapp-handle-display').textContent=appConfig.cashapp_handle||'…';
 }
-function closeModal(){ document.getElementById('auth-modal').classList.remove('open'); }
+function closeModal(){document.getElementById('auth-modal').classList.remove('open');}
 
 async function doLogin(){
   const btn=document.getElementById('login-btn');
-  btn.disabled=true; btn.textContent='Signing in…';
+  btn.disabled=true;btn.textContent='Signing in…';
   try{
     const data=await api('/api/auth/login',{method:'POST',body:JSON.stringify({
       username:document.getElementById('login-user').value.trim(),
       password:document.getElementById('login-pass').value
     })});
-    saveSession(data); closeModal();
+    saveSession(data);closeModal();
     data.is_admin?showAdmin():showLibrary();
   }catch(e){
-    const el=document.getElementById('login-err');
-    el.textContent=e.message; el.style.display='block';
+    const el=document.getElementById('login-err');el.textContent=e.message;el.style.display='block';
   }finally{btn.disabled=false;btn.textContent='Sign In';}
 }
 
@@ -617,10 +720,9 @@ function updateCashAppAmount(){
   const el=document.getElementById('cashapp-amount');
   if(el) el.textContent=tier===2?'$20.00':'$10.00';
 }
-
 async function doSignup(){
   const btn=document.getElementById('signup-btn');
-  btn.disabled=true; btn.textContent='Submitting…';
+  btn.disabled=true;btn.textContent='Submitting…';
   try{
     await api('/api/auth/register',{method:'POST',body:JSON.stringify({
       name:document.getElementById('reg-name').value.trim(),
@@ -631,11 +733,9 @@ async function doSignup(){
     document.getElementById('signup-step2').style.display='none';
     document.getElementById('signup-step3').style.display='block';
   }catch(e){
-    const err=document.getElementById('signup-err2');
-    err.textContent=e.message; err.style.display='block';
+    const err=document.getElementById('signup-err2');err.textContent=e.message;err.style.display='block';
   }finally{btn.disabled=false;btn.textContent="✓ I've Paid — Submit Request";}
 }
-
 function saveSession(data){
   token=data.token;
   currentUser={name:data.name,tier:data.tier,isAdmin:data.is_admin};
@@ -644,8 +744,7 @@ function saveSession(data){
 }
 function logout(){
   token=null;currentUser=null;
-  localStorage.removeItem('bv_token');
-  localStorage.removeItem('bv_user');
+  localStorage.removeItem('bv_token');localStorage.removeItem('bv_user');
   showPage('page-landing');
 }
 
@@ -655,21 +754,18 @@ function showPage(id){
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
 }
-
 async function showLibrary(){
   showPage('page-library');
   document.getElementById('user-display-name').textContent=currentUser.name;
-  document.getElementById('user-tier-badge').textContent=currentUser.tier===2?'Scholar':'Reader';
+  const badge=document.getElementById('user-tier-badge');
+  if(currentUser.tier===2){badge.textContent='Scholar ✦';badge.classList.add('scholar');}
+  else{badge.textContent='Reader';badge.classList.remove('scholar');}
   document.getElementById('upsell-banner').style.display=currentUser.tier===1?'flex':'none';
-  await Promise.all([loadBooks(), loadManga()]);
+  await Promise.all([loadBooks(),loadManga()]);
 }
+async function showAdmin(){showPage('page-admin');await loadAdminStats();}
 
-async function showAdmin(){
-  showPage('page-admin');
-  await loadAdminStats();
-}
-
-// ── Tab switching ──────────────────────────────────────────
+// ── Tabs ───────────────────────────────────────────────────
 function switchTab(tab){
   activeTab=tab;
   document.getElementById('section-books').style.display=tab==='books'?'block':'none';
@@ -677,48 +773,29 @@ function switchTab(tab){
   document.getElementById('tab-books').className='lib-tab'+(tab==='books'?' active':'');
   document.getElementById('tab-manga').className='lib-tab'+(tab==='manga'?' active':'');
   document.getElementById('search-input').value='';
-  if(tab==='manga') renderMangaGrid(); else renderBooks();
+  if(tab==='manga')renderMangaGrid();else renderBooks();
 }
-
-function onSearch(){
-  if(activeTab==='manga') renderMangaGrid(); else renderBooks();
-}
+function onSearch(){if(activeTab==='manga')renderMangaGrid();else renderBooks();}
 
 // ── Books ──────────────────────────────────────────────────
 async function loadBooks(){
-  try{
-    const res=await fetch('/api/books');
-    allBooks=await res.json();
-  }catch(e){allBooks=[];}
-  try{buildMarquee(allBooks);}catch(e){}
-  renderGenreFilters();
-  renderBooks();
+  try{allBooks=await fetch('/api/books').then(r=>r.json());}catch(e){allBooks=[];}
+  buildMarquee(allBooks);renderGenreFilters();renderBooks();
 }
-
 function buildMarquee(books){
   const el=document.getElementById('marquee1');
-  if(!el||!books.length) return;
+  if(!el||!books.length)return;
   const items=[...books,...books];
-  el.innerHTML=items.map(b=>`
-    <div class="book-card-mini">
-      <div class="book-spine" style="background:${b.color}">
-        <span style="color:#fff;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;line-height:1.2">${b.title}</span>
-      </div>
-    </div>`).join('');
+  el.innerHTML=items.map(b=>`<div class="book-card-mini"><div class="book-spine" style="background:${b.color}"><span style="color:#fff;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;line-height:1.2">${b.title}</span></div></div>`).join('');
 }
-
 async function buildLandingMarquee(){
   try{const books=await fetch('/api/books').then(r=>r.json());buildMarquee(books);}catch(e){}
 }
-
 function renderGenreFilters(){
   const genres=['All',...new Set(allBooks.map(b=>b.genre).filter(Boolean))];
-  document.getElementById('genre-filters').innerHTML=genres.map(g=>
-    `<button class="genre-btn${g===activeGenre?' active':''}" onclick="setGenre('${g}')">${g}</button>`
-  ).join('');
+  document.getElementById('genre-filters').innerHTML=genres.map(g=>`<button class="genre-btn${g===activeGenre?' active':''}" onclick="setGenre('${g}')">${g}</button>`).join('');
 }
 function setGenre(g){activeGenre=g;renderGenreFilters();renderBooks();}
-
 function renderBooks(){
   const q=(document.getElementById('search-input')?.value||'').toLowerCase();
   const filtered=allBooks.filter(b=>{
@@ -729,62 +806,26 @@ function renderBooks(){
   const grid=document.getElementById('books-grid');
   if(!filtered.length){grid.innerHTML='<p style="color:#999;font-size:15px;grid-column:1/-1">No books found. The admin has not uploaded any books yet.</p>';return;}
   grid.innerHTML=filtered.map(b=>`
-    <div class="book-item" onclick="openBook(${b.id})">
+    <div class="book-item" onclick="openItem('book',${b.id})">
       <div class="book-cover" style="background:${b.color}">
-        <div class="hover-overlay">
-          <div class="hover-icon">📖</div>
-          <div class="hover-text">Read Now</div>
-        </div>
+        <div class="hover-overlay"><div class="hover-icon">📖</div><div class="hover-text">Read Now</div></div>
         <div class="book-title-cover">${b.title}</div>
         <div class="book-author-cover">${b.author}</div>
       </div>
-      <div class="book-meta">
-        <div class="book-meta-title">${b.title}</div>
-        <div class="book-meta-genre">${b.genre||''} · ${b.year||''}</div>
-      </div>
+      <div class="book-meta"><div class="book-meta-title">${b.title}</div><div class="book-meta-genre">${b.genre||''} · ${b.year||''}</div></div>
     </div>`).join('');
-}
-
-async function openBook(id){
-  try{
-    const b=await api(`/api/books/${id}/read`);
-    currentItem={type:'book',data:b};
-    document.getElementById('rdr-title').textContent=b.title;
-    document.getElementById('rdr-author').textContent=`${b.author}${b.year?' · '+b.year:''}`;
-    const body=document.getElementById('rdr-body');
-    if(b.stream_url){
-      body.innerHTML=`<iframe src="${b.stream_url}"></iframe>`;
-    }else{
-      body.innerHTML=`<div class="reader-placeholder">
-        <strong style="font-family:'Playfair Display',serif;font-size:20px">${b.title}</strong><br>
-        <em>by ${b.author}</em><br><br>
-        ${b.description||''}
-        ${!b.has_file?'<br><br><span style="color:#bbb">No file has been uploaded for this book yet.</span>':''}
-      </div>`;
-    }
-    document.getElementById('rdr-dl').style.display=(currentUser.tier===2&&b.has_file)?'inline-block':'none';
-    document.getElementById('reader-modal').classList.add('open');
-  }catch(e){showToast('⚠ '+e.message);}
 }
 
 // ── Manga ──────────────────────────────────────────────────
 async function loadManga(){
-  try{
-    const res=await fetch('/api/manga');
-    allManga=await res.json();
-  }catch(e){allManga=[];}
-  renderMangaGenreFilters();
-  renderMangaGrid();
+  try{allManga=await fetch('/api/manga').then(r=>r.json());}catch(e){allManga=[];}
+  renderMangaGenreFilters();renderMangaGrid();
 }
-
 function renderMangaGenreFilters(){
   const genres=['All',...new Set(allManga.map(m=>m.genre).filter(Boolean))];
-  document.getElementById('manga-genre-filters').innerHTML=genres.map(g=>
-    `<button class="genre-btn${g===activeMangaGenre?' active':''}" onclick="setMangaGenre('${g}')">${g}</button>`
-  ).join('');
+  document.getElementById('manga-genre-filters').innerHTML=genres.map(g=>`<button class="genre-btn${g===activeMangaGenre?' active':''}" onclick="setMangaGenre('${g}')">${g}</button>`).join('');
 }
 function setMangaGenre(g){activeMangaGenre=g;renderMangaGenreFilters();renderMangaGrid();}
-
 function renderMangaGrid(){
   const q=(document.getElementById('search-input')?.value||'').toLowerCase();
   const filtered=allManga.filter(m=>{
@@ -795,12 +836,9 @@ function renderMangaGrid(){
   const grid=document.getElementById('manga-grid');
   if(!filtered.length){grid.innerHTML='<p style="color:#999;font-size:15px;grid-column:1/-1">No manga found. The admin has not uploaded any manga yet.</p>';return;}
   grid.innerHTML=filtered.map(m=>`
-    <div class="book-item" onclick="openManga(${m.id})">
+    <div class="book-item" onclick="openItem('manga',${m.id})">
       <div class="book-cover" style="background:${m.color}">
-        <div class="hover-overlay">
-          <div class="hover-icon">📖</div>
-          <div class="hover-text">Read Now</div>
-        </div>
+        <div class="hover-overlay"><div class="hover-icon">📖</div><div class="hover-text">Read Now</div></div>
         <div class="book-title-cover">${m.title}</div>
         <div class="book-author-cover">${m.author}</div>
       </div>
@@ -811,39 +849,309 @@ function renderMangaGrid(){
     </div>`).join('');
 }
 
-async function openManga(id){
+// ══════════════════════════════════════════════════════════
+// ── READER ────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════
+
+async function openItem(type, id){
+  const endpoint=type==='manga'?`/api/manga/${id}/read`:`/api/books/${id}/read`;
+  let meta;
+  try{meta=await api(endpoint);}
+  catch(e){showToast('⚠ '+e.message);return;}
+
+  currentItemMeta={type,id,tier:meta.tier,title:meta.title};
+  pdfDoc=null;currentPage=1;totalPages=0;currentZoom=1.0;isScrollMode=false;
+
+  // Set header info
+  document.getElementById('rdr-title').textContent=meta.title;
+  const sub=type==='manga'
+    ?`${meta.author}${meta.chapters!=null?' · '+meta.chapters+' ch':''} · ${meta.status}`
+    :`${meta.author}${meta.year?' · '+meta.year:''}`;
+  document.getElementById('rdr-author').textContent=sub;
+
+  // Scholar vs Tier1 UI
+  const isScholar = meta.tier >= 2;
+  document.getElementById('scholar-tools').style.display=isScholar?'flex':'none';
+  document.getElementById('scholar-bar').style.display=isScholar?'flex':'none';
+  document.getElementById('tier1-upsell').style.display=isScholar?'none':'flex';
+  document.getElementById('rdr-jump-wrap').style.display=isScholar?'flex':'none';
+  document.getElementById('rdr-dl').style.display=(isScholar&&meta.has_file)?'inline-block':'none';
+
+  // Set default mode
+  if(isScholar){
+    readerMode=localStorage.getItem('bv_reader_mode')||'night';
+  }else{
+    readerMode='night';
+  }
+  applyMode(readerMode);
+
+  // Open modal
+  document.getElementById('reader-modal').classList.add('open');
+  readingStart=Date.now();
+
+  if(!meta.has_file||!meta.stream_path){
+    showPlaceholder(meta);
+    return;
+  }
+
+  // Restore saved page (Scholar)
+  if(isScholar){
+    const saved=localStorage.getItem(`bv_page_${type}_${id}`);
+    if(saved) currentPage=parseInt(saved)||1;
+  }
+
+  // Load bookmarks from localStorage
+  const bmKey=`bv_bm_${type}_${id}`;
+  bookmarks[bmKey]=JSON.parse(localStorage.getItem(bmKey)||'[]');
+
+  await loadPDF(meta.stream_path);
+}
+
+async function loadPDF(streamPath){
+  showLoading(true);
+  showPlaceholderEl(false);
+  document.getElementById('rdr-canvas-wrap').style.display='none';
+  document.getElementById('rdr-scroll-container').style.display='none';
+
   try{
-    const m=await api(`/api/manga/${id}/read`);
-    currentItem={type:'manga',data:m};
-    document.getElementById('rdr-title').textContent=m.title;
-    document.getElementById('rdr-author').textContent=`${m.author}${m.chapters!=null?' · '+m.chapters+' chapters':''} · ${m.status}`;
-    const body=document.getElementById('rdr-body');
-    if(m.stream_url){
-      body.innerHTML=`<iframe src="${m.stream_url}"></iframe>`;
-    }else{
-      body.innerHTML=`<div class="reader-placeholder">
-        <strong style="font-family:'Playfair Display',serif;font-size:20px">${m.title}</strong><br>
-        <em>by ${m.author}</em><br><br>
-        ${m.description||''}
-        ${!m.has_file?'<br><br><span style="color:#bbb">No file has been uploaded for this manga yet.</span>':''}
-      </div>`;
+    // Fetch PDF bytes through our auth proxy
+    const res=await fetch(streamPath,{headers:{Authorization:'Bearer '+token}});
+    if(!res.ok) throw new Error('Failed to load PDF');
+    const arrayBuf=await res.arrayBuffer();
+    pdfDoc=await pdfjsLib.getDocument({data:arrayBuf}).promise;
+    totalPages=pdfDoc.numPages;
+    if(currentPage>totalPages) currentPage=1;
+    showLoading(false);
+    await renderPage(currentPage,'none');
+  }catch(e){
+    showLoading(false);
+    showToast('⚠ Could not load PDF: '+e.message);
+  }
+}
+
+async function renderPage(pageNum, flipDir='none'){
+  if(!pdfDoc) return;
+  if(renderTask) renderTask.cancel();
+
+  const canvas=document.getElementById('rdr-canvas');
+  const ctx=canvas.getContext('2d');
+
+  const page=await pdfDoc.getPage(pageNum);
+  const area=document.getElementById('rdr-canvas-area');
+  const maxW=area.clientWidth - 120;
+  const maxH=area.clientHeight - 20;
+  const vp0=page.getViewport({scale:1});
+  const scale=Math.min(maxW/vp0.width, maxH/vp0.height) * currentZoom;
+  const viewport=page.getViewport({scale});
+
+  canvas.width=viewport.width;
+  canvas.height=viewport.height;
+
+  // Sepia filter for Scholar sepia mode
+  if(readerMode==='sepia'){
+    canvas.style.filter='sepia(0.5) brightness(0.9)';
+  } else {
+    canvas.style.filter='none';
+  }
+
+  document.getElementById('rdr-canvas-wrap').style.display='flex';
+
+  renderTask=page.render({canvasContext:ctx,viewport});
+  try{
+    await renderTask.promise;
+  }catch(e){
+    if(e.name!=='RenderingCancelledException') console.error(e);
+    return;
+  }
+
+  // Page flip animation
+  if(flipDir!=='none'){
+    canvas.classList.remove('flip-fwd','flip-bck');
+    void canvas.offsetWidth;
+    canvas.classList.add(flipDir==='fwd'?'flip-fwd':'flip-bck');
+    setTimeout(()=>canvas.classList.remove('flip-fwd','flip-bck'),400);
+  }
+
+  currentPage=pageNum;
+  updateFooter();
+  saveProgress();
+}
+
+async function changePage(delta){
+  const newPage=currentPage+delta;
+  if(newPage<1||newPage>totalPages) return;
+  await renderPage(newPage, delta>0?'fwd':'bck');
+}
+
+async function jumpToPage(){
+  if(currentUser.tier<2) return;
+  const v=parseInt(document.getElementById('rdr-jump-input').value);
+  if(!v||v<1||v>totalPages) return;
+  await renderPage(v,'fwd');
+  document.getElementById('rdr-jump-input').value='';
+}
+
+function updateFooter(){
+  document.getElementById('rdr-page-info').textContent=`Page ${currentPage} of ${totalPages}`;
+  const pct=totalPages>0?(currentPage/totalPages*100).toFixed(0):0;
+  document.getElementById('rdr-progress').style.width=pct+'%';
+
+  // Estimated time remaining (Scholar)
+  if(currentUser&&currentUser.tier>=2&&readingStart){
+    const elapsed=(Date.now()-readingStart)/1000;
+    const pagesRead=Math.max(currentPage-1,1);
+    const secPerPage=elapsed/pagesRead;
+    const remaining=Math.round((totalPages-currentPage)*secPerPage/60);
+    document.getElementById('rdr-time').textContent=remaining>0?`~${remaining} min left`:'';
+  }
+
+  // Nav buttons
+  document.getElementById('rdr-prev').disabled=currentPage<=1;
+  document.getElementById('rdr-next').disabled=currentPage>=totalPages;
+}
+
+function saveProgress(){
+  if(!currentItemMeta||currentUser.tier<2) return;
+  const{type,id}=currentItemMeta;
+  localStorage.setItem(`bv_page_${type}_${id}`,currentPage);
+}
+
+// ── Zoom (Scholar) ─────────────────────────────────────────
+function adjustZoom(delta){
+  if(currentUser.tier<2) return;
+  currentZoom=Math.max(0.5,Math.min(3.0,currentZoom+delta));
+  document.getElementById('zoom-val').textContent=Math.round(currentZoom*100)+'%';
+  renderPage(currentPage,'none');
+}
+
+// ── Mode (Scholar) ─────────────────────────────────────────
+function setMode(m){
+  if(currentUser.tier<2) return;
+  readerMode=m;
+  applyMode(m);
+  localStorage.setItem('bv_reader_mode',m);
+  ['day','night','sepia'].forEach(x=>{
+    const b=document.getElementById('btn-mode-'+x);
+    if(b) b.classList.toggle('active',x===m);
+  });
+  if(pdfDoc) renderPage(currentPage,'none');
+}
+function applyMode(m){
+  const shell=document.getElementById('reader-shell');
+  shell.className='reader-shell '+m;
+}
+
+// ── Scroll mode (Scholar) ──────────────────────────────────
+async function toggleScrollMode(){
+  if(currentUser.tier<2) return;
+  isScrollMode=!isScrollMode;
+  document.getElementById('btn-scroll-toggle').classList.toggle('active',isScrollMode);
+  document.getElementById('rdr-canvas-wrap').style.display=isScrollMode?'none':'flex';
+  const sc=document.getElementById('rdr-scroll-container');
+  if(isScrollMode){
+    sc.style.display='flex';
+    sc.innerHTML='<div class="rdr-spinner" style="margin:40px auto"></div>';
+    // Render all pages into scroll view
+    const canvases=[];
+    for(let p=1;p<=totalPages;p++){
+      const c=document.createElement('canvas');
+      c.style.boxShadow='0 4px 24px rgba(0,0,0,0.4)';
+      c.style.borderRadius='3px';
+      c.style.maxWidth='100%';
+      canvases.push(c);
     }
-    document.getElementById('rdr-dl').style.display=(currentUser.tier===2&&m.has_file)?'inline-block':'none';
-    document.getElementById('reader-modal').classList.add('open');
+    sc.innerHTML='';
+    canvases.forEach(c=>sc.appendChild(c));
+    for(let p=1;p<=totalPages;p++){
+      const page=await pdfDoc.getPage(p);
+      const vp0=page.getViewport({scale:1});
+      const scale=Math.min((sc.clientWidth-40)/vp0.width,2)*currentZoom;
+      const vp=page.getViewport({scale});
+      canvases[p-1].width=vp.width;canvases[p-1].height=vp.height;
+      await page.render({canvasContext:canvases[p-1].getContext('2d'),viewport:vp}).promise;
+    }
+  }else{
+    sc.style.display='none';
+    sc.innerHTML='';
+    await renderPage(currentPage,'none');
+  }
+}
+
+// ── Bookmarks (Scholar) ────────────────────────────────────
+function addBookmark(){
+  if(!currentItemMeta||currentUser.tier<2) return;
+  const{type,id}=currentItemMeta;
+  const bmKey=`bv_bm_${type}_${id}`;
+  if(!bookmarks[bmKey]) bookmarks[bmKey]=[];
+  if(!bookmarks[bmKey].includes(currentPage)){
+    bookmarks[bmKey].push(currentPage);
+    bookmarks[bmKey].sort((a,b)=>a-b);
+    localStorage.setItem(bmKey,JSON.stringify(bookmarks[bmKey]));
+    showToast(`🔖 Bookmark added — Page ${currentPage}`);
+    if(document.getElementById('bookmarks-panel').classList.contains('open')) renderBookmarks();
+  } else {
+    showToast('Already bookmarked!');
+  }
+}
+function toggleBookmarks(){
+  const p=document.getElementById('bookmarks-panel');
+  p.classList.toggle('open');
+  if(p.classList.contains('open')) renderBookmarks();
+}
+function renderBookmarks(){
+  const{type,id}=currentItemMeta;
+  const bmKey=`bv_bm_${type}_${id}`;
+  const bms=bookmarks[bmKey]||[];
+  const list=document.getElementById('bm-list');
+  if(!bms.length){list.innerHTML='<div class="bm-empty">No bookmarks yet.<br>Click "Bookmark This Page" to add one.</div>';return;}
+  list.innerHTML=bms.map(pg=>`
+    <div class="bm-item" onclick="gotoBookmark(${pg})">
+      <div class="bm-pg">Page ${pg}</div>
+      <div class="bm-label">${currentItemMeta.title}</div>
+    </div>`).join('');
+}
+async function gotoBookmark(pg){
+  document.getElementById('bookmarks-panel').classList.remove('open');
+  await renderPage(pg,'fwd');
+}
+
+// ── Download (Scholar) ─────────────────────────────────────
+async function doDownload(){
+  if(!currentItemMeta||currentUser.tier<2) return;
+  try{
+    const{type,id}=currentItemMeta;
+    const endpoint=type==='manga'?`/api/manga/${id}/download`:`/api/books/${id}/download`;
+    const{url}=await api(endpoint);
+    window.open(url,'_blank');
   }catch(e){showToast('⚠ '+e.message);}
 }
 
-function closeReader(){document.getElementById('reader-modal').classList.remove('open');}
+// ── Reader helpers ─────────────────────────────────────────
+function showLoading(v){
+  document.getElementById('rdr-loading').style.display=v?'flex':'none';
+}
+function showPlaceholder(meta){
+  showLoading(false);
+  document.getElementById('rdr-canvas-wrap').style.display='none';
+  document.getElementById('rdr-scroll-container').style.display='none';
+  document.getElementById('ph-title').textContent=meta.title;
+  document.getElementById('ph-desc').textContent=meta.description||'';
+  showPlaceholderEl(true);
+}
+function showPlaceholderEl(v){
+  document.getElementById('rdr-placeholder').style.display=v?'flex':'none';
+}
 
-async function doDownload(){
-  if(!currentItem) return;
-  try{
-    const endpoint=currentItem.type==='manga'
-      ?`/api/manga/${currentItem.data.id}/download`
-      :`/api/books/${currentItem.data.id}/download`;
-    const {url}=await api(endpoint);
-    window.open(url,'_blank');
-  }catch(e){showToast('⚠ '+e.message);}
+function closeReader(){
+  document.getElementById('reader-modal').classList.remove('open');
+  document.getElementById('bookmarks-panel').classList.remove('open');
+  if(renderTask){try{renderTask.cancel();}catch(e){}}
+  renderTask=null;pdfDoc=null;
+  // Clear scroll container
+  document.getElementById('rdr-scroll-container').innerHTML='';
+  document.getElementById('rdr-scroll-container').style.display='none';
+  document.getElementById('rdr-canvas-wrap').style.display='none';
+  isScrollMode=false;
 }
 
 // ── Admin ──────────────────────────────────────────────────
@@ -859,75 +1167,52 @@ async function loadAdminStats(){
     document.getElementById('st-tier2').textContent=s.tier2_users;
     const badge=document.getElementById('req-badge');
     if(s.pending_users>0){badge.textContent=s.pending_users;badge.style.display='inline';}
-    else{badge.style.display='none';}
+    else badge.style.display='none';
   }catch(e){}
 }
-
 async function loadAdminRequests(){
   try{
     const users=await api('/api/admin/requests');
     const t=document.getElementById('admin-requests-table');
     const noMsg=document.getElementById('no-requests-msg');
-    if(!users.length){
-      t.innerHTML=`<tr><th>Name</th><th>Email</th><th>Plan</th><th>Actions</th></tr>`;
-      noMsg.style.display='block';return;
-    }
+    if(!users.length){t.innerHTML=`<tr><th>Name</th><th>Email</th><th>Plan</th><th>Actions</th></tr>`;noMsg.style.display='block';return;}
     noMsg.style.display='none';
     t.innerHTML=`<tr><th>Name</th><th>Email</th><th>Plan</th><th>Actions</th></tr>`
-      +users.map(u=>`
-        <tr>
-          <td><strong>${u.name}</strong></td>
-          <td>${u.email}</td>
-          <td><span class="tag ${u.tier===2?'tag-blue':'tag-gold'}">${u.tier===2?'Scholar $20':'Reader $10'}</span></td>
-          <td style="display:flex;gap:8px">
-            <button onclick="approveUser(${u.id})" style="background:#e8f5e9;border:1px solid #4caf50;color:#2e7d32;padding:5px 14px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:700">✓ Approve</button>
-            <button onclick="declineUser(${u.id})" style="background:#fee;border:1px solid #fcc;color:#c00;padding:5px 14px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:700">✗ Decline</button>
-          </td>
-        </tr>`).join('');
+      +users.map(u=>`<tr>
+        <td><strong>${u.name}</strong></td><td>${u.email}</td>
+        <td><span class="tag ${u.tier===2?'tag-blue':'tag-gold'}">${u.tier===2?'Scholar $20':'Reader $10'}</span></td>
+        <td style="display:flex;gap:8px">
+          <button onclick="approveUser(${u.id})" style="background:#e8f5e9;border:1px solid #4caf50;color:#2e7d32;padding:5px 14px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:700">✓ Approve</button>
+          <button onclick="declineUser(${u.id})" style="background:#fee;border:1px solid #fcc;color:#c00;padding:5px 14px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:700">✗ Decline</button>
+        </td></tr>`).join('');
     await loadAdminStats();
   }catch(e){showToast('Failed to load requests');}
 }
-
-async function approveUser(id){
-  try{await api(`/api/admin/requests/${id}/approve`,{method:'POST'});showToast('✓ User approved!');loadAdminRequests();}
-  catch(e){showToast('Error: '+e.message);}
-}
-async function declineUser(id){
-  if(!confirm('Decline this request?')) return;
-  try{await api(`/api/admin/requests/${id}/decline`,{method:'POST'});showToast('Request declined.');loadAdminRequests();}
-  catch(e){showToast('Error: '+e.message);}
-}
-
+async function approveUser(id){try{await api(`/api/admin/requests/${id}/approve`,{method:'POST'});showToast('✓ User approved!');loadAdminRequests();}catch(e){showToast('Error: '+e.message);}}
+async function declineUser(id){if(!confirm('Decline this request?'))return;try{await api(`/api/admin/requests/${id}/decline`,{method:'POST'});showToast('Request declined.');loadAdminRequests();}catch(e){showToast('Error: '+e.message);}}
 async function loadAdminUsers(){
   try{
     const users=await api('/api/admin/users');
     const t=document.getElementById('admin-users-table');
     t.innerHTML=`<tr><th>Name</th><th>Email</th><th>Plan</th><th>Status</th><th>Action</th></tr>`
-      +users.map(u=>`
-        <tr>
-          <td>${u.name}</td><td>${u.email}</td>
-          <td><span class="tag ${u.tier===2?'tag-blue':'tag-gold'}">${u.tier===2?'Scholar':'Reader'}</span></td>
-          <td><span class="tag" style="${u.status==='active'?'background:#e8f5e9;color:#2e7d32':'background:#fee;color:#c00'}">${u.status}</span></td>
-          <td><button onclick="deleteUser(${u.id})" style="background:#fee;border:1px solid #fcc;color:#c00;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px">Delete</button></td>
-        </tr>`).join('');
+      +users.map(u=>`<tr><td>${u.name}</td><td>${u.email}</td>
+        <td><span class="tag ${u.tier===2?'tag-blue':'tag-gold'}">${u.tier===2?'Scholar':'Reader'}</span></td>
+        <td><span class="tag" style="${u.status==='active'?'background:#e8f5e9;color:#2e7d32':'background:#fee;color:#c00'}">${u.status}</span></td>
+        <td><button onclick="deleteUser(${u.id})" style="background:#fee;border:1px solid #fcc;color:#c00;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px">Delete</button></td></tr>`).join('');
   }catch(e){}
 }
-async function deleteUser(id){
-  if(!confirm('Permanently delete this user?')) return;
-  try{await api(`/api/admin/users/${id}`,{method:'DELETE'});showToast('User deleted');loadAdminUsers();loadAdminStats();}
-  catch(e){showToast('Error: '+e.message);}
-}
+async function deleteUser(id){if(!confirm('Permanently delete this user?'))return;try{await api(`/api/admin/users/${id}`,{method:'DELETE'});showToast('User deleted');loadAdminUsers();loadAdminStats();}catch(e){showToast('Error: '+e.message);}}
 
 function adminTab(section,el){
   document.querySelectorAll('.admin-section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.sidebar-item').forEach(s=>s.classList.remove('active'));
   document.getElementById('admin-'+section).classList.add('active');
-  if(el) el.classList.add('active');
-  if(section==='books')     loadAdminBooks();
-  if(section==='users')     loadAdminUsers();
-  if(section==='manga')     loadAdminManga();
-  if(section==='requests')  loadAdminRequests();
-  if(section==='dashboard') loadAdminStats();
+  if(el)el.classList.add('active');
+  if(section==='books')loadAdminBooks();
+  if(section==='users')loadAdminUsers();
+  if(section==='manga')loadAdminManga();
+  if(section==='requests')loadAdminRequests();
+  if(section==='dashboard')loadAdminStats();
 }
 
 async function uploadBook(){
@@ -944,38 +1229,26 @@ async function uploadBook(){
     fd.append('color',document.getElementById('up-color').value);
     fd.append('description',document.getElementById('up-desc').value);
     const fi=document.getElementById('up-file');
-    if(fi.files[0]) fd.append('file',fi.files[0]);
+    if(fi.files[0])fd.append('file',fi.files[0]);
     const res=await fetch('/api/admin/books',{method:'POST',headers:{Authorization:'Bearer '+token},body:fd});
     const data=await res.json();
-    if(!res.ok) throw new Error(data.error);
+    if(!res.ok)throw new Error(data.error);
     ['up-title','up-author','up-year','up-desc'].forEach(id=>document.getElementById(id).value='');
     fi.value='';
-    const s=document.getElementById('upload-success');
-    s.style.display='block';setTimeout(()=>s.style.display='none',3000);
+    const s=document.getElementById('upload-success');s.style.display='block';setTimeout(()=>s.style.display='none',3000);
     await loadAdminStats();
   }catch(e){showToast('Upload failed: '+e.message);}
   finally{btn.disabled=false;btn.textContent='Upload Book';}
 }
-
 async function loadAdminBooks(){
   try{
     const books=await api('/api/books');
     const t=document.getElementById('admin-books-table');
     t.innerHTML=`<tr><th>#</th><th>Title</th><th>Author</th><th>Genre</th><th>Year</th><th>File</th><th>Action</th></tr>`
-      +books.map((b,i)=>`
-        <tr>
-          <td>${i+1}</td><td><strong>${b.title}</strong></td><td>${b.author}</td>
-          <td>${b.genre||'—'}</td><td>${b.year||'—'}</td>
-          <td>${b.has_file?'✅ PDF':'—'}</td>
-          <td><button onclick="deleteBook(${b.id})" style="background:#fee;border:1px solid #fcc;color:#c00;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px">Delete</button></td>
-        </tr>`).join('');
+      +books.map((b,i)=>`<tr><td>${i+1}</td><td><strong>${b.title}</strong></td><td>${b.author}</td><td>${b.genre||'—'}</td><td>${b.year||'—'}</td><td>${b.has_file?'✅ PDF':'—'}</td><td><button onclick="deleteBook(${b.id})" style="background:#fee;border:1px solid #fcc;color:#c00;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px">Delete</button></td></tr>`).join('');
   }catch(e){showToast('Failed to load books');}
 }
-async function deleteBook(id){
-  if(!confirm('Delete this book?')) return;
-  try{await api(`/api/admin/books/${id}`,{method:'DELETE'});showToast('Book deleted');loadAdminBooks();loadAdminStats();}
-  catch(e){showToast('Error: '+e.message);}
-}
+async function deleteBook(id){if(!confirm('Delete this book?'))return;try{await api(`/api/admin/books/${id}`,{method:'DELETE'});showToast('Book deleted');loadAdminBooks();loadAdminStats();}catch(e){showToast('Error: '+e.message);}}
 
 async function uploadManga(){
   const title=document.getElementById('mn-title').value.trim();
@@ -992,58 +1265,45 @@ async function uploadManga(){
     fd.append('color',document.getElementById('mn-color').value);
     fd.append('description',document.getElementById('mn-desc').value);
     const fi=document.getElementById('mn-file');
-    if(fi.files[0]) fd.append('file',fi.files[0]);
+    if(fi.files[0])fd.append('file',fi.files[0]);
     const res=await fetch('/api/admin/manga',{method:'POST',headers:{Authorization:'Bearer '+token},body:fd});
     const data=await res.json();
-    if(!res.ok) throw new Error(data.error);
+    if(!res.ok)throw new Error(data.error);
     ['mn-title','mn-author','mn-chapters','mn-desc'].forEach(id=>document.getElementById(id).value='');
     fi.value='';
-    const s=document.getElementById('manga-upload-success');
-    s.style.display='block';setTimeout(()=>s.style.display='none',3000);
+    const s=document.getElementById('manga-upload-success');s.style.display='block';setTimeout(()=>s.style.display='none',3000);
     showToast('✓ Manga uploaded!');
   }catch(e){showToast('Upload failed: '+e.message);}
   finally{btn.disabled=false;btn.textContent='Upload Manga';}
 }
-
 async function loadAdminManga(){
   try{
     const items=await api('/api/manga');
     const t=document.getElementById('admin-manga-table');
     t.innerHTML=`<tr><th>#</th><th>Title</th><th>Author</th><th>Genre</th><th>Chapters</th><th>Status</th><th>File</th><th>Action</th></tr>`
-      +items.map((m,i)=>`
-        <tr>
-          <td>${i+1}</td><td><strong>${m.title}</strong></td><td>${m.author}</td>
-          <td>${m.genre||'—'}</td><td>${m.chapters!=null?m.chapters:'—'}</td>
-          <td><span class="tag ${m.status==='Completed'?'tag-blue':'tag-gold'}">${m.status}</span></td>
-          <td>${m.has_file?'✅ File':'—'}</td>
-          <td><button onclick="deleteManga(${m.id})" style="background:#fee;border:1px solid #fcc;color:#c00;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px">Delete</button></td>
-        </tr>`).join('');
+      +items.map((m,i)=>`<tr><td>${i+1}</td><td><strong>${m.title}</strong></td><td>${m.author}</td><td>${m.genre||'—'}</td><td>${m.chapters!=null?m.chapters:'—'}</td><td><span class="tag ${m.status==='Completed'?'tag-blue':'tag-gold'}">${m.status}</span></td><td>${m.has_file?'✅ File':'—'}</td><td><button onclick="deleteManga(${m.id})" style="background:#fee;border:1px solid #fcc;color:#c00;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px">Delete</button></td></tr>`).join('');
   }catch(e){showToast('Failed to load manga');}
 }
-async function deleteManga(id){
-  if(!confirm('Delete this manga?')) return;
-  try{await api(`/api/admin/manga/${id}`,{method:'DELETE'});showToast('Manga deleted');loadAdminManga();}
-  catch(e){showToast('Error: '+e.message);}
-}
+async function deleteManga(id){if(!confirm('Delete this manga?'))return;try{await api(`/api/admin/manga/${id}`,{method:'DELETE'});showToast('Manga deleted');loadAdminManga();}catch(e){showToast('Error: '+e.message);}}
+
+// ── Keyboard nav ───────────────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeModal();closeReader();}
+  if(document.getElementById('reader-modal').classList.contains('open')&&!isScrollMode){
+    if(e.key==='ArrowRight'||e.key==='ArrowDown') changePage(1);
+    if(e.key==='ArrowLeft'||e.key==='ArrowUp') changePage(-1);
+  }
+});
+document.getElementById('auth-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+document.getElementById('reader-modal').addEventListener('click',function(e){if(e.target===this)closeReader();});
 
 // ── Init ───────────────────────────────────────────────────
 loadConfig();
 buildLandingMarquee();
-
 if(token&&currentUser){
-  if(currentUser.isAdmin) showAdmin();
+  if(currentUser.isAdmin)showAdmin();
   else showLibrary();
 }
-
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){closeModal();closeReader();}
-});
-document.getElementById('auth-modal').addEventListener('click',function(e){
-  if(e.target===this) closeModal();
-});
-document.getElementById('reader-modal').addEventListener('click',function(e){
-  if(e.target===this) closeReader();
-});
 </script>
 </body>
 </html>
