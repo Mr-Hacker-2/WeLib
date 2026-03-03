@@ -241,9 +241,22 @@ def read_book(book_id):
     if not user or user.tier < 1:
         return jsonify({'error': 'Subscription required'}), 403
     b = Book.query.get_or_404(book_id)
+    # Generate an inline (no download) presigned URL for the embedded viewer
+    stream_url = None
+    if b.file_key and B2_BUCKET_NAME and B2_ENDPOINT:
+        try:
+            stream_url = get_b2_client().generate_presigned_url(
+                'get_object',
+                Params={'Bucket': B2_BUCKET_NAME, 'Key': b.file_key,
+                        'ResponseContentDisposition': 'inline',
+                        'ResponseContentType': 'application/pdf'},
+                ExpiresIn=3600
+            )
+        except Exception:
+            stream_url = None
     return jsonify({'id': b.id, 'title': b.title, 'author': b.author,
                     'genre': b.genre, 'year': b.year, 'description': b.description,
-                    'has_file': bool(b.file_key)})
+                    'has_file': bool(b.file_key), 'stream_url': stream_url})
 
 
 @app.route('/api/books/<int:book_id>/download', methods=['GET'])
@@ -411,9 +424,22 @@ def read_manga(manga_id):
     if not user or user.tier < 1:
         return jsonify({'error': 'Subscription required'}), 403
     m = Manga.query.get_or_404(manga_id)
+    stream_url = None
+    if m.file_key and B2_BUCKET_NAME and B2_ENDPOINT:
+        try:
+            stream_url = get_b2_client().generate_presigned_url(
+                'get_object',
+                Params={'Bucket': B2_BUCKET_NAME, 'Key': m.file_key,
+                        'ResponseContentDisposition': 'inline',
+                        'ResponseContentType': 'application/pdf'},
+                ExpiresIn=3600
+            )
+        except Exception:
+            stream_url = None
     return jsonify({'id': m.id, 'title': m.title, 'author': m.author,
                     'genre': m.genre, 'chapters': m.chapters, 'status': m.status,
-                    'description': m.description, 'has_file': bool(m.file_key)})
+                    'description': m.description, 'has_file': bool(m.file_key),
+                    'stream_url': stream_url})
 
 # ── Manga download (tier 2 only) ───────────────────────────
 @app.route('/api/manga/<int:manga_id>/download', methods=['GET'])
