@@ -298,13 +298,13 @@
   </div>
   <div class="admin-body">
     <div class="admin-sidebar">
-      <div class="sidebar-item active" onclick="adminTab('dashboard',this)">📊 Dashboard</div>
-      <div class="sidebar-item" onclick="adminTab('requests',this)">🔔 Requests <span id="req-badge" style="background:#c9963c;color:#000;border-radius:20px;padding:1px 8px;font-size:11px;font-weight:900;margin-left:4px;display:none"></span></div>
-      <div class="sidebar-item" onclick="adminTab('upload',this)">📤 Upload Book</div>
-      <div class="sidebar-item" onclick="adminTab('books',this)">📚 Manage Books</div>
-      <div class="sidebar-item" onclick="adminTab('upload-manga',this)">🗂 Upload Manga</div>
-      <div class="sidebar-item" onclick="adminTab('manga',this)">🎌 Manage Manga</div>
-      <div class="sidebar-item" onclick="adminTab('users',this)">👤 Users</div>
+      <div class="sidebar-item active" data-section="dashboard"   onclick="adminTab('dashboard',this)">📊 Dashboard</div>
+      <div class="sidebar-item"        data-section="requests"    onclick="adminTab('requests',this)">🔔 Requests <span id="req-badge" style="background:#c9963c;color:#000;border-radius:20px;padding:1px 8px;font-size:11px;font-weight:900;margin-left:4px;display:none"></span></div>
+      <div class="sidebar-item"        data-section="upload"      onclick="adminTab('upload',this)">📤 Upload Book</div>
+      <div class="sidebar-item"        data-section="books"       onclick="adminTab('books',this)">📚 Manage Books</div>
+      <div class="sidebar-item"        data-section="upload-manga" onclick="adminTab('upload-manga',this)">🗂 Upload Manga</div>
+      <div class="sidebar-item"        data-section="manga"       onclick="adminTab('manga',this)">🎌 Manage Manga</div>
+      <div class="sidebar-item"        data-section="users"       onclick="adminTab('users',this)">👤 Users</div>
     </div>
     <div class="admin-main">
 
@@ -320,7 +320,8 @@
         </div>
         <div class="admin-card">
           <h3>Quick Actions</h3>
-          <button class="btn-admin" onclick="adminTab('upload', document.querySelectorAll('.sidebar-item')[1])">+ Upload a New Book</button>
+          <!-- Fixed: use data-section lookup instead of fragile index -->
+          <button class="btn-admin" onclick="adminTab('upload', document.querySelector('[data-section=upload]'))">+ Upload a New Book</button>
         </div>
       </div>
 
@@ -328,7 +329,8 @@
         <h2 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;margin-bottom:24px">Pending Requests</h2>
         <div class="admin-card">
           <h3>Account Requests — Awaiting Approval</h3>
-          <p style="font-size:13px;color:#888;margin-bottom:20px">Verify the CashApp payment to <strong>$AbdullahLababidi19</strong> with description "Requesting to make an account in BookVault", then approve or decline.</p>
+          <!-- CashApp handle is loaded dynamically from /api/config -->
+          <p style="font-size:13px;color:#888;margin-bottom:20px">Verify the CashApp payment to <strong id="admin-cashapp-handle">…</strong> with description "Requesting to make an account in BookVault", then approve or decline.</p>
           <table class="books-admin-table" id="admin-requests-table">
             <tr><th>Name</th><th>Email</th><th>Plan</th><th>Actions</th></tr>
           </table>
@@ -463,7 +465,7 @@
         <div class="modal-sub">Join 2 million readers on BookVault</div>
         <div class="form-group"><label>Full Name</label><input type="text" id="reg-name" placeholder="Your Name"></div>
         <div class="form-group"><label>Email</label><input type="email" id="reg-email" placeholder="your@email.com"></div>
-        <div class="form-group"><label>Password</label><input type="password" id="reg-pass" placeholder="Create a password"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="reg-pass" placeholder="Create a password (min 4 chars)"></div>
         <div class="form-group">
           <label>Choose Plan</label>
           <select id="reg-plan" onchange="updateCashAppAmount()">
@@ -483,7 +485,8 @@
         <div style="background:#f0faf0;border:2px solid #4a5e52;border-radius:8px;padding:20px;margin-bottom:20px;text-align:center">
           <div style="font-size:32px;margin-bottom:8px">💸</div>
           <div style="font-size:13px;color:#555;margin-bottom:6px;font-weight:700;text-transform:uppercase;letter-spacing:1px">Send to CashApp</div>
-          <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:#0a0a0a;margin-bottom:4px">$AbdullahLababidi19</div>
+          <!-- Populated dynamically from /api/config -->
+          <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:#0a0a0a;margin-bottom:4px" id="cashapp-handle-display">…</div>
           <div style="font-size:22px;font-weight:900;color:#4a5e52;margin-bottom:12px" id="cashapp-amount">$10.00</div>
           <div style="background:#fff;border:1px solid #ddd;border-radius:5px;padding:10px;font-size:13px;color:#333">
             <strong>Description (required):</strong><br>
@@ -491,7 +494,7 @@
           </div>
         </div>
         <div style="font-size:13px;color:#666;margin-bottom:20px;line-height:1.6">
-          ⚠️ After sending payment, click <strong>Submit Request</strong>. The admin will verify your payment and activate your account. You'll receive a confirmation email.
+          ⚠️ After sending payment, click <strong>Submit Request</strong>. The admin will verify your payment and activate your account.
         </div>
         <p class="modal-err" id="signup-err2"></p>
         <button class="btn-ink" id="signup-btn" onclick="doSignup()">✓ I've Paid — Submit Request</button>
@@ -531,50 +534,70 @@
 </div>
 
 <script>
-const API = '';   // same origin — Flask serves both frontend and API
-let token = sessionStorage.getItem('bv_token') || null;
-let currentUser = JSON.parse(sessionStorage.getItem('bv_user') || 'null');
+const API = '';
+// Use localStorage so the session survives tab/browser close
+let token = localStorage.getItem('bv_token') || null;
+let currentUser = JSON.parse(localStorage.getItem('bv_user') || 'null');
 let allBooks = [];
 let activeGenre = 'All';
 let currentBook = null;
+let appConfig = {};  // populated from /api/config
 
-// ── TOAST ──────────────────────────────────────────────
+// ── TOAST ──────────────────────────────────────────────────
 function showToast(msg, dur=3000){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.style.display='block';
-  setTimeout(()=>t.style.display='none', dur);
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', dur);
 }
 
-// ── API helper ─────────────────────────────────────────
+// ── API helper ─────────────────────────────────────────────
 async function api(path, opts={}){
   const headers = {'Content-Type':'application/json', ...(opts.headers||{})};
-  if(token) headers['Authorization'] = 'Bearer '+token;
-  const res = await fetch(API+path, {...opts, headers});
-  const data = await res.json().catch(()=>({}));
+  if(token) headers['Authorization'] = 'Bearer ' + token;
+  const res = await fetch(API + path, {...opts, headers});
+  const data = await res.json().catch(() => ({}));
   if(!res.ok) throw new Error(data.error || 'Request failed');
   return data;
 }
 
-// ── AUTH ───────────────────────────────────────────────
+// ── Load public config (CashApp handle etc.) ───────────────
+async function loadConfig(){
+  try {
+    appConfig = await fetch('/api/config').then(r => r.json());
+    // Update any visible CashApp handle elements
+    const handle = appConfig.cashapp_handle || '';
+    document.querySelectorAll('#cashapp-handle-display, #admin-cashapp-handle')
+      .forEach(el => el.textContent = handle);
+  } catch(e) {}
+}
+
+// ── Email validation helper ────────────────────────────────
+function isValidEmail(email){
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// ── AUTH ───────────────────────────────────────────────────
 function openModal(view){
   document.getElementById('auth-modal').classList.add('open');
-  document.getElementById('modal-login').style.display  = view==='login'  ? 'block' : 'none';
-  document.getElementById('modal-signup').style.display = view==='signup' ? 'block' : 'none';
-  document.getElementById('login-err').style.display='none';
-  document.getElementById('signup-err').style.display='none';
-  // Reset signup to step 1
-  document.getElementById('signup-step1').style.display='block';
-  document.getElementById('signup-step2').style.display='none';
-  document.getElementById('signup-step3').style.display='none';
+  document.getElementById('modal-login').style.display  = view === 'login'  ? 'block' : 'none';
+  document.getElementById('modal-signup').style.display = view === 'signup' ? 'block' : 'none';
+  document.getElementById('login-err').style.display = 'none';
+  document.getElementById('signup-err').style.display = 'none';
+  document.getElementById('signup-step1').style.display = 'block';
+  document.getElementById('signup-step2').style.display = 'none';
+  document.getElementById('signup-step3').style.display = 'none';
+  // Populate CashApp handle when modal opens
+  const handle = appConfig.cashapp_handle || '';
+  document.getElementById('cashapp-handle-display').textContent = handle;
 }
 function closeModal(){ document.getElementById('auth-modal').classList.remove('open'); }
 
 async function doLogin(){
-  const btn=document.getElementById('login-btn');
-  btn.disabled=true; btn.textContent='Signing in…';
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true; btn.textContent = 'Signing in…';
   try {
-    const data = await api('/api/auth/login',{
-      method:'POST',
+    const data = await api('/api/auth/login', {
+      method: 'POST',
       body: JSON.stringify({
         username: document.getElementById('login-user').value.trim(),
         password: document.getElementById('login-pass').value
@@ -584,9 +607,10 @@ async function doLogin(){
     closeModal();
     data.is_admin ? showAdmin() : showLibrary();
   } catch(e){
-    document.getElementById('login-err').textContent=e.message;
-    document.getElementById('login-err').style.display='block';
-  } finally { btn.disabled=false; btn.textContent='Sign In'; }
+    const errEl = document.getElementById('login-err');
+    errEl.textContent = e.message;
+    errEl.style.display = 'block';
+  } finally { btn.disabled = false; btn.textContent = 'Sign In'; }
 }
 
 function goToPaymentStep(){
@@ -594,10 +618,11 @@ function goToPaymentStep(){
   const email = document.getElementById('reg-email').value.trim();
   const pw    = document.getElementById('reg-pass').value;
   const err   = document.getElementById('signup-err');
-  if(!name || !email || pw.length < 4){
-    err.textContent = 'Please fill all fields (password min 4 chars).';
-    err.style.display = 'block'; return;
-  }
+
+  if(!name){ err.textContent = 'Please enter your full name.'; err.style.display = 'block'; return; }
+  if(!isValidEmail(email)){ err.textContent = 'Please enter a valid email address.'; err.style.display = 'block'; return; }
+  if(pw.length < 4){ err.textContent = 'Password must be at least 4 characters.'; err.style.display = 'block'; return; }
+
   err.style.display = 'none';
   document.getElementById('signup-step1').style.display = 'none';
   document.getElementById('signup-step2').style.display = 'block';
@@ -617,10 +642,10 @@ function updateCashAppAmount(){
 
 async function doSignup(){
   const btn = document.getElementById('signup-btn');
-  btn.disabled=true; btn.textContent='Submitting…';
+  btn.disabled = true; btn.textContent = 'Submitting…';
   try {
-    const data = await api('/api/auth/register',{
-      method:'POST',
+    await api('/api/auth/register', {
+      method: 'POST',
       body: JSON.stringify({
         name:     document.getElementById('reg-name').value.trim(),
         email:    document.getElementById('reg-email').value.trim(),
@@ -628,41 +653,41 @@ async function doSignup(){
         tier:     parseInt(document.getElementById('reg-plan').value)
       })
     });
-    // Show pending confirmation step
     document.getElementById('signup-step2').style.display = 'none';
     document.getElementById('signup-step3').style.display = 'block';
   } catch(e){
     const err = document.getElementById('signup-err2');
     err.textContent = e.message;
     err.style.display = 'block';
-  } finally { btn.disabled=false; btn.textContent='✓ I\'ve Paid — Submit Request'; }
+  } finally { btn.disabled = false; btn.textContent = "✓ I've Paid — Submit Request"; }
 }
 
 function saveSession(data){
   token = data.token;
-  currentUser = {name:data.name, tier:data.tier, isAdmin:data.is_admin};
-  sessionStorage.setItem('bv_token', token);
-  sessionStorage.setItem('bv_user', JSON.stringify(currentUser));
+  currentUser = {name: data.name, tier: data.tier, isAdmin: data.is_admin};
+  localStorage.setItem('bv_token', token);
+  localStorage.setItem('bv_user', JSON.stringify(currentUser));
 }
 
 function logout(){
-  token=null; currentUser=null;
-  sessionStorage.clear();
+  token = null; currentUser = null;
+  localStorage.removeItem('bv_token');
+  localStorage.removeItem('bv_user');
   showPage('page-landing');
 }
 
-// ── PAGES ──────────────────────────────────────────────
+// ── PAGES ──────────────────────────────────────────────────
 function showPage(id){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  window.scrollTo(0,0);
+  window.scrollTo(0, 0);
 }
 
 async function showLibrary(){
   showPage('page-library');
   document.getElementById('user-display-name').textContent = currentUser.name;
-  document.getElementById('user-tier-badge').textContent = currentUser.tier===2?'Scholar':'Reader';
-  document.getElementById('upsell-banner').style.display = currentUser.tier===1?'flex':'none';
+  document.getElementById('user-tier-badge').textContent = currentUser.tier === 2 ? 'Scholar' : 'Reader';
+  document.getElementById('upsell-banner').style.display = currentUser.tier === 1 ? 'flex' : 'none';
   await loadBooks();
 }
 
@@ -671,18 +696,16 @@ async function showAdmin(){
   await loadAdminStats();
 }
 
-// ── LIBRARY ────────────────────────────────────────────
+// ── LIBRARY ────────────────────────────────────────────────
 async function loadBooks(){
   try {
-    // Use plain fetch — public endpoint, no auth or Content-Type needed
     const res = await fetch('/api/books');
-    if (!res.ok) throw new Error('Server error ' + res.status);
+    if(!res.ok) throw new Error('Server error ' + res.status);
     allBooks = await res.json();
   } catch(e){
     showToast('Failed to load books: ' + e.message);
     allBooks = [];
   }
-  // Render independently so a marquee error never blocks the grid
   try { buildMarquee(allBooks); } catch(e){}
   renderGenreFilters();
   renderBooks();
@@ -691,8 +714,8 @@ async function loadBooks(){
 function buildMarquee(books){
   const el = document.getElementById('marquee1');
   if(!el || !books.length) return;
-  const items = [...books,...books];
-  el.innerHTML = items.map(b=>`
+  const items = [...books, ...books];
+  el.innerHTML = items.map(b => `
     <div class="book-card-mini">
       <div class="book-spine" style="background:${b.color}">
         <span style="color:#fff;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;line-height:1.2">${b.title}</span>
@@ -700,41 +723,33 @@ function buildMarquee(books){
     </div>`).join('');
 }
 
-// Also build landing marquee on load
 async function buildLandingMarquee(){
   try {
-    const books = await fetch('/api/books').then(r=>r.json());
-    const items=[...books,...books];
-    document.getElementById('marquee1').innerHTML=items.map(b=>`
-      <div class="book-card-mini">
-        <div class="book-spine" style="background:${b.color}">
-          <span style="color:#fff;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;line-height:1.2">${b.title}</span>
-        </div>
-      </div>`).join('');
+    const books = await fetch('/api/books').then(r => r.json());
+    buildMarquee(books);
   } catch(e){}
 }
 
 function renderGenreFilters(){
-  const genres=['All',...new Set(allBooks.map(b=>b.genre).filter(Boolean))];
-  document.getElementById('genre-filters').innerHTML=genres.map(g=>
-    `<button class="genre-btn${g===activeGenre?' active':''}" onclick="setGenre('${g}')">${g}</button>`
+  const genres = ['All', ...new Set(allBooks.map(b => b.genre).filter(Boolean))];
+  document.getElementById('genre-filters').innerHTML = genres.map(g =>
+    `<button class="genre-btn${g === activeGenre ? ' active' : ''}" onclick="setGenre('${g}')">${g}</button>`
   ).join('');
 }
 
-function setGenre(g){ activeGenre=g; renderGenreFilters(); renderBooks(); }
-
+function setGenre(g){ activeGenre = g; renderGenreFilters(); renderBooks(); }
 function filterBooks(){ renderBooks(); }
 
 function renderBooks(){
-  const q=(document.getElementById('search-input')?.value||'').toLowerCase();
-  const filtered=allBooks.filter(b=>{
-    const mg=activeGenre==='All'||b.genre===activeGenre;
-    const mq=!q||b.title.toLowerCase().includes(q)||b.author.toLowerCase().includes(q)||(b.genre||'').toLowerCase().includes(q);
-    return mg&&mq;
+  const q = (document.getElementById('search-input')?.value || '').toLowerCase();
+  const filtered = allBooks.filter(b => {
+    const mg = activeGenre === 'All' || b.genre === activeGenre;
+    const mq = !q || b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q) || (b.genre || '').toLowerCase().includes(q);
+    return mg && mq;
   });
-  const grid=document.getElementById('books-grid');
-  if(!filtered.length){ grid.innerHTML='<p style="color:#999;font-size:15px;grid-column:1/-1">No books found.</p>'; return; }
-  grid.innerHTML=filtered.map(b=>`
+  const grid = document.getElementById('books-grid');
+  if(!filtered.length){ grid.innerHTML = '<p style="color:#999;font-size:15px;grid-column:1/-1">No books found.</p>'; return; }
+  grid.innerHTML = filtered.map(b => `
     <div class="book-item" onclick="openBook(${b.id})">
       <div class="book-cover" style="background:${b.color}">
         <div class="lock-overlay">
@@ -746,7 +761,7 @@ function renderBooks(){
       </div>
       <div class="book-meta">
         <div class="book-meta-title">${b.title}</div>
-        <div class="book-meta-genre">${b.genre||''} · ${b.year||''}</div>
+        <div class="book-meta-genre">${b.genre || ''} · ${b.year || ''}</div>
       </div>
     </div>`).join('');
 }
@@ -754,20 +769,20 @@ function renderBooks(){
 async function openBook(id){
   try {
     const b = await api(`/api/books/${id}/read`);
-    currentBook=b;
-    document.getElementById('rdr-title').textContent=b.title;
-    document.getElementById('rdr-author').textContent=`${b.author} · ${b.year||''}`;
-    document.getElementById('rdr-body').innerHTML=`
+    currentBook = b;
+    document.getElementById('rdr-title').textContent = b.title;
+    document.getElementById('rdr-author').textContent = `${b.author} · ${b.year || ''}`;
+    document.getElementById('rdr-body').innerHTML = `
       <h3>${b.title}</h3>
       <p><em>by ${b.author}</em></p>
-      <p>${b.description||''}</p>
+      <p>${b.description || ''}</p>
       <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-      <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.</p>
+      <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
       <p><em>[Full book text would stream here from your file storage]</em></p>`;
-    const dlBtn=document.getElementById('rdr-dl');
-    dlBtn.style.display = (currentUser.tier===2 && b.has_file) ? 'inline-block' : 'none';
+    const dlBtn = document.getElementById('rdr-dl');
+    dlBtn.style.display = (currentUser.tier === 2 && b.has_file) ? 'inline-block' : 'none';
     document.getElementById('reader-modal').classList.add('open');
-  } catch(e){ showToast('⚠ '+e.message); }
+  } catch(e){ showToast('⚠ ' + e.message); }
 }
 
 function closeReader(){ document.getElementById('reader-modal').classList.remove('open'); }
@@ -775,44 +790,42 @@ function closeReader(){ document.getElementById('reader-modal').classList.remove
 async function downloadBook(){
   try {
     const {url} = await api(`/api/books/${currentBook.id}/download`);
-    window.open(url,'_blank');
-  } catch(e){ showToast('⚠ '+e.message); }
+    window.open(url, '_blank');
+  } catch(e){ showToast('⚠ ' + e.message); }
 }
 
-// ── ADMIN ──────────────────────────────────────────────
+// ── ADMIN ──────────────────────────────────────────────────
 async function loadAdminStats(){
   try {
-    const s=await api('/api/admin/stats');
-    document.getElementById('st-books').textContent=s.total_books;
-    document.getElementById('st-users').textContent=s.total_users;
-    document.getElementById('st-pending').textContent=s.pending_users;
-    document.getElementById('st-revenue').textContent='$'+s.monthly_revenue.toLocaleString();
-    document.getElementById('st-tier1').textContent=s.tier1_users;
-    document.getElementById('st-tier2').textContent=s.tier2_users;
-    // Update badge on Requests sidebar item
+    const s = await api('/api/admin/stats');
+    document.getElementById('st-books').textContent   = s.total_books;
+    document.getElementById('st-users').textContent   = s.total_users;
+    document.getElementById('st-pending').textContent = s.pending_users;
+    document.getElementById('st-revenue').textContent = '$' + s.monthly_revenue.toLocaleString();
+    document.getElementById('st-tier1').textContent   = s.tier1_users;
+    document.getElementById('st-tier2').textContent   = s.tier2_users;
     const badge = document.getElementById('req-badge');
-    if(s.pending_users > 0){ badge.textContent=s.pending_users; badge.style.display='inline'; }
-    else { badge.style.display='none'; }
+    if(s.pending_users > 0){ badge.textContent = s.pending_users; badge.style.display = 'inline'; }
+    else { badge.style.display = 'none'; }
   } catch(e){}
 }
 
-// ── ADMIN REQUESTS ─────────────────────────────────────────
 async function loadAdminRequests(){
   try {
     const users = await api('/api/admin/requests');
     const t = document.getElementById('admin-requests-table');
     const noMsg = document.getElementById('no-requests-msg');
     if(!users.length){
-      t.innerHTML=`<tr><th>Name</th><th>Email</th><th>Plan</th><th>Actions</th></tr>`;
-      noMsg.style.display='block'; return;
+      t.innerHTML = `<tr><th>Name</th><th>Email</th><th>Plan</th><th>Actions</th></tr>`;
+      noMsg.style.display = 'block'; return;
     }
-    noMsg.style.display='none';
-    t.innerHTML=`<tr><th>Name</th><th>Email</th><th>Plan</th><th>Actions</th></tr>`
-      +users.map(u=>`
+    noMsg.style.display = 'none';
+    t.innerHTML = `<tr><th>Name</th><th>Email</th><th>Plan</th><th>Actions</th></tr>`
+      + users.map(u => `
         <tr>
           <td><strong>${u.name}</strong></td>
           <td>${u.email}</td>
-          <td><span class="tag ${u.tier===2?'tag-blue':'tag-gold'}">${u.tier===2?'Scholar $20':'Reader $10'}</span></td>
+          <td><span class="tag ${u.tier === 2 ? 'tag-blue' : 'tag-gold'}">${u.tier === 2 ? 'Scholar $20' : 'Reader $10'}</span></td>
           <td style="display:flex;gap:8px">
             <button onclick="approveUser(${u.id})" style="background:#e8f5e9;border:1px solid #4caf50;color:#2e7d32;padding:5px 14px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:700">✓ Approve</button>
             <button onclick="declineUser(${u.id})" style="background:#fee;border:1px solid #fcc;color:#c00;padding:5px 14px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:700">✗ Decline</button>
@@ -824,30 +837,30 @@ async function loadAdminRequests(){
 
 async function approveUser(id){
   try {
-    await api(`/api/admin/requests/${id}/approve`,{method:'POST'});
-    showToast('✓ User approved — email sent!'); loadAdminRequests();
-  } catch(e){ showToast('Error: '+e.message); }
+    await api(`/api/admin/requests/${id}/approve`, {method:'POST'});
+    showToast('✓ User approved!'); loadAdminRequests();
+  } catch(e){ showToast('Error: ' + e.message); }
 }
 
 async function declineUser(id){
-  if(!confirm('Decline this request? An email will be sent to the user.')) return;
+  if(!confirm('Decline this request?')) return;
   try {
-    await api(`/api/admin/requests/${id}/decline`,{method:'POST'});
-    showToast('Request declined — email sent.'); loadAdminRequests();
-  } catch(e){ showToast('Error: '+e.message); }
+    await api(`/api/admin/requests/${id}/decline`, {method:'POST'});
+    showToast('Request declined.'); loadAdminRequests();
+  } catch(e){ showToast('Error: ' + e.message); }
 }
 
 async function loadAdminUsers(){
   try {
-    const users=await api('/api/admin/users');
-    const t=document.getElementById('admin-users-table');
-    t.innerHTML=`<tr><th>Name</th><th>Email</th><th>Plan</th><th>Status</th><th>Action</th></tr>`
-      +users.map(u=>`
+    const users = await api('/api/admin/users');
+    const t = document.getElementById('admin-users-table');
+    t.innerHTML = `<tr><th>Name</th><th>Email</th><th>Plan</th><th>Status</th><th>Action</th></tr>`
+      + users.map(u => `
         <tr>
           <td>${u.name}</td>
           <td>${u.email}</td>
-          <td><span class="tag ${u.tier===2?'tag-blue':'tag-gold'}">${u.tier===2?'Scholar':'Reader'}</span></td>
-          <td><span class="tag" style="${u.status==='active'?'background:#e8f5e9;color:#2e7d32':'background:#fee;color:#c00'}">${u.status}</span></td>
+          <td><span class="tag ${u.tier === 2 ? 'tag-blue' : 'tag-gold'}">${u.tier === 2 ? 'Scholar' : 'Reader'}</span></td>
+          <td><span class="tag" style="${u.status === 'active' ? 'background:#e8f5e9;color:#2e7d32' : 'background:#fee;color:#c00'}">${u.status}</span></td>
           <td><button onclick="deleteUser(${u.id})" style="background:#fee;border:1px solid #fcc;color:#c00;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px">Delete</button></td>
         </tr>`).join('');
   } catch(e){}
@@ -856,71 +869,67 @@ async function loadAdminUsers(){
 async function deleteUser(id){
   if(!confirm('Permanently delete this user?')) return;
   try {
-    await api(`/api/admin/users/${id}`,{method:'DELETE'});
+    await api(`/api/admin/users/${id}`, {method:'DELETE'});
     showToast('User deleted'); loadAdminUsers(); loadAdminStats();
-  } catch(e){ showToast('Error: '+e.message); }
+  } catch(e){ showToast('Error: ' + e.message); }
 }
 
 function adminTab(section, el){
-  document.querySelectorAll('.admin-section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.sidebar-item').forEach(s=>s.classList.remove('active'));
-  document.getElementById('admin-'+section).classList.add('active');
-  el.classList.add('active');
-  if(section==='books') loadAdminBooks();
-  if(section==='users') loadAdminUsers();
-  if(section==='manga') loadAdminManga();
-  if(section==='requests') loadAdminRequests();
-  if(section==='dashboard') loadAdminStats();
+  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+  document.getElementById('admin-' + section).classList.add('active');
+  if(el) el.classList.add('active');
+  if(section === 'books')     loadAdminBooks();
+  if(section === 'users')     loadAdminUsers();
+  if(section === 'manga')     loadAdminManga();
+  if(section === 'requests')  loadAdminRequests();
+  if(section === 'dashboard') loadAdminStats();
 }
 
 async function uploadBook(){
-  const title=document.getElementById('up-title').value.trim();
-  const author=document.getElementById('up-author').value.trim();
-  if(!title||!author){ showToast('Title and author are required'); return; }
-  const btn=document.getElementById('upload-btn');
-  btn.disabled=true; btn.textContent='Uploading…';
+  const title  = document.getElementById('up-title').value.trim();
+  const author = document.getElementById('up-author').value.trim();
+  if(!title || !author){ showToast('Title and author are required'); return; }
+  const btn = document.getElementById('upload-btn');
+  btn.disabled = true; btn.textContent = 'Uploading…';
   try {
-    const fd=new FormData();
-    fd.append('title',title);
-    fd.append('author',author);
-    fd.append('genre',document.getElementById('up-genre').value);
-    fd.append('year',document.getElementById('up-year').value);
-    fd.append('color',document.getElementById('up-color').value);
-    fd.append('description',document.getElementById('up-desc').value);
-    const fileInput=document.getElementById('up-file');
-    if(fileInput.files[0]) fd.append('file',fileInput.files[0]);
+    const fd = new FormData();
+    fd.append('title', title);
+    fd.append('author', author);
+    fd.append('genre', document.getElementById('up-genre').value);
+    fd.append('year', document.getElementById('up-year').value);
+    fd.append('color', document.getElementById('up-color').value);
+    fd.append('description', document.getElementById('up-desc').value);
+    const fileInput = document.getElementById('up-file');
+    if(fileInput.files[0]) fd.append('file', fileInput.files[0]);
 
-    const res=await fetch('/api/admin/books',{
-      method:'POST',
-      headers:{'Authorization':'Bearer '+token},
-      body:fd
-    });
-    const data=await res.json();
+    const res = await fetch('/api/admin/books', {method:'POST', headers:{'Authorization':'Bearer '+token}, body:fd});
+    const data = await res.json();
     if(!res.ok) throw new Error(data.error);
 
-    ['up-title','up-author','up-year','up-desc'].forEach(id=>document.getElementById(id).value='');
-    fileInput.value='';
-    const s=document.getElementById('upload-success');
-    s.style.display='block';
-    setTimeout(()=>s.style.display='none',3000);
+    ['up-title','up-author','up-year','up-desc'].forEach(id => document.getElementById(id).value = '');
+    fileInput.value = '';
+    const s = document.getElementById('upload-success');
+    s.style.display = 'block';
+    setTimeout(() => s.style.display = 'none', 3000);
     await loadAdminStats();
-  } catch(e){ showToast('Upload failed: '+e.message); }
-  finally { btn.disabled=false; btn.textContent='Upload Book'; }
+  } catch(e){ showToast('Upload failed: ' + e.message); }
+  finally { btn.disabled = false; btn.textContent = 'Upload Book'; }
 }
 
 async function loadAdminBooks(){
   try {
-    const books=await api('/api/books');
-    const t=document.getElementById('admin-books-table');
-    t.innerHTML=`<tr><th>#</th><th>Title</th><th>Author</th><th>Genre</th><th>Year</th><th>File</th><th>Action</th></tr>`
-      +books.map((b,i)=>`
+    const books = await api('/api/books');
+    const t = document.getElementById('admin-books-table');
+    t.innerHTML = `<tr><th>#</th><th>Title</th><th>Author</th><th>Genre</th><th>Year</th><th>File</th><th>Action</th></tr>`
+      + books.map((b, i) => `
         <tr>
           <td>${i+1}</td>
           <td><strong>${b.title}</strong></td>
           <td>${b.author}</td>
-          <td>${b.genre||'—'}</td>
-          <td>${b.year||'—'}</td>
-          <td>${b.has_file?'✅ PDF':'—'}</td>
+          <td>${b.genre || '—'}</td>
+          <td>${b.year || '—'}</td>
+          <td>${b.has_file ? '✅ PDF' : '—'}</td>
           <td><button onclick="deleteBook(${b.id})" style="background:#fee;border:1px solid #fcc;color:#c00;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px">Delete</button></td>
         </tr>`).join('');
   } catch(e){ showToast('Failed to load books'); }
@@ -929,41 +938,40 @@ async function loadAdminBooks(){
 async function deleteBook(id){
   if(!confirm('Delete this book?')) return;
   try {
-    await api(`/api/admin/books/${id}`,{method:'DELETE'});
+    await api(`/api/admin/books/${id}`, {method:'DELETE'});
     showToast('Book deleted'); loadAdminBooks(); loadAdminStats();
-  } catch(e){ showToast('Error: '+e.message); }
+  } catch(e){ showToast('Error: ' + e.message); }
 }
 
-// ── MANGA ADMIN ────────────────────────────────────────────
 async function uploadManga(){
   const title  = document.getElementById('mn-title').value.trim();
   const author = document.getElementById('mn-author').value.trim();
-  if(!title||!author){ showToast('Title and author are required'); return; }
+  if(!title || !author){ showToast('Title and author are required'); return; }
   const btn = document.getElementById('manga-upload-btn');
-  btn.disabled=true; btn.textContent='Uploading…';
+  btn.disabled = true; btn.textContent = 'Uploading…';
   try {
     const fd = new FormData();
-    fd.append('title',  title);
+    fd.append('title', title);
     fd.append('author', author);
-    fd.append('genre',  document.getElementById('mn-genre').value);
+    fd.append('genre', document.getElementById('mn-genre').value);
     fd.append('chapters', document.getElementById('mn-chapters').value);
     fd.append('status', document.getElementById('mn-status').value);
-    fd.append('color',  document.getElementById('mn-color').value);
+    fd.append('color', document.getElementById('mn-color').value);
     fd.append('description', document.getElementById('mn-desc').value);
     const fileInput = document.getElementById('mn-file');
     if(fileInput.files[0]) fd.append('file', fileInput.files[0]);
 
-    const res  = await fetch('/api/admin/manga',{method:'POST',headers:{'Authorization':'Bearer '+token},body:fd});
+    const res  = await fetch('/api/admin/manga', {method:'POST', headers:{'Authorization':'Bearer '+token}, body:fd});
     const data = await res.json();
     if(!res.ok) throw new Error(data.error);
 
-    ['mn-title','mn-author','mn-chapters','mn-desc'].forEach(id=>document.getElementById(id).value='');
-    fileInput.value='';
+    ['mn-title','mn-author','mn-chapters','mn-desc'].forEach(id => document.getElementById(id).value = '');
+    fileInput.value = '';
     const s = document.getElementById('manga-upload-success');
-    s.style.display='block'; setTimeout(()=>s.style.display='none',3000);
+    s.style.display = 'block'; setTimeout(() => s.style.display = 'none', 3000);
     showToast('✓ Manga uploaded!');
-  } catch(e){ showToast('Upload failed: '+e.message); }
-  finally { btn.disabled=false; btn.textContent='Upload Manga'; }
+  } catch(e){ showToast('Upload failed: ' + e.message); }
+  finally { btn.disabled = false; btn.textContent = 'Upload Manga'; }
 }
 
 async function loadAdminManga(){
@@ -971,15 +979,15 @@ async function loadAdminManga(){
     const items = await api('/api/manga');
     const t = document.getElementById('admin-manga-table');
     t.innerHTML = `<tr><th>#</th><th>Title</th><th>Author</th><th>Genre</th><th>Chapters</th><th>Status</th><th>File</th><th>Action</th></tr>`
-      + items.map((m,i)=>`
+      + items.map((m, i) => `
         <tr>
           <td>${i+1}</td>
           <td><strong>${m.title}</strong></td>
           <td>${m.author}</td>
-          <td>${m.genre||'—'}</td>
-          <td>${m.chapters!=null?m.chapters:'—'}</td>
-          <td><span class="tag ${m.status==='Completed'?'tag-blue':'tag-gold'}">${m.status}</span></td>
-          <td>${m.has_file?'✅ File':'—'}</td>
+          <td>${m.genre || '—'}</td>
+          <td>${m.chapters != null ? m.chapters : '—'}</td>
+          <td><span class="tag ${m.status === 'Completed' ? 'tag-blue' : 'tag-gold'}">${m.status}</span></td>
+          <td>${m.has_file ? '✅ File' : '—'}</td>
           <td><button onclick="deleteManga(${m.id})" style="background:#fee;border:1px solid #fcc;color:#c00;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px">Delete</button></td>
         </tr>`).join('');
   } catch(e){ showToast('Failed to load manga'); }
@@ -988,28 +996,28 @@ async function loadAdminManga(){
 async function deleteManga(id){
   if(!confirm('Delete this manga?')) return;
   try {
-    await api(`/api/admin/manga/${id}`,{method:'DELETE'});
+    await api(`/api/admin/manga/${id}`, {method:'DELETE'});
     showToast('Manga deleted'); loadAdminManga();
-  } catch(e){ showToast('Error: '+e.message); }
+  } catch(e){ showToast('Error: ' + e.message); }
 }
 
-// ── INIT ──────────────────────────────────────────────
+// ── INIT ───────────────────────────────────────────────────
+loadConfig();
 buildLandingMarquee();
 
-// Auto-restore session
 if(token && currentUser){
   if(currentUser.isAdmin) showAdmin();
   else showLibrary();
 }
 
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){ closeModal(); closeReader(); }
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape'){ closeModal(); closeReader(); }
 });
-document.getElementById('auth-modal').addEventListener('click',function(e){
-  if(e.target===this) closeModal();
+document.getElementById('auth-modal').addEventListener('click', function(e){
+  if(e.target === this) closeModal();
 });
-document.getElementById('reader-modal').addEventListener('click',function(e){
-  if(e.target===this) closeReader();
+document.getElementById('reader-modal').addEventListener('click', function(e){
+  if(e.target === this) closeReader();
 });
 </script>
 </body>
