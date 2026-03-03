@@ -97,6 +97,20 @@ class Manga(db.Model):
 # ── DB Init ────────────────────────────────────────────────
 def init_db():
     db.create_all()
+    # ── Safe migrations: add new columns if they don't exist yet ──
+    _migrations = [
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS membership_start TIMESTAMP",
+        "ALTER TABLE books ADD COLUMN IF NOT EXISTS cover_key VARCHAR(500)",
+        "ALTER TABLE manga ADD COLUMN IF NOT EXISTS cover_key VARCHAR(500)",
+    ]
+    with db.engine.connect() as conn:
+        for sql in _migrations:
+            try:
+                conn.execute(db.text(sql))
+                conn.commit()
+            except Exception:
+                conn.rollback()
+    # ── Seed admin user ───────────────────────────────────────────
     try:
         if not User.query.filter_by(email=ADMIN_EMAIL).first():
             db.session.add(User(
