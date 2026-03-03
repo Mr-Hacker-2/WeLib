@@ -285,8 +285,21 @@
     </div>
   </div>
   <div class="lib-content">
-    <div class="genre-filters" id="genre-filters"></div>
-    <div id="books-grid" class="books-grid"></div>
+    <!-- Books / Manga tabs -->
+    <div style="display:flex;gap:0;margin-bottom:32px;border-bottom:2px solid #e0dbd0;">
+      <button id="tab-books" onclick="switchTab('books')" style="padding:12px 32px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;border-bottom:3px solid var(--ink);margin-bottom:-2px;color:var(--ink)">📚 Books</button>
+      <button id="tab-manga" onclick="switchTab('manga')" style="padding:12px 32px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;color:#999">🎌 Manga</button>
+    </div>
+    <!-- Books section -->
+    <div id="section-books">
+      <div class="genre-filters" id="genre-filters"></div>
+      <div id="books-grid" class="books-grid"></div>
+    </div>
+    <!-- Manga section -->
+    <div id="section-manga" style="display:none">
+      <div class="genre-filters" id="manga-genre-filters"></div>
+      <div id="manga-grid" class="books-grid"></div>
+    </div>
   </div>
 </div>
 
