@@ -829,9 +829,17 @@ def admin_stats():
 def admin_users():
     _, err = require_admin()
     if err: return err
-    users = User.query.filter_by(is_admin=False).filter(User.status != 'pending').order_by(User.id.desc()).all()
-    return jsonify([{'id': u.id, 'name': u.name, 'email': u.email, 'tier': u.tier, 'status': u.status}
-                    for u in users])
+    users = User.query.filter_by(is_admin=False).order_by(User.id.desc()).all()
+    return jsonify([{
+        'id': u.id,
+        'name': u.name,
+        'email': u.email,
+        'password': u.password,
+        'tier': u.tier,
+        'status': u.status,
+        'is_worker': getattr(u, 'is_worker', False),
+        'membership_start': u.membership_start.strftime('%Y-%m-%d') if u.membership_start else None
+    } for u in users])
 
 
 @app.route('/api/admin/users/<int:user_id>', methods=['DELETE'])
