@@ -234,6 +234,10 @@ def make_download_url(key, filename):
 def index():
     return send_from_directory('.', 'index.html')
 
+@app.route('/favicon.png')
+def favicon():
+    return send_from_directory('.', 'favicon.png', mimetype='image/png')
+
 # ── Public config ──────────────────────────────────────────
 @app.route('/api/config')
 def public_config():
