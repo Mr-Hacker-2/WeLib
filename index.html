@@ -7,185 +7,186 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --ink: #0a0a0a; --paper: #f5f0e8; --cream: #faf7f2;
-    --gold: #c9963c; --gold-light: #e8b84b;
-    --red: #b5341e; --sage: #4a5e52;
+    --ink:#0a0a0a; --paper:#f5f0e8; --cream:#faf7f2;
+    --gold:#c9963c; --gold-light:#e8b84b;
+    --red:#b5341e; --sage:#4a5e52;
   }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--ink); min-height:100vh; overflow-x:hidden; }
-  .page { display:none; min-height:100vh; }
-  .page.active { display:block; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;overflow-x:hidden;}
+  .page{display:none;min-height:100vh;}
+  .page.active{display:block;}
 
-  /* ── LANDING ── */
-  #page-landing { background:var(--ink); color:var(--paper); }
-  .landing-nav { display:flex; justify-content:space-between; align-items:center; padding:28px 60px; border-bottom:1px solid rgba(255,255,255,0.08); }
-  .logo { font-family:'Playfair Display',serif; font-size:26px; font-weight:900; }
-  .logo span { color:var(--gold); }
-  .nav-btns { display:flex; gap:12px; }
-  .btn { cursor:pointer; border:none; padding:10px 24px; border-radius:4px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; transition:.2s; }
-  .btn-outline { background:transparent; border:1px solid rgba(255,255,255,0.3); color:var(--paper); }
-  .btn-outline:hover { border-color:var(--gold); color:var(--gold); }
-  .btn-gold { background:var(--gold); color:var(--ink); font-weight:700; }
-  .btn-gold:hover { background:var(--gold-light); transform:translateY(-1px); box-shadow:0 4px 20px rgba(201,150,60,0.4); }
-  .hero { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:100px 40px 60px; }
-  .hero-eyebrow { font-size:11px; letter-spacing:4px; text-transform:uppercase; color:var(--gold); margin-bottom:24px; }
-  .hero-title { font-family:'Playfair Display',serif; font-size:clamp(52px,8vw,100px); font-weight:900; line-height:0.95; margin-bottom:28px; }
-  .hero-title em { color:var(--gold); font-style:normal; }
-  .hero-sub { font-size:17px; max-width:520px; line-height:1.7; color:rgba(245,240,232,0.7); margin-bottom:48px; }
-  .hero-cta { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
-  .btn-lg { padding:15px 36px; font-size:15px; border-radius:4px; }
-  .stats-bar { display:flex; justify-content:center; gap:60px; padding:48px 40px; border-top:1px solid rgba(255,255,255,0.08); border-bottom:1px solid rgba(255,255,255,0.08); flex-wrap:wrap; }
-  .stat { text-align:center; }
-  .stat-num { font-family:'Playfair Display',serif; font-size:38px; font-weight:900; color:var(--gold); }
-  .stat-label { font-size:12px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.45); margin-top:4px; }
-  .marquee-wrap { overflow:hidden; padding:40px 0; }
-  .marquee { display:flex; gap:16px; animation:scroll 30s linear infinite; width:max-content; }
-  @keyframes scroll { from { transform:translateX(0); } to { transform:translateX(-50%); } }
-  .book-card-mini { width:90px; flex-shrink:0; }
-  .book-spine { height:130px; border-radius:4px; display:flex; align-items:flex-end; padding:10px 8px; transition:.2s; }
-  .book-spine:hover { transform:translateY(-6px) scale(1.04); }
-
-  /* PRICING */
-  .pricing-section { padding:80px 40px; max-width:900px; margin:0 auto; }
-  .section-title { font-family:'Playfair Display',serif; font-size:40px; font-weight:900; text-align:center; margin-bottom:8px; }
-  .section-sub { text-align:center; color:rgba(255,255,255,0.5); font-size:15px; margin-bottom:50px; }
-  .plans { display:flex; gap:20px; justify-content:center; flex-wrap:wrap; }
-  .plan { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:40px 36px; flex:1; min-width:280px; max-width:360px; transition:.3s; position:relative; }
-  .plan:hover { border-color:var(--gold); transform:translateY(-4px); }
-  .plan.featured { border-color:var(--gold); background:rgba(201,150,60,0.06); }
-  .plan-badge { position:absolute; top:-13px; left:50%; transform:translateX(-50%); background:var(--gold); color:var(--ink); font-size:11px; font-weight:700; padding:4px 16px; border-radius:20px; letter-spacing:1px; text-transform:uppercase; }
-  .plan-tier { font-size:12px; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:12px; }
-  .plan-name { font-family:'Playfair Display',serif; font-size:28px; font-weight:700; margin-bottom:8px; }
-  .plan-price { font-size:48px; font-weight:900; margin:20px 0 4px; }
-  .plan-price span { font-size:16px; font-weight:400; opacity:0.5; }
-  .plan-features { list-style:none; margin:24px 0 32px; }
-  .plan-features li { padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06); font-size:14px; display:flex; gap:10px; align-items:center; }
-  .plan-features li::before { content:'✓'; color:var(--gold); font-weight:700; }
-  .plan-features li.no::before { content:'✗'; color:rgba(255,255,255,0.2); }
-  .plan-features li.no { color:rgba(255,255,255,0.3); }
+  /* LANDING */
+  #page-landing{background:var(--ink);color:var(--paper);}
+  .landing-nav{display:flex;justify-content:space-between;align-items:center;padding:28px 60px;border-bottom:1px solid rgba(255,255,255,0.08);}
+  .logo{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;}
+  .logo span{color:var(--gold);}
+  .nav-btns{display:flex;gap:12px;}
+  .btn{cursor:pointer;border:none;padding:10px 24px;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;transition:.2s;}
+  .btn-outline{background:transparent;border:1px solid rgba(255,255,255,0.3);color:var(--paper);}
+  .btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+  .btn-gold{background:var(--gold);color:var(--ink);font-weight:700;}
+  .btn-gold:hover{background:var(--gold-light);transform:translateY(-1px);box-shadow:0 4px 20px rgba(201,150,60,0.4);}
+  .hero{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 40px 60px;}
+  .hero-eyebrow{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:24px;}
+  .hero-title{font-family:'Playfair Display',serif;font-size:clamp(52px,8vw,100px);font-weight:900;line-height:0.95;margin-bottom:28px;}
+  .hero-title em{color:var(--gold);font-style:normal;}
+  .hero-sub{font-size:17px;max-width:520px;line-height:1.7;color:rgba(245,240,232,0.7);margin-bottom:48px;}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
+  .btn-lg{padding:15px 36px;font-size:15px;border-radius:4px;}
+  .stats-bar{display:flex;justify-content:center;gap:60px;padding:48px 40px;border-top:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);flex-wrap:wrap;}
+  .stat{text-align:center;}
+  .stat-num{font-family:'Playfair Display',serif;font-size:38px;font-weight:900;color:var(--gold);}
+  .stat-label{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-top:4px;}
+  .marquee-wrap{overflow:hidden;padding:40px 0;}
+  .marquee{display:flex;gap:16px;animation:scroll 30s linear infinite;width:max-content;}
+  @keyframes scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  .book-card-mini{width:90px;flex-shrink:0;}
+  .book-spine{height:130px;border-radius:4px;display:flex;align-items:flex-end;padding:10px 8px;transition:.2s;}
+  .book-spine:hover{transform:translateY(-6px) scale(1.04);}
+  .pricing-section{padding:80px 40px;max-width:900px;margin:0 auto;}
+  .section-title{font-family:'Playfair Display',serif;font-size:40px;font-weight:900;text-align:center;margin-bottom:8px;}
+  .section-sub{text-align:center;color:rgba(255,255,255,0.5);font-size:15px;margin-bottom:50px;}
+  .plans{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;}
+  .plan{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:40px 36px;flex:1;min-width:280px;max-width:360px;transition:.3s;position:relative;}
+  .plan:hover{border-color:var(--gold);transform:translateY(-4px);}
+  .plan.featured{border-color:var(--gold);background:rgba(201,150,60,0.06);}
+  .plan-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--ink);font-size:11px;font-weight:700;padding:4px 16px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;}
+  .plan-tier{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+  .plan-name{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;margin-bottom:8px;}
+  .plan-price{font-size:48px;font-weight:900;margin:20px 0 4px;}
+  .plan-price span{font-size:16px;font-weight:400;opacity:0.5;}
+  .plan-features{list-style:none;margin:24px 0 32px;}
+  .plan-features li{padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:14px;display:flex;gap:10px;align-items:center;}
+  .plan-features li::before{content:'✓';color:var(--gold);font-weight:700;}
+  .plan-features li.no::before{content:'✗';color:rgba(255,255,255,0.2);}
+  .plan-features li.no{color:rgba(255,255,255,0.3);}
 
   /* MODAL */
-  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:1000; align-items:center; justify-content:center; }
-  .modal-overlay.open { display:flex; }
-  .modal { background:var(--cream); color:var(--ink); border-radius:10px; padding:48px; width:100%; max-width:420px; position:relative; animation:fadeUp .25s ease; }
-  @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-  .modal-close { position:absolute; top:16px; right:20px; background:none; border:none; font-size:22px; cursor:pointer; color:#888; }
-  .modal-title { font-family:'Playfair Display',serif; font-size:28px; font-weight:900; margin-bottom:6px; }
-  .modal-sub { font-size:13px; color:#777; margin-bottom:28px; }
-  .form-group { margin-bottom:18px; }
-  .form-group label { display:block; font-size:12px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:7px; color:#555; }
-  .form-group input, .form-group select { width:100%; padding:12px 14px; border:1.5px solid #ddd; border-radius:5px; font-family:'DM Sans',sans-serif; font-size:15px; transition:.2s; background:#fff; }
-  .form-group input:focus, .form-group select:focus { outline:none; border-color:var(--gold); }
-  .btn-ink { background:var(--ink); color:var(--paper); width:100%; padding:14px; font-size:15px; border-radius:5px; font-weight:600; margin-top:8px; cursor:pointer; border:none; transition:.2s; }
-  .btn-ink:hover { background:#222; }
-  .btn-ink:disabled { opacity:0.5; cursor:not-allowed; }
-  .modal-err { color:var(--red); font-size:13px; margin-top:8px; display:none; }
-  .modal-switch { text-align:center; margin-top:18px; font-size:13px; color:#888; }
-  .modal-switch a { color:var(--ink); font-weight:700; cursor:pointer; text-decoration:underline; }
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--cream);color:var(--ink);border-radius:10px;padding:48px;width:100%;max-width:420px;position:relative;animation:fadeUp .25s ease;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+  .modal-close{position:absolute;top:16px;right:20px;background:none;border:none;font-size:22px;cursor:pointer;color:#888;}
+  .modal-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;margin-bottom:6px;}
+  .modal-sub{font-size:13px;color:#777;margin-bottom:28px;}
+  .form-group{margin-bottom:18px;}
+  .form-group label{display:block;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;color:#555;}
+  .form-group input,.form-group select{width:100%;padding:12px 14px;border:1.5px solid #ddd;border-radius:5px;font-family:'DM Sans',sans-serif;font-size:15px;transition:.2s;background:#fff;}
+  .form-group input:focus,.form-group select:focus{outline:none;border-color:var(--gold);}
+  .btn-ink{background:var(--ink);color:var(--paper);width:100%;padding:14px;font-size:15px;border-radius:5px;font-weight:600;margin-top:8px;cursor:pointer;border:none;transition:.2s;}
+  .btn-ink:hover{background:#222;}
+  .btn-ink:disabled{opacity:0.5;cursor:not-allowed;}
+  .modal-err{color:var(--red);font-size:13px;margin-top:8px;display:none;}
+  .modal-switch{text-align:center;margin-top:18px;font-size:13px;color:#888;}
+  .modal-switch a{color:var(--ink);font-weight:700;cursor:pointer;text-decoration:underline;}
 
   /* LIBRARY */
-  #page-library { background:var(--cream); }
-  .lib-header { background:var(--ink); color:var(--paper); padding:20px 48px; display:flex; align-items:center; justify-content:space-between; }
-  .lib-logo { font-family:'Playfair Display',serif; font-size:22px; font-weight:900; }
-  .lib-logo span { color:var(--gold); }
-  .user-info { display:flex; align-items:center; gap:16px; font-size:14px; }
-  .user-badge { background:var(--gold); color:var(--ink); padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; text-transform:uppercase; }
-  .btn-sm { padding:7px 16px; font-size:13px; border-radius:4px; cursor:pointer; }
-  .lib-hero { background:linear-gradient(135deg, var(--ink) 0%, #1c1208 100%); color:var(--paper); padding:64px 48px; text-align:center; }
-  .lib-hero h2 { font-family:'Playfair Display',serif; font-size:clamp(32px,5vw,56px); font-weight:900; margin-bottom:10px; }
-  .lib-hero p { color:rgba(255,255,255,0.6); font-size:16px; }
-  .search-bar-wrap { max-width:640px; margin:28px auto 0; display:flex; gap:10px; }
-  .search-bar-wrap input { flex:1; padding:14px 18px; border-radius:5px; border:none; font-size:15px; font-family:'DM Sans',sans-serif; }
-  .lib-content { padding:48px; max-width:1300px; margin:0 auto; }
-  .genre-filters { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:36px; }
-  .genre-btn { padding:7px 18px; border-radius:20px; border:1.5px solid #ccc; font-size:13px; cursor:pointer; background:transparent; transition:.2s; font-family:'DM Sans',sans-serif; }
-  .genre-btn:hover, .genre-btn.active { background:var(--ink); color:var(--paper); border-color:var(--ink); }
-  .books-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:28px; }
-  .book-item { cursor:pointer; transition:.25s; }
-  .book-item:hover { transform:translateY(-6px); }
-  .book-cover { width:100%; aspect-ratio:2/3; border-radius:5px; display:flex; flex-direction:column; justify-content:flex-end; padding:14px; position:relative; overflow:hidden; box-shadow:4px 6px 20px rgba(0,0,0,0.22); }
-  .book-cover::before { content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%); }
-  .book-title-cover { font-family:'Playfair Display',serif; font-size:13px; font-weight:700; color:#fff; position:relative; line-height:1.3; }
-  .book-author-cover { font-size:10px; color:rgba(255,255,255,0.7); position:relative; margin-top:3px; }
-  .book-meta { padding:10px 2px 0; }
-  .book-meta-title { font-size:13px; font-weight:600; }
-  .book-meta-genre { font-size:11px; color:#888; }
-  .lock-overlay { position:absolute; inset:0; background:rgba(0,0,0,0.6); display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:5px; opacity:0; transition:.2s; }
-  .book-item:hover .lock-overlay { opacity:1; }
-  .lock-icon { font-size:28px; margin-bottom:6px; }
-  .lock-text { font-size:11px; color:#fff; text-align:center; font-weight:600; text-transform:uppercase; letter-spacing:1px; }
-  .upsell-banner { background:linear-gradient(135deg,#1c1208,#0a0a0a); color:var(--paper); padding:28px 48px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; }
-  .upsell-text strong { font-family:'Playfair Display',serif; font-size:20px; display:block; }
-  .upsell-text span { font-size:14px; color:rgba(255,255,255,0.6); }
+  #page-library{background:var(--cream);}
+  .lib-header{background:var(--ink);color:var(--paper);padding:20px 48px;display:flex;align-items:center;justify-content:space-between;}
+  .lib-logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;}
+  .lib-logo span{color:var(--gold);}
+  .user-info{display:flex;align-items:center;gap:16px;font-size:14px;}
+  .user-badge{background:var(--gold);color:var(--ink);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;}
+  .btn-sm{padding:7px 16px;font-size:13px;border-radius:4px;cursor:pointer;}
+  .lib-hero{background:linear-gradient(135deg,var(--ink) 0%,#1c1208 100%);color:var(--paper);padding:64px 48px;text-align:center;}
+  .lib-hero h2{font-family:'Playfair Display',serif;font-size:clamp(32px,5vw,56px);font-weight:900;margin-bottom:10px;}
+  .lib-hero p{color:rgba(255,255,255,0.6);font-size:16px;}
+  .search-bar-wrap{max-width:640px;margin:28px auto 0;display:flex;gap:10px;}
+  .search-bar-wrap input{flex:1;padding:14px 18px;border-radius:5px;border:none;font-size:15px;font-family:'DM Sans',sans-serif;}
+  .lib-content{padding:48px;max-width:1300px;margin:0 auto;}
+  .lib-tabs{display:flex;gap:0;margin-bottom:32px;border-bottom:2px solid #e0dbd0;}
+  .lib-tab{padding:12px 32px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;color:#999;transition:.2s;}
+  .lib-tab.active{border-bottom-color:var(--ink);color:var(--ink);}
+  .genre-filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:36px;}
+  .genre-btn{padding:7px 18px;border-radius:20px;border:1.5px solid #ccc;font-size:13px;cursor:pointer;background:transparent;transition:.2s;font-family:'DM Sans',sans-serif;}
+  .genre-btn:hover,.genre-btn.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+  .books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:28px;}
+  .book-item{cursor:pointer;transition:.25s;}
+  .book-item:hover{transform:translateY(-6px);}
+  .book-cover{width:100%;aspect-ratio:2/3;border-radius:5px;display:flex;flex-direction:column;justify-content:flex-end;padding:14px;position:relative;overflow:hidden;box-shadow:4px 6px 20px rgba(0,0,0,0.22);}
+  .book-cover::before{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,transparent 60%);}
+  .book-title-cover{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:#fff;position:relative;line-height:1.3;}
+  .book-author-cover{font-size:10px;color:rgba(255,255,255,0.7);position:relative;margin-top:3px;}
+  .book-meta{padding:10px 2px 0;}
+  .book-meta-title{font-size:13px;font-weight:600;}
+  .book-meta-genre{font-size:11px;color:#888;}
+  .hover-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:5px;opacity:0;transition:.2s;}
+  .book-item:hover .hover-overlay{opacity:1;}
+  .hover-icon{font-size:28px;margin-bottom:6px;}
+  .hover-text{font-size:11px;color:#fff;text-align:center;font-weight:600;text-transform:uppercase;letter-spacing:1px;}
+  .upsell-banner{background:linear-gradient(135deg,#1c1208,#0a0a0a);color:var(--paper);padding:28px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+  .upsell-text strong{font-family:'Playfair Display',serif;font-size:20px;display:block;}
+  .upsell-text span{font-size:14px;color:rgba(255,255,255,0.6);}
 
   /* READER */
-  .reader-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2000; align-items:center; justify-content:center; }
-  .reader-modal.open { display:flex; }
-  .reader-box { background:var(--cream); border-radius:8px; width:100%; max-width:900px; height:90vh; display:flex; flex-direction:column; animation:fadeUp .25s ease; overflow:hidden; }
-  .reader-header { background:var(--ink); color:var(--paper); padding:16px 24px; display:flex; align-items:center; justify-content:space-between; }
-  .reader-book-title { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; }
-  .reader-book-author { font-size:12px; color:rgba(255,255,255,0.6); }
-  .reader-body { padding:36px 48px; overflow-y:auto; font-size:17px; line-height:1.8; color:#222; }
-  .reader-body h3 { font-family:'Playfair Display',serif; font-size:24px; margin-bottom:16px; }
-  .reader-body p { margin-bottom:16px; }
-  .download-btn { background:var(--gold); border:none; padding:8px 20px; border-radius:4px; font-weight:700; font-size:13px; cursor:pointer; color:var(--ink); transition:.2s; }
-  .download-btn:hover { background:var(--gold-light); }
-  .close-reader { background:rgba(255,255,255,0.1); border:none; color:#fff; padding:7px 14px; border-radius:4px; cursor:pointer; font-size:13px; }
-  .reader-actions { display:flex; gap:10px; align-items:center; }
+  .reader-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:2000;align-items:center;justify-content:center;}
+  .reader-modal.open{display:flex;}
+  .reader-box{background:var(--cream);border-radius:8px;width:96vw;max-width:1000px;height:92vh;display:flex;flex-direction:column;animation:fadeUp .25s ease;overflow:hidden;}
+  .reader-header{background:var(--ink);color:var(--paper);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .reader-book-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;}
+  .reader-book-author{font-size:11px;color:rgba(255,255,255,0.6);}
+  .reader-body{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+  .reader-body iframe{width:100%;height:100%;border:none;flex:1;}
+  .reader-placeholder{padding:40px 48px;font-size:15px;color:#888;line-height:1.8;}
+  .download-btn{background:var(--gold);border:none;padding:8px 18px;border-radius:4px;font-weight:700;font-size:13px;cursor:pointer;color:var(--ink);transition:.2s;}
+  .download-btn:hover{background:var(--gold-light);}
+  .close-reader{background:rgba(255,255,255,0.1);border:none;color:#fff;padding:7px 14px;border-radius:4px;cursor:pointer;font-size:13px;}
+  .reader-actions{display:flex;gap:10px;align-items:center;}
 
   /* ADMIN */
-  #page-admin { background:#f9f9f9; }
-  .admin-header { background:var(--ink); color:var(--paper); padding:18px 40px; display:flex; align-items:center; justify-content:space-between; }
-  .admin-title { font-family:'Playfair Display',serif; font-size:20px; font-weight:900; }
-  .admin-title span { color:var(--gold); }
-  .admin-body { display:flex; min-height:calc(100vh - 60px); }
-  .admin-sidebar { width:220px; background:var(--ink); padding:24px 0; flex-shrink:0; }
-  .sidebar-item { padding:13px 28px; color:rgba(255,255,255,0.6); cursor:pointer; font-size:14px; transition:.15s; display:flex; gap:12px; align-items:center; border-left:3px solid transparent; }
-  .sidebar-item:hover, .sidebar-item.active { color:var(--paper); background:rgba(255,255,255,0.06); border-left-color:var(--gold); }
-  .admin-main { flex:1; padding:40px; }
-  .admin-section { display:none; }
-  .admin-section.active { display:block; }
-  .admin-card { background:#fff; border-radius:8px; padding:28px; box-shadow:0 2px 12px rgba(0,0,0,0.06); margin-bottom:24px; }
-  .admin-card h3 { font-family:'Playfair Display',serif; font-size:22px; margin-bottom:20px; font-weight:700; }
-  .form-row { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:16px; }
-  .form-field { flex:1; min-width:200px; }
-  .form-field label { display:block; font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#666; margin-bottom:6px; }
-  .form-field input, .form-field select, .form-field textarea { width:100%; padding:10px 12px; border:1.5px solid #e0e0e0; border-radius:5px; font-family:'DM Sans',sans-serif; font-size:14px; }
-  .form-field textarea { resize:vertical; min-height:80px; }
-  .form-field input:focus, .form-field select:focus { outline:none; border-color:var(--gold); }
-  .btn-admin { background:var(--ink); color:#fff; border:none; padding:11px 26px; border-radius:5px; font-size:14px; font-weight:600; cursor:pointer; transition:.2s; font-family:'DM Sans',sans-serif; }
-  .btn-admin:hover { background:#222; }
-  .btn-admin:disabled { opacity:0.5; cursor:not-allowed; }
-  .books-admin-table { width:100%; border-collapse:collapse; font-size:14px; }
-  .books-admin-table th { text-align:left; padding:10px 14px; background:#f3f3f3; font-size:11px; letter-spacing:1px; text-transform:uppercase; color:#666; }
-  .books-admin-table td { padding:12px 14px; border-bottom:1px solid #f0f0f0; vertical-align:middle; }
-  .books-admin-table tr:hover td { background:#fafafa; }
-  .tag { display:inline-block; padding:2px 10px; border-radius:20px; font-size:11px; font-weight:600; }
-  .tag-gold { background:#fef3d9; color:#9a6e00; }
-  .tag-blue { background:#ddf0ff; color:#005a99; }
-  .stat-cards { display:flex; gap:20px; flex-wrap:wrap; margin-bottom:28px; }
-  .stat-card { background:#fff; border-radius:8px; padding:24px 28px; box-shadow:0 2px 12px rgba(0,0,0,0.06); flex:1; min-width:160px; }
-  .stat-card .num { font-family:'Playfair Display',serif; font-size:36px; font-weight:900; color:var(--ink); }
-  .stat-card .lbl { font-size:12px; color:#999; text-transform:uppercase; letter-spacing:1.5px; margin-top:4px; }
-  .success-msg { color:#4a5e52; font-size:13px; margin-top:10px; display:none; font-weight:600; }
-  .toast { position:fixed; bottom:28px; right:28px; background:var(--ink); color:#fff; padding:14px 22px; border-radius:7px; font-size:14px; z-index:9999; display:none; animation:fadeUp .2s ease; }
+  #page-admin{background:#f9f9f9;}
+  .admin-header{background:var(--ink);color:var(--paper);padding:18px 40px;display:flex;align-items:center;justify-content:space-between;}
+  .admin-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;}
+  .admin-title span{color:var(--gold);}
+  .admin-body{display:flex;min-height:calc(100vh - 60px);}
+  .admin-sidebar{width:220px;background:var(--ink);padding:24px 0;flex-shrink:0;}
+  .sidebar-item{padding:13px 28px;color:rgba(255,255,255,0.6);cursor:pointer;font-size:14px;transition:.15s;display:flex;gap:12px;align-items:center;border-left:3px solid transparent;}
+  .sidebar-item:hover,.sidebar-item.active{color:var(--paper);background:rgba(255,255,255,0.06);border-left-color:var(--gold);}
+  .admin-main{flex:1;padding:40px;}
+  .admin-section{display:none;}
+  .admin-section.active{display:block;}
+  .admin-card{background:#fff;border-radius:8px;padding:28px;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:24px;}
+  .admin-card h3{font-family:'Playfair Display',serif;font-size:22px;margin-bottom:20px;font-weight:700;}
+  .form-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;}
+  .form-field{flex:1;min-width:200px;}
+  .form-field label{display:block;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#666;margin-bottom:6px;}
+  .form-field input,.form-field select,.form-field textarea{width:100%;padding:10px 12px;border:1.5px solid #e0e0e0;border-radius:5px;font-family:'DM Sans',sans-serif;font-size:14px;}
+  .form-field textarea{resize:vertical;min-height:80px;}
+  .form-field input:focus,.form-field select:focus{outline:none;border-color:var(--gold);}
+  .btn-admin{background:var(--ink);color:#fff;border:none;padding:11px 26px;border-radius:5px;font-size:14px;font-weight:600;cursor:pointer;transition:.2s;font-family:'DM Sans',sans-serif;}
+  .btn-admin:hover{background:#222;}
+  .btn-admin:disabled{opacity:0.5;cursor:not-allowed;}
+  .books-admin-table{width:100%;border-collapse:collapse;font-size:14px;}
+  .books-admin-table th{text-align:left;padding:10px 14px;background:#f3f3f3;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#666;}
+  .books-admin-table td{padding:12px 14px;border-bottom:1px solid #f0f0f0;vertical-align:middle;}
+  .books-admin-table tr:hover td{background:#fafafa;}
+  .tag{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+  .tag-gold{background:#fef3d9;color:#9a6e00;}
+  .tag-blue{background:#ddf0ff;color:#005a99;}
+  .stat-cards{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:28px;}
+  .stat-card{background:#fff;border-radius:8px;padding:24px 28px;box-shadow:0 2px 12px rgba(0,0,0,0.06);flex:1;min-width:160px;}
+  .stat-card .num{font-family:'Playfair Display',serif;font-size:36px;font-weight:900;color:var(--ink);}
+  .stat-card .lbl{font-size:12px;color:#999;text-transform:uppercase;letter-spacing:1.5px;margin-top:4px;}
+  .success-msg{color:#4a5e52;font-size:13px;margin-top:10px;display:none;font-weight:600;}
+  .toast{position:fixed;bottom:28px;right:28px;background:var(--ink);color:#fff;padding:14px 22px;border-radius:7px;font-size:14px;z-index:9999;display:none;animation:fadeUp .2s ease;}
 
-  @media(max-width:700px) {
-    .landing-nav { padding:20px 24px; }
-    .hero { padding:60px 24px 40px; }
-    .stats-bar { gap:30px; padding:32px 20px; }
-    .lib-header, .lib-content, .upsell-banner { padding-left:20px; padding-right:20px; }
-    .books-grid { grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); }
-    .admin-sidebar { display:none; }
+  @media(max-width:700px){
+    .landing-nav{padding:20px 24px;}
+    .hero{padding:60px 24px 40px;}
+    .stats-bar{gap:30px;padding:32px 20px;}
+    .lib-header,.lib-content,.upsell-banner{padding-left:20px;padding-right:20px;}
+    .books-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}
+    .admin-sidebar{display:none;}
+    .lib-tab{padding:10px 18px;font-size:13px;}
   }
 </style>
 </head>
 <body>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- ══════════════ LANDING ══════════════ -->
+<!-- ══ LANDING ══ -->
 <div id="page-landing" class="page active">
   <nav class="landing-nav">
     <div class="logo">Book<span>Vault</span></div>
@@ -210,7 +211,6 @@
     <div class="stat"><div class="stat-num">2M+</div><div class="stat-label">Happy Readers</div></div>
   </div>
   <div class="marquee-wrap"><div class="marquee" id="marquee1"></div></div>
-
   <div class="pricing-section" id="pricing">
     <h2 class="section-title">Choose Your Plan</h2>
     <p class="section-sub">Unlimited access to every book we carry — no ads, no queues.</p>
@@ -222,10 +222,9 @@
         <div class="plan-price">$10<span>/mo</span></div>
         <ul class="plan-features">
           <li>Unlimited online reading</li>
-          <li>15 million+ books</li>
+          <li>Books &amp; Manga library</li>
           <li>All genres &amp; languages</li>
           <li>Mobile &amp; desktop</li>
-          <li>Bookmarks &amp; highlights</li>
           <li class="no">PDF downloads</li>
           <li class="no">Offline access</li>
         </ul>
@@ -242,7 +241,6 @@
           <li>PDF downloads — keep forever</li>
           <li>Offline reading</li>
           <li>Priority new releases</li>
-          <li>Advanced search &amp; filters</li>
           <li>Early access to new titles</li>
           <li>Exclusive author content</li>
         </ul>
@@ -250,23 +248,17 @@
       </div>
     </div>
   </div>
-
-  <div style="padding:60px 40px;max-width:1000px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:36px;">
-    <div><div style="font-size:32px;margin-bottom:12px">📚</div><h4 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:8px">Every Genre Imaginable</h4><p style="font-size:14px;color:rgba(255,255,255,0.5);line-height:1.7">From ancient philosophy to sci-fi thrillers — if it's been written, it's here.</p></div>
-    <div><div style="font-size:32px;margin-bottom:12px">⚡</div><h4 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:8px">Instant Access</h4><p style="font-size:14px;color:rgba(255,255,255,0.5);line-height:1.7">No waiting, no queues. Open any book in seconds from any device.</p></div>
-    <div><div style="font-size:32px;margin-bottom:12px">🔒</div><h4 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:8px">100% Legal &amp; Licensed</h4><p style="font-size:14px;color:rgba(255,255,255,0.5);line-height:1.7">Every title is properly licensed. Authors get paid, you read guilt-free.</p></div>
-  </div>
   <div style="text-align:center;padding:40px;border-top:1px solid rgba(255,255,255,0.08);font-size:13px;color:rgba(255,255,255,0.3)">© 2026 BookVault. All rights reserved.</div>
 </div>
 
-<!-- ══════════════ LIBRARY ══════════════ -->
+<!-- ══ LIBRARY ══ -->
 <div id="page-library" class="page">
   <div class="upsell-banner" id="upsell-banner" style="display:none">
     <div class="upsell-text">
       <strong>Upgrade to Scholar — $20/month</strong>
-      <span>Download any book as a PDF and keep it forever. You're on Reader.</span>
+      <span>Download any book or manga as a PDF and keep it forever.</span>
     </div>
-    <button class="btn btn-gold btn-sm" onclick="showToast('Stripe integration coming soon!')">Upgrade Now →</button>
+    <button class="btn btn-gold btn-sm" onclick="showToast('Contact admin to upgrade your plan!')">Upgrade Now →</button>
   </div>
   <div class="lib-header">
     <div class="lib-logo">Book<span>Vault</span></div>
@@ -278,17 +270,17 @@
   </div>
   <div class="lib-hero">
     <h2>Your Library Awaits</h2>
-    <p>15 million+ books at your fingertips — search, explore, and dive in.</p>
+    <p>Books &amp; Manga — search, explore, and dive in.</p>
     <div class="search-bar-wrap">
-      <input type="text" id="search-input" placeholder="Search by title, author, or genre…" oninput="filterBooks()">
-      <button class="btn btn-gold" onclick="filterBooks()">Search</button>
+      <input type="text" id="search-input" placeholder="Search by title, author, or genre…" oninput="onSearch()">
+      <button class="btn btn-gold" onclick="onSearch()">Search</button>
     </div>
   </div>
   <div class="lib-content">
-    <!-- Books / Manga tabs -->
-    <div style="display:flex;gap:0;margin-bottom:32px;border-bottom:2px solid #e0dbd0;">
-      <button id="tab-books" onclick="switchTab('books')" style="padding:12px 32px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;border-bottom:3px solid var(--ink);margin-bottom:-2px;color:var(--ink)">📚 Books</button>
-      <button id="tab-manga" onclick="switchTab('manga')" style="padding:12px 32px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;color:#999">🎌 Manga</button>
+    <!-- Tabs -->
+    <div class="lib-tabs">
+      <button class="lib-tab active" id="tab-books" onclick="switchTab('books')">📚 Books</button>
+      <button class="lib-tab" id="tab-manga" onclick="switchTab('manga')">🎌 Manga</button>
     </div>
     <!-- Books section -->
     <div id="section-books">
@@ -303,7 +295,7 @@
   </div>
 </div>
 
-<!-- ══════════════ ADMIN ══════════════ -->
+<!-- ══ ADMIN ══ -->
 <div id="page-admin" class="page">
   <div class="admin-header">
     <div class="admin-title">Book<span>Vault</span> Admin</div>
@@ -311,13 +303,13 @@
   </div>
   <div class="admin-body">
     <div class="admin-sidebar">
-      <div class="sidebar-item active" data-section="dashboard"   onclick="adminTab('dashboard',this)">📊 Dashboard</div>
-      <div class="sidebar-item"        data-section="requests"    onclick="adminTab('requests',this)">🔔 Requests <span id="req-badge" style="background:#c9963c;color:#000;border-radius:20px;padding:1px 8px;font-size:11px;font-weight:900;margin-left:4px;display:none"></span></div>
-      <div class="sidebar-item"        data-section="upload"      onclick="adminTab('upload',this)">📤 Upload Book</div>
-      <div class="sidebar-item"        data-section="books"       onclick="adminTab('books',this)">📚 Manage Books</div>
-      <div class="sidebar-item"        data-section="upload-manga" onclick="adminTab('upload-manga',this)">🗂 Upload Manga</div>
-      <div class="sidebar-item"        data-section="manga"       onclick="adminTab('manga',this)">🎌 Manage Manga</div>
-      <div class="sidebar-item"        data-section="users"       onclick="adminTab('users',this)">👤 Users</div>
+      <div class="sidebar-item active" data-sec="dashboard"    onclick="adminTab('dashboard',this)">📊 Dashboard</div>
+      <div class="sidebar-item"        data-sec="requests"     onclick="adminTab('requests',this)">🔔 Requests <span id="req-badge" style="background:#c9963c;color:#000;border-radius:20px;padding:1px 8px;font-size:11px;font-weight:900;margin-left:4px;display:none"></span></div>
+      <div class="sidebar-item"        data-sec="upload"       onclick="adminTab('upload',this)">📤 Upload Book</div>
+      <div class="sidebar-item"        data-sec="books"        onclick="adminTab('books',this)">📚 Manage Books</div>
+      <div class="sidebar-item"        data-sec="upload-manga" onclick="adminTab('upload-manga',this)">🗂 Upload Manga</div>
+      <div class="sidebar-item"        data-sec="manga"        onclick="adminTab('manga',this)">🎌 Manage Manga</div>
+      <div class="sidebar-item"        data-sec="users"        onclick="adminTab('users',this)">👤 Users</div>
     </div>
     <div class="admin-main">
 
@@ -325,16 +317,19 @@
         <h2 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;margin-bottom:24px">Dashboard</h2>
         <div class="stat-cards">
           <div class="stat-card"><div class="num" id="st-books">—</div><div class="lbl">Total Books</div></div>
+          <div class="stat-card"><div class="num" id="st-manga">—</div><div class="lbl">Total Manga</div></div>
           <div class="stat-card"><div class="num" id="st-users">—</div><div class="lbl">Active Users</div></div>
           <div class="stat-card" style="border:2px solid #c9963c"><div class="num" id="st-pending" style="color:#c9963c">—</div><div class="lbl">Pending Requests</div></div>
           <div class="stat-card"><div class="num" id="st-revenue">—</div><div class="lbl">Monthly Revenue</div></div>
-          <div class="stat-card"><div class="num" id="st-tier1">—</div><div class="lbl">Reader (Tier 1)</div></div>
-          <div class="stat-card"><div class="num" id="st-tier2">—</div><div class="lbl">Scholar (Tier 2)</div></div>
+          <div class="stat-card"><div class="num" id="st-tier1">—</div><div class="lbl">Reader (T1)</div></div>
+          <div class="stat-card"><div class="num" id="st-tier2">—</div><div class="lbl">Scholar (T2)</div></div>
         </div>
         <div class="admin-card">
           <h3>Quick Actions</h3>
-          <!-- Fixed: use data-section lookup instead of fragile index -->
-          <button class="btn-admin" onclick="adminTab('upload', document.querySelector('[data-section=upload]'))">+ Upload a New Book</button>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <button class="btn-admin" onclick="adminTab('upload',document.querySelector('[data-sec=upload]'))">+ Upload Book</button>
+            <button class="btn-admin" onclick="adminTab('upload-manga',document.querySelector('[data-sec=upload-manga]'))">+ Upload Manga</button>
+          </div>
         </div>
       </div>
 
@@ -342,8 +337,7 @@
         <h2 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;margin-bottom:24px">Pending Requests</h2>
         <div class="admin-card">
           <h3>Account Requests — Awaiting Approval</h3>
-          <!-- CashApp handle is loaded dynamically from /api/config -->
-          <p style="font-size:13px;color:#888;margin-bottom:20px">Verify the CashApp payment to <strong id="admin-cashapp-handle">…</strong> with description "Requesting to make an account in BookVault", then approve or decline.</p>
+          <p style="font-size:13px;color:#888;margin-bottom:20px">Verify the CashApp payment to <strong id="admin-cashapp-label">…</strong> with description "Requesting to make an account in BookVault", then approve or decline.</p>
           <table class="books-admin-table" id="admin-requests-table">
             <tr><th>Name</th><th>Email</th><th>Plan</th><th>Actions</th></tr>
           </table>
@@ -356,25 +350,22 @@
         <div class="admin-card">
           <h3>Book Details</h3>
           <div class="form-row">
-            <div class="form-field"><label>Title *</label><input type="text" id="up-title" placeholder="e.g. The Great Gatsby"></div>
-            <div class="form-field"><label>Author *</label><input type="text" id="up-author" placeholder="e.g. F. Scott Fitzgerald"></div>
+            <div class="form-field"><label>Title *</label><input type="text" id="up-title" placeholder="e.g. Dune"></div>
+            <div class="form-field"><label>Author *</label><input type="text" id="up-author" placeholder="e.g. Frank Herbert"></div>
           </div>
           <div class="form-row">
-            <div class="form-field">
-              <label>Genre</label>
+            <div class="form-field"><label>Genre</label>
               <select id="up-genre">
-                <option>Classic Literature</option><option>Science Fiction</option>
-                <option>Fantasy</option><option>Mystery</option>
-                <option>Romance</option><option>History</option>
-                <option>Philosophy</option><option>Self-Help</option>
-                <option>Biography</option><option>Thriller</option>
+                <option>Classic Literature</option><option>Science Fiction</option><option>Fantasy</option>
+                <option>Mystery</option><option>Romance</option><option>History</option>
+                <option>Philosophy</option><option>Self-Help</option><option>Biography</option><option>Thriller</option>
               </select>
             </div>
-            <div class="form-field"><label>Year Published</label><input type="number" id="up-year" placeholder="e.g. 1925"></div>
+            <div class="form-field"><label>Year Published</label><input type="number" id="up-year" placeholder="e.g. 1965"></div>
             <div class="form-field"><label>Cover Color</label><input type="color" id="up-color" value="#1a3a5c"></div>
           </div>
           <div class="form-row">
-            <div class="form-field"><label>Description</label><textarea id="up-desc" placeholder="Short book description…"></textarea></div>
+            <div class="form-field"><label>Description</label><textarea id="up-desc" placeholder="Short description…"></textarea></div>
           </div>
           <div class="form-row">
             <div class="form-field"><label>Upload File (PDF / EPUB / TXT)</label><input type="file" id="up-file" accept=".pdf,.epub,.txt"></div>
@@ -403,18 +394,15 @@
             <div class="form-field"><label>Author *</label><input type="text" id="mn-author" placeholder="e.g. Masashi Kishimoto"></div>
           </div>
           <div class="form-row">
-            <div class="form-field">
-              <label>Genre</label>
+            <div class="form-field"><label>Genre</label>
               <select id="mn-genre">
-                <option>Action</option><option>Adventure</option><option>Comedy</option>
-                <option>Drama</option><option>Fantasy</option><option>Horror</option>
-                <option>Romance</option><option>Sci-Fi</option><option>Slice of Life</option>
-                <option>Sports</option><option>Supernatural</option><option>Thriller</option>
+                <option>Action</option><option>Adventure</option><option>Comedy</option><option>Drama</option>
+                <option>Fantasy</option><option>Horror</option><option>Romance</option><option>Sci-Fi</option>
+                <option>Slice of Life</option><option>Sports</option><option>Supernatural</option><option>Thriller</option>
               </select>
             </div>
             <div class="form-field"><label>Chapters</label><input type="number" id="mn-chapters" placeholder="e.g. 700"></div>
-            <div class="form-field">
-              <label>Status</label>
+            <div class="form-field"><label>Status</label>
               <select id="mn-status">
                 <option value="Ongoing">Ongoing</option>
                 <option value="Completed">Completed</option>
@@ -424,7 +412,7 @@
             <div class="form-field"><label>Cover Color</label><input type="color" id="mn-color" value="#1a1a2e"></div>
           </div>
           <div class="form-row">
-            <div class="form-field"><label>Description</label><textarea id="mn-desc" placeholder="Short manga description…"></textarea></div>
+            <div class="form-field"><label>Description</label><textarea id="mn-desc" placeholder="Short description…"></textarea></div>
           </div>
           <div class="form-row">
             <div class="form-field"><label>Upload File (PDF / CBZ / CBR / ZIP)</label><input type="file" id="mn-file" accept=".pdf,.cbz,.cbr,.zip"></div>
@@ -458,27 +446,26 @@
   </div>
 </div>
 
-<!-- ══════════════ AUTH MODAL ══════════════ -->
+<!-- ══ AUTH MODAL ══ -->
 <div class="modal-overlay" id="auth-modal">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
     <div id="modal-login">
       <div class="modal-title">Welcome Back</div>
       <div class="modal-sub">Sign in to your BookVault account</div>
-      <div class="form-group"><label>Username or Email</label><input type="text" id="login-user" placeholder="your@email.com"></div>
+      <div class="form-group"><label>Email</label><input type="text" id="login-user" placeholder="your@email.com"></div>
       <div class="form-group"><label>Password</label><input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
-      <p class="modal-err" id="login-err">Invalid credentials.</p>
+      <p class="modal-err" id="login-err"></p>
       <button class="btn-ink" id="login-btn" onclick="doLogin()">Sign In</button>
       <div class="modal-switch">No account? <a onclick="openModal('signup')">Create one →</a></div>
     </div>
     <div id="modal-signup" style="display:none">
-      <!-- Step 1: Account details -->
       <div id="signup-step1">
         <div class="modal-title">Create Account</div>
-        <div class="modal-sub">Join 2 million readers on BookVault</div>
+        <div class="modal-sub">Join BookVault today</div>
         <div class="form-group"><label>Full Name</label><input type="text" id="reg-name" placeholder="Your Name"></div>
         <div class="form-group"><label>Email</label><input type="email" id="reg-email" placeholder="your@email.com"></div>
-        <div class="form-group"><label>Password</label><input type="password" id="reg-pass" placeholder="Create a password (min 4 chars)"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="reg-pass" placeholder="Min 4 characters"></div>
         <div class="form-group">
           <label>Choose Plan</label>
           <select id="reg-plan" onchange="updateCashAppAmount()">
@@ -490,15 +477,12 @@
         <button class="btn-ink" onclick="goToPaymentStep()">Continue to Payment →</button>
         <div class="modal-switch">Already have an account? <a onclick="openModal('login')">Sign in →</a></div>
       </div>
-
-      <!-- Step 2: CashApp payment -->
       <div id="signup-step2" style="display:none">
         <div class="modal-title">Complete Payment</div>
         <div class="modal-sub">Send payment via CashApp to activate your account</div>
         <div style="background:#f0faf0;border:2px solid #4a5e52;border-radius:8px;padding:20px;margin-bottom:20px;text-align:center">
           <div style="font-size:32px;margin-bottom:8px">💸</div>
           <div style="font-size:13px;color:#555;margin-bottom:6px;font-weight:700;text-transform:uppercase;letter-spacing:1px">Send to CashApp</div>
-          <!-- Populated dynamically from /api/config -->
           <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:#0a0a0a;margin-bottom:4px" id="cashapp-handle-display">…</div>
           <div style="font-size:22px;font-weight:900;color:#4a5e52;margin-bottom:12px" id="cashapp-amount">$10.00</div>
           <div style="background:#fff;border:1px solid #ddd;border-radius:5px;padding:10px;font-size:13px;color:#333">
@@ -506,22 +490,17 @@
             <span style="font-family:monospace;font-size:14px;color:#1a3a5c">Requesting to make an account in BookVault</span>
           </div>
         </div>
-        <div style="font-size:13px;color:#666;margin-bottom:20px;line-height:1.6">
-          ⚠️ After sending payment, click <strong>Submit Request</strong>. The admin will verify your payment and activate your account.
-        </div>
+        <div style="font-size:13px;color:#666;margin-bottom:20px;line-height:1.6">⚠️ After sending payment, click <strong>Submit Request</strong>. Admin will verify and activate your account.</div>
         <p class="modal-err" id="signup-err2"></p>
         <button class="btn-ink" id="signup-btn" onclick="doSignup()">✓ I've Paid — Submit Request</button>
         <div style="text-align:center;margin-top:12px"><a onclick="backToStep1()" style="font-size:13px;color:#888;cursor:pointer">← Go back</a></div>
       </div>
-
-      <!-- Step 3: Pending confirmation -->
       <div id="signup-step3" style="display:none;text-align:center">
         <div style="font-size:48px;margin-bottom:16px">⏳</div>
         <div class="modal-title" style="font-size:22px">Request Submitted!</div>
         <div style="margin:16px 0;font-size:15px;line-height:1.7;color:#555">
           Your account request has been received.<br>
-          The admin will review your CashApp payment and activate your account.<br><br>
-          <strong>We will send you an email once your account is approved.</strong>
+          The admin will review your CashApp payment and activate your account.
         </div>
         <button class="btn-ink" onclick="closeModal()">Close</button>
       </div>
@@ -529,7 +508,7 @@
   </div>
 </div>
 
-<!-- ══════════════ READER MODAL ══════════════ -->
+<!-- ══ READER MODAL ══ -->
 <div class="reader-modal" id="reader-modal">
   <div class="reader-box">
     <div class="reader-header">
@@ -538,170 +517,151 @@
         <div class="reader-book-author" id="rdr-author"></div>
       </div>
       <div class="reader-actions">
-        <button class="download-btn" id="rdr-dl" onclick="downloadBook()" style="display:none">⬇ Download PDF</button>
+        <button class="download-btn" id="rdr-dl" onclick="doDownload()" style="display:none">⬇ Download PDF</button>
         <button class="close-reader" onclick="closeReader()">✕ Close</button>
       </div>
     </div>
-    <div class="reader-body" id="rdr-body" style="padding:0;flex:1;display:flex;flex-direction:column;overflow:hidden"></div>
+    <div class="reader-body" id="rdr-body"></div>
   </div>
 </div>
 
 <script>
 const API = '';
-// Use localStorage so the session survives tab/browser close
-let token = localStorage.getItem('bv_token') || null;
+let token       = localStorage.getItem('bv_token') || null;
 let currentUser = JSON.parse(localStorage.getItem('bv_user') || 'null');
-let allBooks = [];
-let activeGenre = 'All';
-let currentBook = null;
-let appConfig = {};  // populated from /api/config
+let allBooks    = [];
+let allManga    = [];
+let activeGenre      = 'All';
+let activeMangaGenre = 'All';
+let activeTab   = 'books';
+let currentItem = null;   // {type:'book'|'manga', data}
+let appConfig   = {};
 
-// ── TOAST ──────────────────────────────────────────────────
+// ── Toast ──────────────────────────────────────────────────
 function showToast(msg, dur=3000){
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.style.display = 'block';
-  setTimeout(() => t.style.display = 'none', dur);
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.display='block';
+  setTimeout(()=>t.style.display='none',dur);
 }
 
 // ── API helper ─────────────────────────────────────────────
 async function api(path, opts={}){
-  const headers = {'Content-Type':'application/json', ...(opts.headers||{})};
-  if(token) headers['Authorization'] = 'Bearer ' + token;
-  const res = await fetch(API + path, {...opts, headers});
-  const data = await res.json().catch(() => ({}));
-  if(!res.ok) throw new Error(data.error || 'Request failed');
+  const h={'Content-Type':'application/json',...(opts.headers||{})};
+  if(token) h['Authorization']='Bearer '+token;
+  const res=await fetch(API+path,{...opts,headers:h});
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(data.error||'Request failed');
   return data;
 }
 
-// ── Load public config (CashApp handle etc.) ───────────────
+// ── Load public config ──────────────────────────────────────
 async function loadConfig(){
-  try {
-    appConfig = await fetch('/api/config').then(r => r.json());
-    // Update any visible CashApp handle elements
-    const handle = appConfig.cashapp_handle || '';
-    document.querySelectorAll('#cashapp-handle-display, #admin-cashapp-handle')
-      .forEach(el => el.textContent = handle);
-  } catch(e) {}
+  try{
+    appConfig=await fetch('/api/config').then(r=>r.json());
+    const h=appConfig.cashapp_handle||'';
+    document.getElementById('cashapp-handle-display').textContent=h;
+    document.getElementById('admin-cashapp-label').textContent=h;
+  }catch(e){}
 }
 
-// ── Email validation helper ────────────────────────────────
-function isValidEmail(email){
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-// ── AUTH ───────────────────────────────────────────────────
+// ── Auth ───────────────────────────────────────────────────
 function openModal(view){
   document.getElementById('auth-modal').classList.add('open');
-  document.getElementById('modal-login').style.display  = view === 'login'  ? 'block' : 'none';
-  document.getElementById('modal-signup').style.display = view === 'signup' ? 'block' : 'none';
-  document.getElementById('login-err').style.display = 'none';
-  document.getElementById('signup-err').style.display = 'none';
-  document.getElementById('signup-step1').style.display = 'block';
-  document.getElementById('signup-step2').style.display = 'none';
-  document.getElementById('signup-step3').style.display = 'none';
-  // Populate CashApp handle when modal opens
-  const handle = appConfig.cashapp_handle || '';
-  document.getElementById('cashapp-handle-display').textContent = handle;
+  document.getElementById('modal-login').style.display   = view==='login'  ?'block':'none';
+  document.getElementById('modal-signup').style.display  = view==='signup' ?'block':'none';
+  document.getElementById('login-err').style.display='none';
+  document.getElementById('signup-err').style.display='none';
+  document.getElementById('signup-step1').style.display='block';
+  document.getElementById('signup-step2').style.display='none';
+  document.getElementById('signup-step3').style.display='none';
+  // show cashapp handle
+  document.getElementById('cashapp-handle-display').textContent=appConfig.cashapp_handle||'…';
 }
 function closeModal(){ document.getElementById('auth-modal').classList.remove('open'); }
 
 async function doLogin(){
-  const btn = document.getElementById('login-btn');
-  btn.disabled = true; btn.textContent = 'Signing in…';
-  try {
-    const data = await api('/api/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({
-        username: document.getElementById('login-user').value.trim(),
-        password: document.getElementById('login-pass').value
-      })
-    });
-    saveSession(data);
-    closeModal();
-    data.is_admin ? showAdmin() : showLibrary();
-  } catch(e){
-    const errEl = document.getElementById('login-err');
-    errEl.textContent = e.message;
-    errEl.style.display = 'block';
-  } finally { btn.disabled = false; btn.textContent = 'Sign In'; }
+  const btn=document.getElementById('login-btn');
+  btn.disabled=true; btn.textContent='Signing in…';
+  try{
+    const data=await api('/api/auth/login',{method:'POST',body:JSON.stringify({
+      username:document.getElementById('login-user').value.trim(),
+      password:document.getElementById('login-pass').value
+    })});
+    saveSession(data); closeModal();
+    data.is_admin?showAdmin():showLibrary();
+  }catch(e){
+    const el=document.getElementById('login-err');
+    el.textContent=e.message; el.style.display='block';
+  }finally{btn.disabled=false;btn.textContent='Sign In';}
 }
 
 function goToPaymentStep(){
-  const name  = document.getElementById('reg-name').value.trim();
-  const email = document.getElementById('reg-email').value.trim();
-  const pw    = document.getElementById('reg-pass').value;
-  const err   = document.getElementById('signup-err');
-
-  if(!name){ err.textContent = 'Please enter your full name.'; err.style.display = 'block'; return; }
-  if(!isValidEmail(email)){ err.textContent = 'Please enter a valid email address.'; err.style.display = 'block'; return; }
-  if(pw.length < 4){ err.textContent = 'Password must be at least 4 characters.'; err.style.display = 'block'; return; }
-
-  err.style.display = 'none';
-  document.getElementById('signup-step1').style.display = 'none';
-  document.getElementById('signup-step2').style.display = 'block';
+  const name=document.getElementById('reg-name').value.trim();
+  const email=document.getElementById('reg-email').value.trim();
+  const pw=document.getElementById('reg-pass').value;
+  const err=document.getElementById('signup-err');
+  if(!name){err.textContent='Please enter your full name.';err.style.display='block';return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){err.textContent='Please enter a valid email.';err.style.display='block';return;}
+  if(pw.length<4){err.textContent='Password must be at least 4 characters.';err.style.display='block';return;}
+  err.style.display='none';
+  document.getElementById('signup-step1').style.display='none';
+  document.getElementById('signup-step2').style.display='block';
   updateCashAppAmount();
 }
-
 function backToStep1(){
-  document.getElementById('signup-step2').style.display = 'none';
-  document.getElementById('signup-step1').style.display = 'block';
+  document.getElementById('signup-step2').style.display='none';
+  document.getElementById('signup-step1').style.display='block';
 }
-
 function updateCashAppAmount(){
-  const tier = parseInt(document.getElementById('reg-plan')?.value || 1);
-  const el = document.getElementById('cashapp-amount');
-  if(el) el.textContent = tier === 2 ? '$20.00' : '$10.00';
+  const tier=parseInt(document.getElementById('reg-plan')?.value||1);
+  const el=document.getElementById('cashapp-amount');
+  if(el) el.textContent=tier===2?'$20.00':'$10.00';
 }
 
 async function doSignup(){
-  const btn = document.getElementById('signup-btn');
-  btn.disabled = true; btn.textContent = 'Submitting…';
-  try {
-    await api('/api/auth/register', {
-      method: 'POST',
-      body: JSON.stringify({
-        name:     document.getElementById('reg-name').value.trim(),
-        email:    document.getElementById('reg-email').value.trim(),
-        password: document.getElementById('reg-pass').value,
-        tier:     parseInt(document.getElementById('reg-plan').value)
-      })
-    });
-    document.getElementById('signup-step2').style.display = 'none';
-    document.getElementById('signup-step3').style.display = 'block';
-  } catch(e){
-    const err = document.getElementById('signup-err2');
-    err.textContent = e.message;
-    err.style.display = 'block';
-  } finally { btn.disabled = false; btn.textContent = "✓ I've Paid — Submit Request"; }
+  const btn=document.getElementById('signup-btn');
+  btn.disabled=true; btn.textContent='Submitting…';
+  try{
+    await api('/api/auth/register',{method:'POST',body:JSON.stringify({
+      name:document.getElementById('reg-name').value.trim(),
+      email:document.getElementById('reg-email').value.trim(),
+      password:document.getElementById('reg-pass').value,
+      tier:parseInt(document.getElementById('reg-plan').value)
+    })});
+    document.getElementById('signup-step2').style.display='none';
+    document.getElementById('signup-step3').style.display='block';
+  }catch(e){
+    const err=document.getElementById('signup-err2');
+    err.textContent=e.message; err.style.display='block';
+  }finally{btn.disabled=false;btn.textContent="✓ I've Paid — Submit Request";}
 }
 
 function saveSession(data){
-  token = data.token;
-  currentUser = {name: data.name, tier: data.tier, isAdmin: data.is_admin};
-  localStorage.setItem('bv_token', token);
-  localStorage.setItem('bv_user', JSON.stringify(currentUser));
+  token=data.token;
+  currentUser={name:data.name,tier:data.tier,isAdmin:data.is_admin};
+  localStorage.setItem('bv_token',token);
+  localStorage.setItem('bv_user',JSON.stringify(currentUser));
 }
-
 function logout(){
-  token = null; currentUser = null;
+  token=null;currentUser=null;
   localStorage.removeItem('bv_token');
   localStorage.removeItem('bv_user');
   showPage('page-landing');
 }
 
-// ── PAGES ──────────────────────────────────────────────────
+// ── Pages ──────────────────────────────────────────────────
 function showPage(id){
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  window.scrollTo(0, 0);
+  window.scrollTo(0,0);
 }
 
 async function showLibrary(){
   showPage('page-library');
-  document.getElementById('user-display-name').textContent = currentUser.name;
-  document.getElementById('user-tier-badge').textContent = currentUser.tier === 2 ? 'Scholar' : 'Reader';
-  document.getElementById('upsell-banner').style.display = currentUser.tier === 1 ? 'flex' : 'none';
-  await loadBooks();
+  document.getElementById('user-display-name').textContent=currentUser.name;
+  document.getElementById('user-tier-badge').textContent=currentUser.tier===2?'Scholar':'Reader';
+  document.getElementById('upsell-banner').style.display=currentUser.tier===1?'flex':'none';
+  await Promise.all([loadBooks(), loadManga()]);
 }
 
 async function showAdmin(){
@@ -709,26 +669,37 @@ async function showAdmin(){
   await loadAdminStats();
 }
 
-// ── LIBRARY ────────────────────────────────────────────────
+// ── Tab switching ──────────────────────────────────────────
+function switchTab(tab){
+  activeTab=tab;
+  document.getElementById('section-books').style.display=tab==='books'?'block':'none';
+  document.getElementById('section-manga').style.display=tab==='manga'?'block':'none';
+  document.getElementById('tab-books').className='lib-tab'+(tab==='books'?' active':'');
+  document.getElementById('tab-manga').className='lib-tab'+(tab==='manga'?' active':'');
+  document.getElementById('search-input').value='';
+  if(tab==='manga') renderMangaGrid(); else renderBooks();
+}
+
+function onSearch(){
+  if(activeTab==='manga') renderMangaGrid(); else renderBooks();
+}
+
+// ── Books ──────────────────────────────────────────────────
 async function loadBooks(){
-  try {
-    const res = await fetch('/api/books');
-    if(!res.ok) throw new Error('Server error ' + res.status);
-    allBooks = await res.json();
-  } catch(e){
-    showToast('Failed to load books: ' + e.message);
-    allBooks = [];
-  }
-  try { buildMarquee(allBooks); } catch(e){}
+  try{
+    const res=await fetch('/api/books');
+    allBooks=await res.json();
+  }catch(e){allBooks=[];}
+  try{buildMarquee(allBooks);}catch(e){}
   renderGenreFilters();
   renderBooks();
 }
 
 function buildMarquee(books){
-  const el = document.getElementById('marquee1');
-  if(!el || !books.length) return;
-  const items = [...books, ...books];
-  el.innerHTML = items.map(b => `
+  const el=document.getElementById('marquee1');
+  if(!el||!books.length) return;
+  const items=[...books,...books];
+  el.innerHTML=items.map(b=>`
     <div class="book-card-mini">
       <div class="book-spine" style="background:${b.color}">
         <span style="color:#fff;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;line-height:1.2">${b.title}</span>
@@ -737,300 +708,341 @@ function buildMarquee(books){
 }
 
 async function buildLandingMarquee(){
-  try {
-    const books = await fetch('/api/books').then(r => r.json());
-    buildMarquee(books);
-  } catch(e){}
+  try{const books=await fetch('/api/books').then(r=>r.json());buildMarquee(books);}catch(e){}
 }
 
 function renderGenreFilters(){
-  const genres = ['All', ...new Set(allBooks.map(b => b.genre).filter(Boolean))];
-  document.getElementById('genre-filters').innerHTML = genres.map(g =>
-    `<button class="genre-btn${g === activeGenre ? ' active' : ''}" onclick="setGenre('${g}')">${g}</button>`
+  const genres=['All',...new Set(allBooks.map(b=>b.genre).filter(Boolean))];
+  document.getElementById('genre-filters').innerHTML=genres.map(g=>
+    `<button class="genre-btn${g===activeGenre?' active':''}" onclick="setGenre('${g}')">${g}</button>`
   ).join('');
 }
-
-function setGenre(g){ activeGenre = g; renderGenreFilters(); renderBooks(); }
-function filterBooks(){ renderBooks(); }
+function setGenre(g){activeGenre=g;renderGenreFilters();renderBooks();}
 
 function renderBooks(){
-  const q = (document.getElementById('search-input')?.value || '').toLowerCase();
-  const filtered = allBooks.filter(b => {
-    const mg = activeGenre === 'All' || b.genre === activeGenre;
-    const mq = !q || b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q) || (b.genre || '').toLowerCase().includes(q);
-    return mg && mq;
+  const q=(document.getElementById('search-input')?.value||'').toLowerCase();
+  const filtered=allBooks.filter(b=>{
+    const mg=activeGenre==='All'||b.genre===activeGenre;
+    const mq=!q||b.title.toLowerCase().includes(q)||b.author.toLowerCase().includes(q)||(b.genre||'').toLowerCase().includes(q);
+    return mg&&mq;
   });
-  const grid = document.getElementById('books-grid');
-  if(!filtered.length){ grid.innerHTML = '<p style="color:#999;font-size:15px;grid-column:1/-1">No books found.</p>'; return; }
-  grid.innerHTML = filtered.map(b => `
+  const grid=document.getElementById('books-grid');
+  if(!filtered.length){grid.innerHTML='<p style="color:#999;font-size:15px;grid-column:1/-1">No books found. The admin has not uploaded any books yet.</p>';return;}
+  grid.innerHTML=filtered.map(b=>`
     <div class="book-item" onclick="openBook(${b.id})">
       <div class="book-cover" style="background:${b.color}">
-        <div class="lock-overlay">
-          <div class="lock-icon">📖</div>
-          <div class="lock-text">Read Now</div>
+        <div class="hover-overlay">
+          <div class="hover-icon">📖</div>
+          <div class="hover-text">Read Now</div>
         </div>
         <div class="book-title-cover">${b.title}</div>
         <div class="book-author-cover">${b.author}</div>
       </div>
       <div class="book-meta">
         <div class="book-meta-title">${b.title}</div>
-        <div class="book-meta-genre">${b.genre || ''} · ${b.year || ''}</div>
+        <div class="book-meta-genre">${b.genre||''} · ${b.year||''}</div>
       </div>
     </div>`).join('');
 }
 
 async function openBook(id){
-  try {
-    const b = await api(`/api/books/${id}/read`);
-    currentBook = b;
-    document.getElementById('rdr-title').textContent = b.title;
-    document.getElementById('rdr-author').textContent = `${b.author} · ${b.year || ''}`;
-    document.getElementById('rdr-body').innerHTML = `
-      <h3>${b.title}</h3>
-      <p><em>by ${b.author}</em></p>
-      <p>${b.description || ''}</p>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-      <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-      <p><em>[Full book text would stream here from your file storage]</em></p>`;
-    const dlBtn = document.getElementById('rdr-dl');
-    dlBtn.style.display = (currentUser.tier === 2 && b.has_file) ? 'inline-block' : 'none';
+  try{
+    const b=await api(`/api/books/${id}/read`);
+    currentItem={type:'book',data:b};
+    document.getElementById('rdr-title').textContent=b.title;
+    document.getElementById('rdr-author').textContent=`${b.author}${b.year?' · '+b.year:''}`;
+    const body=document.getElementById('rdr-body');
+    if(b.stream_url){
+      body.innerHTML=`<iframe src="${b.stream_url}"></iframe>`;
+    }else{
+      body.innerHTML=`<div class="reader-placeholder">
+        <strong style="font-family:'Playfair Display',serif;font-size:20px">${b.title}</strong><br>
+        <em>by ${b.author}</em><br><br>
+        ${b.description||''}
+        ${!b.has_file?'<br><br><span style="color:#bbb">No file has been uploaded for this book yet.</span>':''}
+      </div>`;
+    }
+    document.getElementById('rdr-dl').style.display=(currentUser.tier===2&&b.has_file)?'inline-block':'none';
     document.getElementById('reader-modal').classList.add('open');
-  } catch(e){ showToast('⚠ ' + e.message); }
+  }catch(e){showToast('⚠ '+e.message);}
 }
 
-function closeReader(){ document.getElementById('reader-modal').classList.remove('open'); }
-
-async function downloadBook(){
-  try {
-    const {url} = await api(`/api/books/${currentBook.id}/download`);
-    window.open(url, '_blank');
-  } catch(e){ showToast('⚠ ' + e.message); }
+// ── Manga ──────────────────────────────────────────────────
+async function loadManga(){
+  try{
+    const res=await fetch('/api/manga');
+    allManga=await res.json();
+  }catch(e){allManga=[];}
+  renderMangaGenreFilters();
+  renderMangaGrid();
 }
 
-// ── ADMIN ──────────────────────────────────────────────────
+function renderMangaGenreFilters(){
+  const genres=['All',...new Set(allManga.map(m=>m.genre).filter(Boolean))];
+  document.getElementById('manga-genre-filters').innerHTML=genres.map(g=>
+    `<button class="genre-btn${g===activeMangaGenre?' active':''}" onclick="setMangaGenre('${g}')">${g}</button>`
+  ).join('');
+}
+function setMangaGenre(g){activeMangaGenre=g;renderMangaGenreFilters();renderMangaGrid();}
+
+function renderMangaGrid(){
+  const q=(document.getElementById('search-input')?.value||'').toLowerCase();
+  const filtered=allManga.filter(m=>{
+    const mg=activeMangaGenre==='All'||m.genre===activeMangaGenre;
+    const mq=!q||m.title.toLowerCase().includes(q)||m.author.toLowerCase().includes(q)||(m.genre||'').toLowerCase().includes(q);
+    return mg&&mq;
+  });
+  const grid=document.getElementById('manga-grid');
+  if(!filtered.length){grid.innerHTML='<p style="color:#999;font-size:15px;grid-column:1/-1">No manga found. The admin has not uploaded any manga yet.</p>';return;}
+  grid.innerHTML=filtered.map(m=>`
+    <div class="book-item" onclick="openManga(${m.id})">
+      <div class="book-cover" style="background:${m.color}">
+        <div class="hover-overlay">
+          <div class="hover-icon">📖</div>
+          <div class="hover-text">Read Now</div>
+        </div>
+        <div class="book-title-cover">${m.title}</div>
+        <div class="book-author-cover">${m.author}</div>
+      </div>
+      <div class="book-meta">
+        <div class="book-meta-title">${m.title}</div>
+        <div class="book-meta-genre">${m.genre||''}${m.chapters!=null?' · '+m.chapters+' ch':''} · <span style="color:${m.status==='Completed'?'#2e7d32':'#9a6e00'}">${m.status}</span></div>
+      </div>
+    </div>`).join('');
+}
+
+async function openManga(id){
+  try{
+    const m=await api(`/api/manga/${id}/read`);
+    currentItem={type:'manga',data:m};
+    document.getElementById('rdr-title').textContent=m.title;
+    document.getElementById('rdr-author').textContent=`${m.author}${m.chapters!=null?' · '+m.chapters+' chapters':''} · ${m.status}`;
+    const body=document.getElementById('rdr-body');
+    if(m.stream_url){
+      body.innerHTML=`<iframe src="${m.stream_url}"></iframe>`;
+    }else{
+      body.innerHTML=`<div class="reader-placeholder">
+        <strong style="font-family:'Playfair Display',serif;font-size:20px">${m.title}</strong><br>
+        <em>by ${m.author}</em><br><br>
+        ${m.description||''}
+        ${!m.has_file?'<br><br><span style="color:#bbb">No file has been uploaded for this manga yet.</span>':''}
+      </div>`;
+    }
+    document.getElementById('rdr-dl').style.display=(currentUser.tier===2&&m.has_file)?'inline-block':'none';
+    document.getElementById('reader-modal').classList.add('open');
+  }catch(e){showToast('⚠ '+e.message);}
+}
+
+function closeReader(){document.getElementById('reader-modal').classList.remove('open');}
+
+async function doDownload(){
+  if(!currentItem) return;
+  try{
+    const endpoint=currentItem.type==='manga'
+      ?`/api/manga/${currentItem.data.id}/download`
+      :`/api/books/${currentItem.data.id}/download`;
+    const {url}=await api(endpoint);
+    window.open(url,'_blank');
+  }catch(e){showToast('⚠ '+e.message);}
+}
+
+// ── Admin ──────────────────────────────────────────────────
 async function loadAdminStats(){
-  try {
-    const s = await api('/api/admin/stats');
-    document.getElementById('st-books').textContent   = s.total_books;
-    document.getElementById('st-users').textContent   = s.total_users;
-    document.getElementById('st-pending').textContent = s.pending_users;
-    document.getElementById('st-revenue').textContent = '$' + s.monthly_revenue.toLocaleString();
-    document.getElementById('st-tier1').textContent   = s.tier1_users;
-    document.getElementById('st-tier2').textContent   = s.tier2_users;
-    const badge = document.getElementById('req-badge');
-    if(s.pending_users > 0){ badge.textContent = s.pending_users; badge.style.display = 'inline'; }
-    else { badge.style.display = 'none'; }
-  } catch(e){}
+  try{
+    const s=await api('/api/admin/stats');
+    document.getElementById('st-books').textContent=s.total_books;
+    document.getElementById('st-manga').textContent=s.total_manga;
+    document.getElementById('st-users').textContent=s.total_users;
+    document.getElementById('st-pending').textContent=s.pending_users;
+    document.getElementById('st-revenue').textContent='$'+s.monthly_revenue.toLocaleString();
+    document.getElementById('st-tier1').textContent=s.tier1_users;
+    document.getElementById('st-tier2').textContent=s.tier2_users;
+    const badge=document.getElementById('req-badge');
+    if(s.pending_users>0){badge.textContent=s.pending_users;badge.style.display='inline';}
+    else{badge.style.display='none';}
+  }catch(e){}
 }
 
 async function loadAdminRequests(){
-  try {
-    const users = await api('/api/admin/requests');
-    const t = document.getElementById('admin-requests-table');
-    const noMsg = document.getElementById('no-requests-msg');
+  try{
+    const users=await api('/api/admin/requests');
+    const t=document.getElementById('admin-requests-table');
+    const noMsg=document.getElementById('no-requests-msg');
     if(!users.length){
-      t.innerHTML = `<tr><th>Name</th><th>Email</th><th>Plan</th><th>Actions</th></tr>`;
-      noMsg.style.display = 'block'; return;
+      t.innerHTML=`<tr><th>Name</th><th>Email</th><th>Plan</th><th>Actions</th></tr>`;
+      noMsg.style.display='block';return;
     }
-    noMsg.style.display = 'none';
-    t.innerHTML = `<tr><th>Name</th><th>Email</th><th>Plan</th><th>Actions</th></tr>`
-      + users.map(u => `
+    noMsg.style.display='none';
+    t.innerHTML=`<tr><th>Name</th><th>Email</th><th>Plan</th><th>Actions</th></tr>`
+      +users.map(u=>`
         <tr>
           <td><strong>${u.name}</strong></td>
           <td>${u.email}</td>
-          <td><span class="tag ${u.tier === 2 ? 'tag-blue' : 'tag-gold'}">${u.tier === 2 ? 'Scholar $20' : 'Reader $10'}</span></td>
+          <td><span class="tag ${u.tier===2?'tag-blue':'tag-gold'}">${u.tier===2?'Scholar $20':'Reader $10'}</span></td>
           <td style="display:flex;gap:8px">
             <button onclick="approveUser(${u.id})" style="background:#e8f5e9;border:1px solid #4caf50;color:#2e7d32;padding:5px 14px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:700">✓ Approve</button>
             <button onclick="declineUser(${u.id})" style="background:#fee;border:1px solid #fcc;color:#c00;padding:5px 14px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:700">✗ Decline</button>
           </td>
         </tr>`).join('');
     await loadAdminStats();
-  } catch(e){ showToast('Failed to load requests'); }
+  }catch(e){showToast('Failed to load requests');}
 }
 
 async function approveUser(id){
-  try {
-    await api(`/api/admin/requests/${id}/approve`, {method:'POST'});
-    showToast('✓ User approved!'); loadAdminRequests();
-  } catch(e){ showToast('Error: ' + e.message); }
+  try{await api(`/api/admin/requests/${id}/approve`,{method:'POST'});showToast('✓ User approved!');loadAdminRequests();}
+  catch(e){showToast('Error: '+e.message);}
 }
-
 async function declineUser(id){
   if(!confirm('Decline this request?')) return;
-  try {
-    await api(`/api/admin/requests/${id}/decline`, {method:'POST'});
-    showToast('Request declined.'); loadAdminRequests();
-  } catch(e){ showToast('Error: ' + e.message); }
+  try{await api(`/api/admin/requests/${id}/decline`,{method:'POST'});showToast('Request declined.');loadAdminRequests();}
+  catch(e){showToast('Error: '+e.message);}
 }
 
 async function loadAdminUsers(){
-  try {
-    const users = await api('/api/admin/users');
-    const t = document.getElementById('admin-users-table');
-    t.innerHTML = `<tr><th>Name</th><th>Email</th><th>Plan</th><th>Status</th><th>Action</th></tr>`
-      + users.map(u => `
+  try{
+    const users=await api('/api/admin/users');
+    const t=document.getElementById('admin-users-table');
+    t.innerHTML=`<tr><th>Name</th><th>Email</th><th>Plan</th><th>Status</th><th>Action</th></tr>`
+      +users.map(u=>`
         <tr>
-          <td>${u.name}</td>
-          <td>${u.email}</td>
-          <td><span class="tag ${u.tier === 2 ? 'tag-blue' : 'tag-gold'}">${u.tier === 2 ? 'Scholar' : 'Reader'}</span></td>
-          <td><span class="tag" style="${u.status === 'active' ? 'background:#e8f5e9;color:#2e7d32' : 'background:#fee;color:#c00'}">${u.status}</span></td>
+          <td>${u.name}</td><td>${u.email}</td>
+          <td><span class="tag ${u.tier===2?'tag-blue':'tag-gold'}">${u.tier===2?'Scholar':'Reader'}</span></td>
+          <td><span class="tag" style="${u.status==='active'?'background:#e8f5e9;color:#2e7d32':'background:#fee;color:#c00'}">${u.status}</span></td>
           <td><button onclick="deleteUser(${u.id})" style="background:#fee;border:1px solid #fcc;color:#c00;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px">Delete</button></td>
         </tr>`).join('');
-  } catch(e){}
+  }catch(e){}
 }
-
 async function deleteUser(id){
   if(!confirm('Permanently delete this user?')) return;
-  try {
-    await api(`/api/admin/users/${id}`, {method:'DELETE'});
-    showToast('User deleted'); loadAdminUsers(); loadAdminStats();
-  } catch(e){ showToast('Error: ' + e.message); }
+  try{await api(`/api/admin/users/${id}`,{method:'DELETE'});showToast('User deleted');loadAdminUsers();loadAdminStats();}
+  catch(e){showToast('Error: '+e.message);}
 }
 
-function adminTab(section, el){
-  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
-  document.getElementById('admin-' + section).classList.add('active');
+function adminTab(section,el){
+  document.querySelectorAll('.admin-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(s=>s.classList.remove('active'));
+  document.getElementById('admin-'+section).classList.add('active');
   if(el) el.classList.add('active');
-  if(section === 'books')     loadAdminBooks();
-  if(section === 'users')     loadAdminUsers();
-  if(section === 'manga')     loadAdminManga();
-  if(section === 'requests')  loadAdminRequests();
-  if(section === 'dashboard') loadAdminStats();
+  if(section==='books')     loadAdminBooks();
+  if(section==='users')     loadAdminUsers();
+  if(section==='manga')     loadAdminManga();
+  if(section==='requests')  loadAdminRequests();
+  if(section==='dashboard') loadAdminStats();
 }
 
 async function uploadBook(){
-  const title  = document.getElementById('up-title').value.trim();
-  const author = document.getElementById('up-author').value.trim();
-  if(!title || !author){ showToast('Title and author are required'); return; }
-  const btn = document.getElementById('upload-btn');
-  btn.disabled = true; btn.textContent = 'Uploading…';
-  try {
-    const fd = new FormData();
-    fd.append('title', title);
-    fd.append('author', author);
-    fd.append('genre', document.getElementById('up-genre').value);
-    fd.append('year', document.getElementById('up-year').value);
-    fd.append('color', document.getElementById('up-color').value);
-    fd.append('description', document.getElementById('up-desc').value);
-    const fileInput = document.getElementById('up-file');
-    if(fileInput.files[0]) fd.append('file', fileInput.files[0]);
-
-    const res = await fetch('/api/admin/books', {method:'POST', headers:{'Authorization':'Bearer '+token}, body:fd});
-    const data = await res.json();
+  const title=document.getElementById('up-title').value.trim();
+  const author=document.getElementById('up-author').value.trim();
+  if(!title||!author){showToast('Title and author required');return;}
+  const btn=document.getElementById('upload-btn');
+  btn.disabled=true;btn.textContent='Uploading…';
+  try{
+    const fd=new FormData();
+    fd.append('title',title);fd.append('author',author);
+    fd.append('genre',document.getElementById('up-genre').value);
+    fd.append('year',document.getElementById('up-year').value);
+    fd.append('color',document.getElementById('up-color').value);
+    fd.append('description',document.getElementById('up-desc').value);
+    const fi=document.getElementById('up-file');
+    if(fi.files[0]) fd.append('file',fi.files[0]);
+    const res=await fetch('/api/admin/books',{method:'POST',headers:{Authorization:'Bearer '+token},body:fd});
+    const data=await res.json();
     if(!res.ok) throw new Error(data.error);
-
-    ['up-title','up-author','up-year','up-desc'].forEach(id => document.getElementById(id).value = '');
-    fileInput.value = '';
-    const s = document.getElementById('upload-success');
-    s.style.display = 'block';
-    setTimeout(() => s.style.display = 'none', 3000);
+    ['up-title','up-author','up-year','up-desc'].forEach(id=>document.getElementById(id).value='');
+    fi.value='';
+    const s=document.getElementById('upload-success');
+    s.style.display='block';setTimeout(()=>s.style.display='none',3000);
     await loadAdminStats();
-  } catch(e){ showToast('Upload failed: ' + e.message); }
-  finally { btn.disabled = false; btn.textContent = 'Upload Book'; }
+  }catch(e){showToast('Upload failed: '+e.message);}
+  finally{btn.disabled=false;btn.textContent='Upload Book';}
 }
 
 async function loadAdminBooks(){
-  try {
-    const books = await api('/api/books');
-    const t = document.getElementById('admin-books-table');
-    t.innerHTML = `<tr><th>#</th><th>Title</th><th>Author</th><th>Genre</th><th>Year</th><th>File</th><th>Action</th></tr>`
-      + books.map((b, i) => `
+  try{
+    const books=await api('/api/books');
+    const t=document.getElementById('admin-books-table');
+    t.innerHTML=`<tr><th>#</th><th>Title</th><th>Author</th><th>Genre</th><th>Year</th><th>File</th><th>Action</th></tr>`
+      +books.map((b,i)=>`
         <tr>
-          <td>${i+1}</td>
-          <td><strong>${b.title}</strong></td>
-          <td>${b.author}</td>
-          <td>${b.genre || '—'}</td>
-          <td>${b.year || '—'}</td>
-          <td>${b.has_file ? '✅ PDF' : '—'}</td>
+          <td>${i+1}</td><td><strong>${b.title}</strong></td><td>${b.author}</td>
+          <td>${b.genre||'—'}</td><td>${b.year||'—'}</td>
+          <td>${b.has_file?'✅ PDF':'—'}</td>
           <td><button onclick="deleteBook(${b.id})" style="background:#fee;border:1px solid #fcc;color:#c00;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px">Delete</button></td>
         </tr>`).join('');
-  } catch(e){ showToast('Failed to load books'); }
+  }catch(e){showToast('Failed to load books');}
 }
-
 async function deleteBook(id){
   if(!confirm('Delete this book?')) return;
-  try {
-    await api(`/api/admin/books/${id}`, {method:'DELETE'});
-    showToast('Book deleted'); loadAdminBooks(); loadAdminStats();
-  } catch(e){ showToast('Error: ' + e.message); }
+  try{await api(`/api/admin/books/${id}`,{method:'DELETE'});showToast('Book deleted');loadAdminBooks();loadAdminStats();}
+  catch(e){showToast('Error: '+e.message);}
 }
 
 async function uploadManga(){
-  const title  = document.getElementById('mn-title').value.trim();
-  const author = document.getElementById('mn-author').value.trim();
-  if(!title || !author){ showToast('Title and author are required'); return; }
-  const btn = document.getElementById('manga-upload-btn');
-  btn.disabled = true; btn.textContent = 'Uploading…';
-  try {
-    const fd = new FormData();
-    fd.append('title', title);
-    fd.append('author', author);
-    fd.append('genre', document.getElementById('mn-genre').value);
-    fd.append('chapters', document.getElementById('mn-chapters').value);
-    fd.append('status', document.getElementById('mn-status').value);
-    fd.append('color', document.getElementById('mn-color').value);
-    fd.append('description', document.getElementById('mn-desc').value);
-    const fileInput = document.getElementById('mn-file');
-    if(fileInput.files[0]) fd.append('file', fileInput.files[0]);
-
-    const res  = await fetch('/api/admin/manga', {method:'POST', headers:{'Authorization':'Bearer '+token}, body:fd});
-    const data = await res.json();
+  const title=document.getElementById('mn-title').value.trim();
+  const author=document.getElementById('mn-author').value.trim();
+  if(!title||!author){showToast('Title and author required');return;}
+  const btn=document.getElementById('manga-upload-btn');
+  btn.disabled=true;btn.textContent='Uploading…';
+  try{
+    const fd=new FormData();
+    fd.append('title',title);fd.append('author',author);
+    fd.append('genre',document.getElementById('mn-genre').value);
+    fd.append('chapters',document.getElementById('mn-chapters').value);
+    fd.append('status',document.getElementById('mn-status').value);
+    fd.append('color',document.getElementById('mn-color').value);
+    fd.append('description',document.getElementById('mn-desc').value);
+    const fi=document.getElementById('mn-file');
+    if(fi.files[0]) fd.append('file',fi.files[0]);
+    const res=await fetch('/api/admin/manga',{method:'POST',headers:{Authorization:'Bearer '+token},body:fd});
+    const data=await res.json();
     if(!res.ok) throw new Error(data.error);
-
-    ['mn-title','mn-author','mn-chapters','mn-desc'].forEach(id => document.getElementById(id).value = '');
-    fileInput.value = '';
-    const s = document.getElementById('manga-upload-success');
-    s.style.display = 'block'; setTimeout(() => s.style.display = 'none', 3000);
+    ['mn-title','mn-author','mn-chapters','mn-desc'].forEach(id=>document.getElementById(id).value='');
+    fi.value='';
+    const s=document.getElementById('manga-upload-success');
+    s.style.display='block';setTimeout(()=>s.style.display='none',3000);
     showToast('✓ Manga uploaded!');
-  } catch(e){ showToast('Upload failed: ' + e.message); }
-  finally { btn.disabled = false; btn.textContent = 'Upload Manga'; }
+  }catch(e){showToast('Upload failed: '+e.message);}
+  finally{btn.disabled=false;btn.textContent='Upload Manga';}
 }
 
 async function loadAdminManga(){
-  try {
-    const items = await api('/api/manga');
-    const t = document.getElementById('admin-manga-table');
-    t.innerHTML = `<tr><th>#</th><th>Title</th><th>Author</th><th>Genre</th><th>Chapters</th><th>Status</th><th>File</th><th>Action</th></tr>`
-      + items.map((m, i) => `
+  try{
+    const items=await api('/api/manga');
+    const t=document.getElementById('admin-manga-table');
+    t.innerHTML=`<tr><th>#</th><th>Title</th><th>Author</th><th>Genre</th><th>Chapters</th><th>Status</th><th>File</th><th>Action</th></tr>`
+      +items.map((m,i)=>`
         <tr>
-          <td>${i+1}</td>
-          <td><strong>${m.title}</strong></td>
-          <td>${m.author}</td>
-          <td>${m.genre || '—'}</td>
-          <td>${m.chapters != null ? m.chapters : '—'}</td>
-          <td><span class="tag ${m.status === 'Completed' ? 'tag-blue' : 'tag-gold'}">${m.status}</span></td>
-          <td>${m.has_file ? '✅ File' : '—'}</td>
+          <td>${i+1}</td><td><strong>${m.title}</strong></td><td>${m.author}</td>
+          <td>${m.genre||'—'}</td><td>${m.chapters!=null?m.chapters:'—'}</td>
+          <td><span class="tag ${m.status==='Completed'?'tag-blue':'tag-gold'}">${m.status}</span></td>
+          <td>${m.has_file?'✅ File':'—'}</td>
           <td><button onclick="deleteManga(${m.id})" style="background:#fee;border:1px solid #fcc;color:#c00;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px">Delete</button></td>
         </tr>`).join('');
-  } catch(e){ showToast('Failed to load manga'); }
+  }catch(e){showToast('Failed to load manga');}
 }
-
 async function deleteManga(id){
   if(!confirm('Delete this manga?')) return;
-  try {
-    await api(`/api/admin/manga/${id}`, {method:'DELETE'});
-    showToast('Manga deleted'); loadAdminManga();
-  } catch(e){ showToast('Error: ' + e.message); }
+  try{await api(`/api/admin/manga/${id}`,{method:'DELETE'});showToast('Manga deleted');loadAdminManga();}
+  catch(e){showToast('Error: '+e.message);}
 }
 
-// ── INIT ───────────────────────────────────────────────────
+// ── Init ───────────────────────────────────────────────────
 loadConfig();
 buildLandingMarquee();
 
-if(token && currentUser){
+if(token&&currentUser){
   if(currentUser.isAdmin) showAdmin();
   else showLibrary();
 }
 
-document.addEventListener('keydown', e => {
-  if(e.key === 'Escape'){ closeModal(); closeReader(); }
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeModal();closeReader();}
 });
-document.getElementById('auth-modal').addEventListener('click', function(e){
-  if(e.target === this) closeModal();
+document.getElementById('auth-modal').addEventListener('click',function(e){
+  if(e.target===this) closeModal();
 });
-document.getElementById('reader-modal').addEventListener('click', function(e){
-  if(e.target === this) closeReader();
+document.getElementById('reader-modal').addEventListener('click',function(e){
+  if(e.target===this) closeReader();
 });
 </script>
 </body>
