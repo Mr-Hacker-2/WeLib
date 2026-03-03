@@ -54,6 +54,8 @@ def get_b2_client():
 ADMIN_EMAIL    = os.environ.get('ADMIN_EMAIL',    'admin@bookvault.com')
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin1')
 CASHAPP_HANDLE = os.environ.get('CASHAPP_HANDLE', '$YourCashAppHandle')
+WORKER_EMAIL   = os.environ.get('WORKER_EMAIL',   'worker@bookvault.com')
+WORKER_PASSWORD= os.environ.get('WORKER_PASSWORD','worker')
 
 # ── Models ─────────────────────────────────────────────────
 class User(db.Model):
@@ -63,7 +65,8 @@ class User(db.Model):
     email    = db.Column(db.String(200), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     tier     = db.Column(db.Integer, default=1)
-    is_admin = db.Column(db.Boolean, default=False)
+    is_admin  = db.Column(db.Boolean, default=False)
+    is_worker = db.Column(db.Boolean, default=False)
     status           = db.Column(db.String(20), default='pending')
     membership_start = db.Column(db.DateTime, nullable=True)
 
@@ -102,6 +105,7 @@ def init_db():
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS membership_start TIMESTAMP",
         "ALTER TABLE books ADD COLUMN IF NOT EXISTS cover_key VARCHAR(500)",
         "ALTER TABLE manga ADD COLUMN IF NOT EXISTS cover_key VARCHAR(500)",
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS is_worker BOOLEAN DEFAULT FALSE",
     ]
     with db.engine.connect() as conn:
         for sql in _migrations:
@@ -117,6 +121,17 @@ def init_db():
                 name='Admin', email=ADMIN_EMAIL,
                 password=bcrypt.generate_password_hash(ADMIN_PASSWORD).decode(),
                 tier=0, is_admin=True, status='active'
+            ))
+            db.session.commit()
+    except Exception:
+        db.session.rollback()
+    # ── Seed worker account ───────────────────────────────────────
+    try:
+        if not User.query.filter_by(email=WORKER_EMAIL).first():
+            db.session.add(User(
+                name='Worker', email=WORKER_EMAIL,
+                password=bcrypt.generate_password_hash(WORKER_PASSWORD).decode(),
+                tier=0, is_admin=False, is_worker=True, status='active'
             ))
             db.session.commit()
     except Exception:
@@ -187,6 +202,13 @@ def require_admin():
         return None, (jsonify({'error': 'Admin only'}), 403)
     return user, None
 
+def require_uploader():
+    """Admin OR worker can upload content."""
+    user = User.query.get(int(get_jwt_identity()))
+    if not user or (not user.is_admin and not user.is_worker):
+        return None, (jsonify({'error': 'Not authorized'}), 403)
+    return user, None
+
 def _stream_b2(file_key):
     """Stream object from B2 through Flask. The B2 URL is never sent to the client."""
     obj = get_b2_client().get_object(Bucket=B2_BUCKET_NAME, Key=file_key)
@@ -228,7 +250,15 @@ def login():
         admin = User.query.filter_by(is_admin=True).first()
         if admin:
             return jsonify({'token': create_access_token(identity=str(admin.id)),
-                            'name': admin.name, 'tier': admin.tier, 'is_admin': True})
+                            'name': admin.name, 'tier': admin.tier, 'is_admin': True,
+                            'is_worker': False})
+
+    if username in ('worker', WORKER_EMAIL) and password == WORKER_PASSWORD:
+        worker = User.query.filter_by(is_worker=True).first()
+        if worker:
+            return jsonify({'token': create_access_token(identity=str(worker.id)),
+                            'name': worker.name, 'tier': 0, 'is_admin': False,
+                            'is_worker': True})
 
     user = User.query.filter_by(email=username).first()
     if not user or not bcrypt.check_password_hash(user.password, password):
@@ -254,6 +284,7 @@ def login():
 
     return jsonify({'token': create_access_token(identity=str(user.id)),
                     'name': user.name, 'tier': user.tier, 'is_admin': user.is_admin,
+                    'is_worker': getattr(user,'is_worker',False),
                     'membership_expired': membership_expired,
                     'days_remaining': days_remaining})
 
@@ -303,6 +334,7 @@ def me():
         else:
             days_remaining = 30 - elapsed
     return jsonify({'name': user.name, 'tier': user.tier, 'is_admin': user.is_admin,
+                    'is_worker': getattr(user,'is_worker',False),
                     'membership_expired': membership_expired, 'days_remaining': days_remaining})
 
 # ── Books ──────────────────────────────────────────────────
@@ -425,7 +457,7 @@ def download_manga(manga_id):
 @app.route('/api/admin/books', methods=['POST'])
 @jwt_required()
 def admin_upload_book():
-    _, err = require_admin()
+    _, err = require_uploader()
     if err: return err
     title  = request.form.get('title', '').strip()
     author = request.form.get('author', '').strip()
@@ -489,7 +521,7 @@ def admin_delete_book(book_id):
 @app.route('/api/admin/manga', methods=['POST'])
 @jwt_required()
 def admin_upload_manga():
-    _, err = require_admin()
+    _, err = require_uploader()
     if err: return err
     title  = request.form.get('title', '').strip()
     author = request.form.get('author', '').strip()
