@@ -82,6 +82,17 @@ class Book(db.Model):
     file_key    = db.Column(db.String(500))
     file_name   = db.Column(db.String(300))
     cover_key   = db.Column(db.String(500), nullable=True)   # B2 key for cover image
+    folder_id   = db.Column(db.Integer, nullable=True)  # optional folder grouping
+
+class Folder(db.Model):
+    __tablename__ = 'folders'
+    id          = db.Column(db.Integer, primary_key=True)
+    name        = db.Column(db.String(300), nullable=False)
+    description = db.Column(db.Text)
+    color       = db.Column(db.String(20), default='#4a3728')
+    cover_key   = db.Column(db.String(500), nullable=True)
+    item_type   = db.Column(db.String(10), default='book')   # 'book' or 'manga'
+    created_at  = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
 class DonatedBook(db.Model):
     __tablename__ = 'donated_books'
@@ -123,6 +134,7 @@ class Manga(db.Model):
     file_key    = db.Column(db.String(500))
     file_name   = db.Column(db.String(300))
     cover_key   = db.Column(db.String(500), nullable=True)   # B2 key for cover image
+    folder_id   = db.Column(db.Integer, nullable=True)  # optional folder grouping
 
 # ── DB Init ────────────────────────────────────────────────
 def init_db():
@@ -133,6 +145,17 @@ def init_db():
         "ALTER TABLE books ADD COLUMN IF NOT EXISTS cover_key VARCHAR(500)",
         "ALTER TABLE manga ADD COLUMN IF NOT EXISTS cover_key VARCHAR(500)",
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS is_worker BOOLEAN DEFAULT FALSE",
+        """CREATE TABLE IF NOT EXISTS folders (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(300) NOT NULL,
+            description TEXT,
+            color VARCHAR(20) DEFAULT '#4a3728',
+            cover_key VARCHAR(500),
+            item_type VARCHAR(10) DEFAULT 'book',
+            created_at TIMESTAMP DEFAULT NOW()
+        )""",
+        "ALTER TABLE books ADD COLUMN IF NOT EXISTS folder_id INTEGER",
+        "ALTER TABLE manga ADD COLUMN IF NOT EXISTS folder_id INTEGER",
         """CREATE TABLE IF NOT EXISTS donated_books (
             id SERIAL PRIMARY KEY,
             user_id INTEGER REFERENCES users(id),
@@ -448,6 +471,88 @@ def decline_book_request(req_id):
     return jsonify({'declined': req_id})
 
 
+
+# ── Folders ────────────────────────────────────────────────
+@app.route('/api/folders', methods=['GET'])
+def list_folders():
+    """Return all folders with their item count."""
+    item_type = request.args.get('type', 'book')
+    folders = Folder.query.filter_by(item_type=item_type).order_by(Folder.id.asc()).all()
+    result = []
+    for f in folders:
+        if item_type == 'book':
+            count = Book.query.filter_by(folder_id=f.id).count()
+            items = [{'id': b.id, 'title': b.title, 'author': b.author,
+                      'genre': b.genre, 'year': b.year, 'color': b.color, 'folder_id': b.folder_id,
+                      'has_file': bool(b.file_key),
+                      'cover_url': cover_stream_url(b.cover_key)}
+                     for b in Book.query.filter_by(folder_id=f.id).all()]
+        else:
+            count = Manga.query.filter_by(folder_id=f.id).count()
+            items = [{'id': m.id, 'title': m.title, 'author': m.author,
+                      'genre': m.genre, 'chapters': m.chapters, 'status': m.status, 'folder_id': m.folder_id,
+                      'color': m.color, 'has_file': bool(m.file_key),
+                      'cover_url': cover_stream_url(m.cover_key)}
+                     for m in Manga.query.filter_by(folder_id=f.id).all()]
+        result.append({
+            'id': f.id, 'name': f.name, 'description': f.description,
+            'color': f.color, 'item_type': f.item_type,
+            'cover_url': cover_stream_url(f.cover_key),
+            'count': count, 'items': items
+        })
+    return jsonify(result)
+
+
+@app.route('/api/admin/folders', methods=['POST'])
+@jwt_required()
+def admin_create_folder():
+    _, err = require_admin()
+    if err: return err
+    name = request.form.get('name', '').strip()
+    if not name:
+        return jsonify({'error': 'Folder name required'}), 400
+    cover_key = None
+    if 'cover' in request.files:
+        try: cover_key, _ = _upload_cover(request.files['cover'], 'folders')
+        except Exception: pass
+    folder = Folder(
+        name=name,
+        description=request.form.get('description', '').strip(),
+        color=request.form.get('color', '#4a3728'),
+        item_type=request.form.get('item_type', 'book'),
+        cover_key=cover_key
+    )
+    db.session.add(folder)
+    db.session.commit()
+    return jsonify({'id': folder.id, 'name': folder.name}), 201
+
+
+@app.route('/api/admin/folders', methods=['GET'])
+@jwt_required()
+def admin_list_folders():
+    _, err = require_admin()
+    if err: return err
+    item_type = request.args.get('type', 'book')
+    folders = Folder.query.filter_by(item_type=item_type).order_by(Folder.id.asc()).all()
+    return jsonify([{'id': f.id, 'name': f.name, 'item_type': f.item_type} for f in folders])
+
+
+@app.route('/api/admin/folders/<int:folder_id>', methods=['DELETE'])
+@jwt_required()
+def admin_delete_folder(folder_id):
+    _, err = require_admin()
+    if err: return err
+    folder = Folder.query.get_or_404(folder_id)
+    # Unassign items from this folder
+    Book.query.filter_by(folder_id=folder_id).update({'folder_id': None})
+    Manga.query.filter_by(folder_id=folder_id).update({'folder_id': None})
+    if B2_BUCKET_NAME and folder.cover_key:
+        try: get_b2_client().delete_object(Bucket=B2_BUCKET_NAME, Key=folder.cover_key)
+        except Exception: pass
+    db.session.delete(folder)
+    db.session.commit()
+    return jsonify({'deleted': folder_id})
+
 # ── Frontend ───────────────────────────────────────────────
 @app.route('/')
 def index():
@@ -565,7 +670,7 @@ def me():
 def list_books():
     books = Book.query.order_by(Book.id.asc()).all()
     return jsonify([{'id': b.id, 'title': b.title, 'author': b.author,
-                     'genre': b.genre, 'year': b.year, 'color': b.color,
+                     'genre': b.genre, 'year': b.year, 'color': b.color, 'folder_id': b.folder_id,
                      'description': b.description, 'has_file': bool(b.file_key),
                      'cover_url': cover_stream_url(b.cover_key)}
                     for b in books])
@@ -624,7 +729,7 @@ def download_book(book_id):
 def list_manga():
     items = Manga.query.order_by(Manga.id.asc()).all()
     return jsonify([{'id': m.id, 'title': m.title, 'author': m.author,
-                     'genre': m.genre, 'chapters': m.chapters, 'status': m.status,
+                     'genre': m.genre, 'chapters': m.chapters, 'status': m.status, 'folder_id': m.folder_id,
                      'color': m.color, 'description': m.description,
                      'has_file': bool(m.file_key),
                      'cover_url': cover_stream_url(m.cover_key)}
@@ -711,6 +816,7 @@ def admin_upload_book():
                 return jsonify({'error': f'B2 upload failed: {e}'}), 500
 
     year = request.form.get('year', '')
+    folder_raw = request.form.get('folder_id', '')
     book = Book(
         title=title, author=author,
         genre=request.form.get('genre', ''),
@@ -718,7 +824,8 @@ def admin_upload_book():
         color=request.form.get('color', '#1a3a5c'),
         description=request.form.get('description', ''),
         file_key=file_key, file_name=file_name,
-        cover_key=cover_key
+        cover_key=cover_key,
+        folder_id=int(folder_raw) if folder_raw.isdigit() else None
     )
     db.session.add(book)
     db.session.commit()
@@ -775,6 +882,7 @@ def admin_upload_manga():
                 return jsonify({'error': f'B2 upload failed: {e}'}), 500
 
     chapters = request.form.get('chapters', '')
+    folder_raw = request.form.get('folder_id', '')
     manga = Manga(
         title=title, author=author,
         genre=request.form.get('genre', ''),
@@ -783,7 +891,8 @@ def admin_upload_manga():
         color=request.form.get('color', '#1a1a2e'),
         description=request.form.get('description', ''),
         file_key=file_key, file_name=file_name,
-        cover_key=cover_key
+        cover_key=cover_key,
+        folder_id=int(folder_raw) if folder_raw.isdigit() else None
     )
     db.session.add(manga)
     db.session.commit()
