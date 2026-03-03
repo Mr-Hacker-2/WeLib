@@ -55,7 +55,25 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);m
 .plan-features li.no::before{content:'✗';color:rgba(255,255,255,0.2);}
 .plan-features li.no{color:rgba(255,255,255,0.3);}
 
-/* MODAL */
+/* EXPIRED MEMBERSHIP PAGE */
+#page-expired{background:var(--ink);color:var(--paper);display:none;min-height:100vh;align-items:center;justify-content:center;flex-direction:column;}
+#page-expired.active{display:flex;}
+.expired-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:60px 52px;max-width:500px;width:90%;text-align:center;animation:fadeUp .4s ease;}
+.expired-icon{font-size:64px;margin-bottom:24px;}
+.expired-title{font-family:'Playfair Display',serif;font-size:36px;font-weight:900;margin-bottom:12px;}
+.expired-sub{font-size:15px;color:rgba(255,255,255,0.55);line-height:1.7;margin-bottom:36px;}
+.btn-upgrade{background:linear-gradient(135deg,#c9963c,#e8b84b,#c9963c);background-size:200% auto;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:16px;font-weight:900;padding:16px 44px;border-radius:6px;border:none;cursor:pointer;letter-spacing:0.5px;box-shadow:0 4px 30px rgba(201,150,60,0.5),0 0 0 1px rgba(201,150,60,0.3);transition:.3s;animation:goldShimmer 2.5s linear infinite;}
+@keyframes goldShimmer{0%{background-position:0% center;}100%{background-position:200% center;}}
+.btn-upgrade:hover{transform:translateY(-2px);box-shadow:0 8px 40px rgba(201,150,60,0.7),0 0 0 2px rgba(201,150,60,0.5);}
+.expired-logout{margin-top:20px;font-size:13px;color:rgba(255,255,255,0.35);cursor:pointer;text-decoration:underline;}
+.expired-logout:hover{color:rgba(255,255,255,0.6);}
+
+/* RENEWAL MODAL */
+#renewal-modal .modal{max-width:440px;}
+.renewal-cashapp-box{background:linear-gradient(135deg,#1a1208,#2a1e0a);border:2px solid var(--gold);border-radius:10px;padding:28px;text-align:center;margin-bottom:20px;}
+.renewal-handle{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:var(--gold);margin-bottom:6px;}
+.renewal-amount{font-size:26px;font-weight:900;color:#4a5e52;}
+.renewal-note{font-size:13px;color:#666;line-height:1.6;margin-bottom:20px;}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;}
 .modal-overlay.open{display:flex;}
 .modal{background:var(--cream);color:var(--ink);border-radius:10px;padding:48px;width:100%;max-width:420px;position:relative;animation:fadeUp .25s ease;}
@@ -201,6 +219,15 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
 .bm-label{font-size:13px;color:#fff;margin-top:2px;}.reader-shell.day .bm-label{color:var(--ink);}
 .bm-empty{font-size:13px;color:rgba(255,255,255,0.3);text-align:center;margin-top:20px;}
 
+/* Stats panel (Scholar only) */
+.stats-panel{position:absolute;left:0;top:0;bottom:0;width:240px;background:rgba(20,14,6,0.96);border-right:1px solid rgba(201,150,60,0.2);padding:20px;overflow-y:auto;transform:translateX(-100%);transition:transform .25s;z-index:20;}
+.stats-panel.open{transform:translateX(0);}
+.reader-shell.day .stats-panel{background:rgba(250,247,242,0.97);border-color:rgba(0,0,0,0.1);}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.07);font-size:13px;color:rgba(255,255,255,0.6);}
+.stat-row strong{color:#fff;font-weight:700;}
+.reader-shell.day .stat-row{color:#666;border-color:rgba(0,0,0,0.07);}
+.reader-shell.day .stat-row strong{color:var(--ink);}
+
 /* Zoom controls */
 .zoom-controls{display:flex;gap:4px;align-items:center;}
 .zoom-val{font-size:12px;color:rgba(255,255,255,0.6);min-width:38px;text-align:center;}
@@ -314,12 +341,14 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
         <ul class="plan-features">
           <li>Everything in Reader</li>
           <li>⬇ Download PDFs — keep forever</li>
-          <li>🌙 Night mode &amp; Sepia mode</li>
-          <li>🔖 Save bookmarks per book</li>
-          <li>🔍 Zoom in / out controls</li>
+          <li>🌙 Night · Day · Sepia reading modes</li>
+          <li>🔖 Bookmarks — save any page</li>
+          <li>🔍 Zoom &amp; custom font size controls</li>
           <li>↗ Jump to any page instantly</li>
-          <li>⏱ Reading time remaining</li>
-          <li>📊 Progress saved automatically</li>
+          <li>⏱ Reading time &amp; session stats</li>
+          <li>📊 Progress auto-saved per book</li>
+          <li>✏️ Highlight mode</li>
+          <li>📜 Full scroll mode</li>
         </ul>
         <button class="btn btn-gold" style="width:100%;padding:13px" onclick="openModal('signup')">Get Scholar</button>
       </div>
@@ -411,7 +440,7 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
         <h2 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;margin-bottom:24px">Pending Requests</h2>
         <div class="admin-card">
           <h3>Account Requests — Awaiting Approval</h3>
-          <p style="font-size:13px;color:#888;margin-bottom:20px">Verify the CashApp payment to <strong id="admin-cashapp-label">…</strong> with description "Requesting to make an account in BookVault", then approve or decline.</p>
+          <p style="font-size:13px;color:#888;margin-bottom:20px">Verify the CashApp payment to <strong id="admin-cashapp-label">…</strong>. This covers both <strong>new signups</strong> and <strong>membership renewals</strong>. Approve or decline below.</p>
           <table class="books-admin-table" id="admin-requests-table"><tr><th>Name</th><th>Email</th><th>Plan</th><th>Actions</th></tr></table>
           <p id="no-requests-msg" style="color:#aaa;font-size:14px;margin-top:16px;display:none">No pending requests. 🎉</p>
         </div>
@@ -428,7 +457,18 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
           <div class="form-row">
             <div class="form-field"><label>Genre</label><select id="up-genre"><option>Classic Literature</option><option>Science Fiction</option><option>Fantasy</option><option>Mystery</option><option>Romance</option><option>History</option><option>Philosophy</option><option>Self-Help</option><option>Biography</option><option>Thriller</option></select></div>
             <div class="form-field"><label>Year Published</label><input type="number" id="up-year" placeholder="e.g. 1965"></div>
-            <div class="form-field"><label>Cover Color</label><input type="color" id="up-color" value="#1a3a5c"></div>
+            <div class="form-field"><label>Fallback Cover Color</label><input type="color" id="up-color" value="#1a3a5c" title="Used if no cover image is uploaded"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Cover Image (JPG / PNG / WEBP) <span style="font-weight:400;color:#aaa;text-transform:none">— replaces color if uploaded</span></label>
+              <input type="file" id="up-cover" accept=".jpg,.jpeg,.png,.webp" onchange="previewCover('up-cover','up-cover-preview')">
+              <div id="up-cover-preview" style="margin-top:10px;display:none">
+                <img style="width:80px;height:120px;object-fit:cover;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.2)" id="up-cover-img" src="">
+                <span style="font-size:12px;color:#4a5e52;margin-left:10px;vertical-align:middle">✓ Cover selected</span>
+                <button type="button" onclick="clearCover('up-cover','up-cover-preview')" style="font-size:11px;color:#c00;background:none;border:none;cursor:pointer;margin-left:6px">✕ Remove</button>
+              </div>
+            </div>
           </div>
           <div class="form-row"><div class="form-field"><label>Description</label><textarea id="up-desc" placeholder="Short description…"></textarea></div></div>
           <div class="form-row"><div class="form-field"><label>Upload File (PDF / EPUB / TXT)</label><input type="file" id="up-file" accept=".pdf,.epub,.txt"></div></div>
@@ -456,7 +496,18 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
             <div class="form-field"><label>Genre</label><select id="mn-genre"><option>Action</option><option>Adventure</option><option>Comedy</option><option>Drama</option><option>Fantasy</option><option>Horror</option><option>Romance</option><option>Sci-Fi</option><option>Slice of Life</option><option>Sports</option><option>Supernatural</option><option>Thriller</option></select></div>
             <div class="form-field"><label>Chapters</label><input type="number" id="mn-chapters" placeholder="e.g. 700"></div>
             <div class="form-field"><label>Status</label><select id="mn-status"><option value="Ongoing">Ongoing</option><option value="Completed">Completed</option><option value="Hiatus">Hiatus</option></select></div>
-            <div class="form-field"><label>Cover Color</label><input type="color" id="mn-color" value="#1a1a2e"></div>
+            <div class="form-field"><label>Fallback Cover Color</label><input type="color" id="mn-color" value="#1a1a2e"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Cover Image (JPG / PNG / WEBP) <span style="font-weight:400;color:#aaa;text-transform:none">— replaces color if uploaded</span></label>
+              <input type="file" id="mn-cover" accept=".jpg,.jpeg,.png,.webp" onchange="previewCover('mn-cover','mn-cover-preview')">
+              <div id="mn-cover-preview" style="margin-top:10px;display:none">
+                <img style="width:80px;height:120px;object-fit:cover;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.2)" id="mn-cover-img" src="">
+                <span style="font-size:12px;color:#4a5e52;margin-left:10px;vertical-align:middle">✓ Cover selected</span>
+                <button type="button" onclick="clearCover('mn-cover','mn-cover-preview')" style="font-size:11px;color:#c00;background:none;border:none;cursor:pointer;margin-left:6px">✕ Remove</button>
+              </div>
+            </div>
           </div>
           <div class="form-row"><div class="form-field"><label>Description</label><textarea id="mn-desc" placeholder="Short description…"></textarea></div></div>
           <div class="form-row"><div class="form-field"><label>Upload File (PDF / CBZ / CBR / ZIP)</label><input type="file" id="mn-file" accept=".pdf,.cbz,.cbr,.zip"></div></div>
@@ -555,10 +606,17 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
             <span class="zoom-val" id="zoom-val">100%</span>
             <button class="rdr-btn" onclick="adjustZoom(0.15)" title="Zoom in">+</button>
           </div>
+          <div class="zoom-controls" title="Font size (affects zoom scale)">
+            <button class="rdr-btn" onclick="adjustFontSize(-10)" title="Smaller">A−</button>
+            <span class="zoom-val" id="font-size-val">100%</span>
+            <button class="rdr-btn" onclick="adjustFontSize(10)" title="Larger">A+</button>
+          </div>
           <button class="rdr-btn" id="btn-mode-day" onclick="setMode('day')" title="Day mode">☀️</button>
           <button class="rdr-btn active" id="btn-mode-night" onclick="setMode('night')" title="Night mode">🌙</button>
           <button class="rdr-btn" id="btn-mode-sepia" onclick="setMode('sepia')" title="Sepia mode">📜</button>
+          <button class="rdr-btn" id="btn-highlight" onclick="toggleHighlight()" title="Highlight mode">✏️</button>
           <button class="rdr-btn" id="btn-bookmarks" onclick="toggleBookmarks()" title="Bookmarks">🔖</button>
+          <button class="rdr-btn" onclick="toggleStatsPanel()" title="Reading stats">📊</button>
           <button class="rdr-btn gold" id="rdr-dl" onclick="doDownload()" style="display:none">⬇ Download</button>
         </div>
         <button class="rdr-btn" onclick="closeReader()" style="margin-left:4px">✕ Close</button>
@@ -613,6 +671,12 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
     <div class="bookmarks-panel" id="bookmarks-panel">
       <div class="bm-title">🔖 Bookmarks</div>
       <div id="bm-list"></div>
+    </div>
+
+    <!-- Stats panel (Scholar only) -->
+    <div class="stats-panel" id="stats-panel">
+      <div class="bm-title">📊 Reading Stats</div>
+      <div id="stats-content"></div>
     </div>
 
   </div>
@@ -692,7 +756,13 @@ async function doLogin(){
       password:document.getElementById('login-pass').value
     })});
     saveSession(data);closeModal();
-    data.is_admin?showAdmin():showLibrary();
+    if(data.is_admin){
+      showAdmin();
+    } else if(data.membership_expired){
+      showExpiredPage(data.tier);
+    } else {
+      showLibrary();
+    }
   }catch(e){
     const el=document.getElementById('login-err');el.textContent=e.message;el.style.display='block';
   }finally{btn.disabled=false;btn.textContent='Sign In';}
@@ -755,6 +825,16 @@ function showPage(id){
   window.scrollTo(0,0);
 }
 async function showLibrary(){
+  // Verify membership status is still valid
+  try{
+    const me=await api('/api/auth/me');
+    if(me.membership_expired){
+      currentUser={...currentUser,tier:me.tier};
+      localStorage.setItem('bv_user',JSON.stringify(currentUser));
+      showExpiredPage(me.tier);
+      return;
+    }
+  }catch(e){}
   showPage('page-library');
   document.getElementById('user-display-name').textContent=currentUser.name;
   const badge=document.getElementById('user-tier-badge');
@@ -807,12 +887,11 @@ function renderBooks(){
   if(!filtered.length){grid.innerHTML='<p style="color:#999;font-size:15px;grid-column:1/-1">No books found. The admin has not uploaded any books yet.</p>';return;}
   grid.innerHTML=filtered.map(b=>`
     <div class="book-item" onclick="openItem('book',${b.id})">
-      <div class="book-cover" style="background:${b.color}">
+      <div class="book-cover" style="background:${b.color};${b.cover_url?`background-image:url('${b.cover_url}');background-size:cover;background-position:center;`:''}">
         <div class="hover-overlay"><div class="hover-icon">📖</div><div class="hover-text">Read Now</div></div>
-        <div class="book-title-cover">${b.title}</div>
-        <div class="book-author-cover">${b.author}</div>
+        ${b.cover_url?'':`<div class="book-title-cover">${b.title}</div><div class="book-author-cover">${b.author}</div>`}
       </div>
-      <div class="book-meta"><div class="book-meta-title">${b.title}</div><div class="book-meta-genre">${b.genre||''} · ${b.year||''}</div></div>
+      <div class="book-meta"><div class="book-meta-title">${b.title}</div><div class="book-meta-genre">${b.genre||''}${b.year?' · '+b.year:''}</div></div>
     </div>`).join('');
 }
 
@@ -837,10 +916,9 @@ function renderMangaGrid(){
   if(!filtered.length){grid.innerHTML='<p style="color:#999;font-size:15px;grid-column:1/-1">No manga found. The admin has not uploaded any manga yet.</p>';return;}
   grid.innerHTML=filtered.map(m=>`
     <div class="book-item" onclick="openItem('manga',${m.id})">
-      <div class="book-cover" style="background:${m.color}">
+      <div class="book-cover" style="background:${m.color};${m.cover_url?`background-image:url('${m.cover_url}');background-size:cover;background-position:center;`:''}">
         <div class="hover-overlay"><div class="hover-icon">📖</div><div class="hover-text">Read Now</div></div>
-        <div class="book-title-cover">${m.title}</div>
-        <div class="book-author-cover">${m.author}</div>
+        ${m.cover_url?'':`<div class="book-title-cover">${m.title}</div><div class="book-author-cover">${m.author}</div>`}
       </div>
       <div class="book-meta">
         <div class="book-meta-title">${m.title}</div>
@@ -876,6 +954,17 @@ async function openItem(type, id){
   document.getElementById('tier1-upsell').style.display=isScholar?'none':'flex';
   document.getElementById('rdr-jump-wrap').style.display=isScholar?'flex':'none';
   document.getElementById('rdr-dl').style.display=(isScholar&&meta.has_file)?'inline-block':'none';
+  // Restore Scholar font size
+  if(isScholar){
+    scholarFontSize=parseInt(localStorage.getItem('bv_font_size')||'100');
+    document.getElementById('font-size-val').textContent=scholarFontSize+'%';
+    currentZoom=(scholarFontSize/100);
+    document.getElementById('zoom-val').textContent=scholarFontSize+'%';
+  }
+  // Reset highlight
+  highlightMode=false;
+  const hbtn=document.getElementById('btn-highlight');
+  if(hbtn)hbtn.classList.remove('active');
 
   // Set default mode
   if(isScholar){
@@ -1143,8 +1232,10 @@ function showPlaceholderEl(v){
 }
 
 function closeReader(){
+  saveReadingStats();
   document.getElementById('reader-modal').classList.remove('open');
   document.getElementById('bookmarks-panel').classList.remove('open');
+  document.getElementById('stats-panel').classList.remove('open');
   if(renderTask){try{renderTask.cancel();}catch(e){}}
   renderTask=null;pdfDoc=null;
   // Clear scroll container
@@ -1152,6 +1243,9 @@ function closeReader(){
   document.getElementById('rdr-scroll-container').style.display='none';
   document.getElementById('rdr-canvas-wrap').style.display='none';
   isScrollMode=false;
+  highlightMode=false;
+  const canvas=document.getElementById('rdr-canvas');
+  if(canvas)canvas.style.cursor='default';
 }
 
 // ── Admin ──────────────────────────────────────────────────
@@ -1230,11 +1324,15 @@ async function uploadBook(){
     fd.append('description',document.getElementById('up-desc').value);
     const fi=document.getElementById('up-file');
     if(fi.files[0])fd.append('file',fi.files[0]);
+    const ci=document.getElementById('up-cover');
+    if(ci&&ci.files[0])fd.append('cover',ci.files[0]);
     const res=await fetch('/api/admin/books',{method:'POST',headers:{Authorization:'Bearer '+token},body:fd});
     const data=await res.json();
     if(!res.ok)throw new Error(data.error);
     ['up-title','up-author','up-year','up-desc'].forEach(id=>document.getElementById(id).value='');
     fi.value='';
+    if(ci)ci.value='';
+    clearCover('up-cover','up-cover-preview');
     const s=document.getElementById('upload-success');s.style.display='block';setTimeout(()=>s.style.display='none',3000);
     await loadAdminStats();
   }catch(e){showToast('Upload failed: '+e.message);}
@@ -1266,11 +1364,15 @@ async function uploadManga(){
     fd.append('description',document.getElementById('mn-desc').value);
     const fi=document.getElementById('mn-file');
     if(fi.files[0])fd.append('file',fi.files[0]);
+    const ci=document.getElementById('mn-cover');
+    if(ci&&ci.files[0])fd.append('cover',ci.files[0]);
     const res=await fetch('/api/admin/manga',{method:'POST',headers:{Authorization:'Bearer '+token},body:fd});
     const data=await res.json();
     if(!res.ok)throw new Error(data.error);
     ['mn-title','mn-author','mn-chapters','mn-desc'].forEach(id=>document.getElementById(id).value='');
     fi.value='';
+    if(ci)ci.value='';
+    clearCover('mn-cover','mn-cover-preview');
     const s=document.getElementById('manga-upload-success');s.style.display='block';setTimeout(()=>s.style.display='none',3000);
     showToast('✓ Manga uploaded!');
   }catch(e){showToast('Upload failed: '+e.message);}
@@ -1285,6 +1387,92 @@ async function loadAdminManga(){
   }catch(e){showToast('Failed to load manga');}
 }
 async function deleteManga(id){if(!confirm('Delete this manga?'))return;try{await api(`/api/admin/manga/${id}`,{method:'DELETE'});showToast('Manga deleted');loadAdminManga();}catch(e){showToast('Error: '+e.message);}}
+
+// ── Cover image preview (admin) ───────────────────────────
+function previewCover(inputId, previewId){
+  const input=document.getElementById(inputId);
+  const preview=document.getElementById(previewId);
+  const img=document.getElementById(inputId+'-img');
+  if(!input||!input.files[0])return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    img.src=e.target.result;
+    preview.style.display='block';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+function clearCover(inputId, previewId){
+  const input=document.getElementById(inputId);
+  const preview=document.getElementById(previewId);
+  const img=document.getElementById(inputId+'-img');
+  if(input)input.value='';
+  if(img)img.src='';
+  if(preview)preview.style.display='none';
+}
+
+// ── Scholar: Font size ─────────────────────────────────────
+let scholarFontSize = parseInt(localStorage.getItem('bv_font_size')||'100');
+function adjustFontSize(delta){
+  if(!currentUser||currentUser.tier<2)return;
+  scholarFontSize=Math.max(70,Math.min(160,scholarFontSize+delta));
+  localStorage.setItem('bv_font_size',scholarFontSize);
+  document.getElementById('font-size-val').textContent=scholarFontSize+'%';
+  renderPage(currentPage,'none');
+}
+
+// ── Scholar: Highlight tool ────────────────────────────────
+let highlightMode=false;
+function toggleHighlight(){
+  if(!currentUser||currentUser.tier<2)return;
+  highlightMode=!highlightMode;
+  document.getElementById('btn-highlight').classList.toggle('active',highlightMode);
+  document.getElementById('rdr-canvas').style.cursor=highlightMode?'crosshair':'default';
+  showToast(highlightMode?'✏️ Highlight mode on — drag to select':'Highlight mode off');
+}
+
+// ── Scholar: Reading stats ─────────────────────────────────
+function getReadingStats(){
+  if(!currentItemMeta)return null;
+  const{type,id}=currentItemMeta;
+  const key=`bv_stats_${type}_${id}`;
+  return JSON.parse(localStorage.getItem(key)||'{"sessions":0,"pagesRead":0,"totalMinutes":0}');
+}
+function saveReadingStats(){
+  if(!currentItemMeta||!readingStart||currentUser.tier<2)return;
+  const{type,id}=currentItemMeta;
+  const key=`bv_stats_${type}_${id}`;
+  const stats=getReadingStats();
+  const mins=Math.round((Date.now()-readingStart)/60000);
+  stats.sessions=(stats.sessions||0)+1;
+  stats.pagesRead=(stats.pagesRead||0)+Math.max(1,currentPage-1);
+  stats.totalMinutes=(stats.totalMinutes||0)+mins;
+  stats.lastRead=new Date().toLocaleDateString();
+  localStorage.setItem(key,JSON.stringify(stats));
+}
+
+// ── Scholar: Stats panel ───────────────────────────────────
+function toggleStatsPanel(){
+  const panel=document.getElementById('stats-panel');
+  const open=panel.classList.toggle('open');
+  if(open) renderStatsPanel();
+}
+function renderStatsPanel(){
+  if(!currentItemMeta)return;
+  const stats=getReadingStats();
+  const pct=totalPages>0?Math.round(currentPage/totalPages*100):0;
+  document.getElementById('stats-content').innerHTML=`
+    <div class="stat-row"><span>Progress</span><strong>${pct}% (pg ${currentPage}/${totalPages})</strong></div>
+    <div class="stat-row"><span>Sessions</span><strong>${stats.sessions||0}</strong></div>
+    <div class="stat-row"><span>Pages Read</span><strong>${stats.pagesRead||0}</strong></div>
+    <div class="stat-row"><span>Time Read</span><strong>${stats.totalMinutes||0} min</strong></div>
+    <div class="stat-row"><span>Last Read</span><strong>${stats.lastRead||'—'}</strong></div>
+    <div style="margin-top:14px">
+      <div style="background:rgba(255,255,255,0.1);border-radius:20px;height:8px;overflow:hidden">
+        <div style="background:var(--gold);height:100%;width:${pct}%;transition:width .3s;border-radius:20px"></div>
+      </div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:6px;text-align:center">${pct}% complete</div>
+    </div>`;
+}
 
 // ── Keyboard nav ───────────────────────────────────────────
 document.addEventListener('keydown',e=>{
@@ -1305,5 +1493,80 @@ if(token&&currentUser){
   else showLibrary();
 }
 </script>
-</body>
+
+<!-- ── EXPIRED MEMBERSHIP PAGE ─────────────────────────── -->
+<div id="page-expired" class="page">
+  <div class="expired-card">
+    <div class="expired-icon">⏳</div>
+    <div class="expired-title">Membership Expired</div>
+    <div class="expired-sub" id="expired-sub-text">
+      Your 1-month membership has expired.<br>
+      Renew now to continue reading.
+    </div>
+    <button class="btn-upgrade" onclick="openRenewalModal()">✦ Upgrade &amp; Renew Membership</button>
+    <div class="expired-logout" onclick="logout()">Sign out</div>
+  </div>
+</div>
+
+<!-- ── RENEWAL MODAL ───────────────────────────────────────── -->
+<div class="modal-overlay" id="renewal-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeRenewalModal()">✕</button>
+    <div id="renewal-step1">
+      <div class="modal-title">Renew Membership</div>
+      <div class="modal-sub">Send payment via CashApp to reactivate your account</div>
+      <div class="renewal-cashapp-box">
+        <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:10px">Send Payment To</div>
+        <div class="renewal-handle" id="renewal-cashapp-handle">…</div>
+        <div class="renewal-amount" id="renewal-amount">$10.00</div>
+      </div>
+      <div class="renewal-note">⚠️ After sending payment, click <strong>Submit Renewal Request</strong>. Admin will verify your CashApp payment and reactivate your account.</div>
+      <p class="modal-err" id="renewal-err"></p>
+      <button class="btn-ink" id="renewal-btn" onclick="doRenewal()">✓ I've Paid — Submit Renewal Request</button>
+    </div>
+    <div id="renewal-step2" style="display:none;text-align:center">
+      <div style="font-size:52px;margin-bottom:16px">✅</div>
+      <div class="modal-title" style="font-size:22px">Renewal Submitted!</div>
+      <div style="margin:16px 0;font-size:15px;line-height:1.7;color:#555">Your renewal request has been received.<br>Admin will verify your CashApp payment and reactivate your account shortly.</div>
+      <button class="btn-ink" onclick="closeRenewalModal()">Got it</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Membership expiry helpers ──────────────────────────────
+function showExpiredPage(tier){
+  const amount = tier===2?'$20.00':'$10.00';
+  document.getElementById('renewal-amount').textContent=amount;
+  document.getElementById('renewal-cashapp-handle').textContent=appConfig.cashapp_handle||'…';
+  showPage('page-expired');
+}
+
+function openRenewalModal(){
+  document.getElementById('renewal-modal').classList.add('open');
+  document.getElementById('renewal-step1').style.display='block';
+  document.getElementById('renewal-step2').style.display='none';
+  document.getElementById('renewal-err').style.display='none';
+  document.getElementById('renewal-cashapp-handle').textContent=appConfig.cashapp_handle||'…';
+}
+function closeRenewalModal(){
+  document.getElementById('renewal-modal').classList.remove('open');
+}
+
+async function doRenewal(){
+  const btn=document.getElementById('renewal-btn');
+  btn.disabled=true;btn.textContent='Submitting…';
+  try{
+    await api('/api/auth/renew',{method:'POST'});
+    document.getElementById('renewal-step1').style.display='none';
+    document.getElementById('renewal-step2').style.display='block';
+  }catch(e){
+    const err=document.getElementById('renewal-err');err.textContent=e.message;err.style.display='block';
+  }finally{btn.disabled=false;btn.textContent="✓ I've Paid — Submit Renewal Request";}
+}
+
+// Close renewal modal on outside click
+document.getElementById('renewal-modal').addEventListener('click',function(e){if(e.target===this)closeRenewalModal();});
+</script>
+
 </html>
