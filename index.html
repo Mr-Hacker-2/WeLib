@@ -283,6 +283,29 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
 .worker-tabs{display:flex;gap:0;margin-bottom:32px;border-bottom:2px solid #e0dbd0;}
 .worker-tab{padding:12px 32px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;color:#999;transition:.2s;}
 .worker-tab.active{border-bottom-color:var(--ink);color:var(--ink);}
+
+/* ── FOLDER SYSTEM ── */
+.folder-item{cursor:pointer;position:relative;}
+.folder-cover{width:100%;aspect-ratio:3/4;border-radius:10px;position:relative;overflow:hidden;transition:.25s;box-shadow:0 4px 18px rgba(0,0,0,0.18);display:flex;align-items:center;justify-content:center;}
+.folder-item:hover .folder-cover{transform:translateY(-6px);box-shadow:0 12px 32px rgba(0,0,0,0.28);}
+.folder-tab{position:absolute;top:-10px;left:14px;width:50%;height:14px;border-radius:5px 5px 0 0;opacity:.8;}
+.folder-body{position:absolute;inset:10px 0 0 0;border-radius:8px;}
+.folder-stack-line{position:absolute;bottom:18px;left:10px;right:10px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;}
+.folder-stack-line:nth-child(2){bottom:26px;left:14px;right:14px;opacity:.7;}
+.folder-icon{font-size:40px;position:relative;z-index:2;}
+.folder-count-badge{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.5);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;z-index:2;}
+.folder-meta{margin-top:10px;}
+.folder-meta-title{font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.folder-meta-sub{font-size:12px;color:#aaa;margin-top:2px;}
+
+/* ── FOLDER MODAL (open folder) ── */
+#folder-modal .modal{max-width:860px;max-height:85vh;overflow-y:auto;}
+.folder-modal-header{display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:20px;border-bottom:2px solid #f0f0f0;}
+.folder-modal-icon{width:56px;height:56px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;}
+.folder-modal-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:900;}
+.folder-modal-sub{font-size:13px;color:#888;margin-top:3px;}
+.folder-books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:20px;}
+
 /* ── DONATE & REQUEST BUTTONS in library ── */
 .lib-action-bar{display:flex;gap:12px;justify-content:flex-end;padding:0 48px 0;margin-bottom:-20px;flex-wrap:wrap;}
 .btn-donate{background:linear-gradient(135deg,#2e7d32,#4caf50);color:#fff;border:none;padding:10px 22px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;transition:.2s;font-family:'DM Sans',sans-serif;}
@@ -474,6 +497,7 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
     <div class="admin-sidebar">
       <div class="sidebar-item active" data-sec="dashboard" onclick="adminTab('dashboard',this)">📊 Dashboard</div>
       <div class="sidebar-item" data-sec="requests" onclick="adminTab('requests',this)">🔔 Requests <span id="req-badge" style="background:#c9963c;color:#000;border-radius:20px;padding:1px 8px;font-size:11px;font-weight:900;margin-left:4px;display:none"></span></div>
+      <div class="sidebar-item" data-sec="folders" onclick="adminTab('folders',this)">📁 Folders</div>
       <div class="sidebar-item" data-sec="upload" onclick="adminTab('upload',this)">📤 Upload Book</div>
       <div class="sidebar-item" data-sec="books" onclick="adminTab('books',this)">📚 Manage Books</div>
       <div class="sidebar-item" data-sec="upload-manga" onclick="adminTab('upload-manga',this)">🗂 Upload Manga</div>
@@ -514,6 +538,38 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
         </div>
       </div>
 
+      <div class="admin-section" id="admin-folders">
+        <h2 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;margin-bottom:24px">📁 Folders</h2>
+        <div class="admin-card" style="margin-bottom:24px">
+          <h3>Create New Folder</h3>
+          <p style="font-size:13px;color:#888;margin-bottom:16px">Group books or manga into a folder. When published, customers see the folder and click it to browse the books inside.</p>
+          <div class="form-row">
+            <div class="form-field"><label>Folder Name *</label><input type="text" id="fl-name" placeholder="e.g. Harry Potter Series"></div>
+            <div class="form-field"><label>Type</label>
+              <select id="fl-type" style="width:100%;padding:11px 14px;border:1.5px solid #ddd;border-radius:5px;font-family:'DM Sans',sans-serif;font-size:14px">
+                <option value="book">📚 Books</option>
+                <option value="manga">🎌 Manga</option>
+              </select>
+            </div>
+            <div class="form-field"><label>Folder Color</label><input type="color" id="fl-color" value="#4a3728"></div>
+          </div>
+          <div class="form-row"><div class="form-field"><label>Description</label><textarea id="fl-desc" placeholder="What's in this folder?" style="min-height:60px"></textarea></div></div>
+          <button class="btn-admin" id="create-folder-btn" onclick="adminCreateFolder()">📁 Create Folder</button>
+          <p class="success-msg" id="folder-create-success">✓ Folder created!</p>
+        </div>
+        <div class="admin-card">
+          <h3>All Folders</h3>
+          <div style="display:flex;gap:10px;margin-bottom:16px">
+            <button class="btn-admin" id="fl-filter-book" onclick="loadAdminFolders('book')" style="background:#1a3a5c">📚 Books</button>
+            <button class="btn-admin" id="fl-filter-manga" onclick="loadAdminFolders('manga')" style="background:#555">🎌 Manga</button>
+          </div>
+          <table class="books-admin-table" id="admin-folders-table">
+            <tr><th>#</th><th>Name</th><th>Type</th><th>Items</th><th>Action</th></tr>
+          </table>
+          <p id="no-folders-msg" style="color:#aaa;font-size:14px;margin-top:16px;display:none">No folders yet.</p>
+        </div>
+      </div>
+
       <div class="admin-section" id="admin-upload">
         <h2 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;margin-bottom:24px">Upload New Book</h2>
         <div class="admin-card">
@@ -539,7 +595,16 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
             </div>
           </div>
           <div class="form-row"><div class="form-field"><label>Description</label><textarea id="up-desc" placeholder="Short description…"></textarea></div></div>
-          <div class="form-row"><div class="form-field"><label>Upload File (PDF / EPUB / TXT)</label><input type="file" id="up-file" accept=".pdf,.epub,.txt"></div></div>
+          <div class="form-row">
+            <div class="form-field"><label>Upload File (PDF / EPUB / TXT)</label><input type="file" id="up-file" accept=".pdf,.epub,.txt"></div>
+            <div class="form-field">
+              <label>Add to Folder <span style="font-weight:400;color:#aaa;font-size:11px">— optional</span></label>
+              <select id="up-folder" style="width:100%;padding:11px 14px;border:1.5px solid #ddd;border-radius:5px;font-family:'DM Sans',sans-serif;font-size:14px">
+                <option value="">— No folder (show individually) —</option>
+              </select>
+              <button type="button" onclick="openCreateFolderModal('book')" style="margin-top:6px;font-size:12px;color:#1a3a5c;background:none;border:none;cursor:pointer;text-decoration:underline">+ Create new folder</button>
+            </div>
+          </div>
           <button class="btn-admin" id="upload-btn" onclick="uploadBook()">Upload Book</button>
           <p class="success-msg" id="upload-success">✓ Book uploaded successfully!</p>
         </div>
@@ -578,7 +643,16 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
             </div>
           </div>
           <div class="form-row"><div class="form-field"><label>Description</label><textarea id="mn-desc" placeholder="Short description…"></textarea></div></div>
-          <div class="form-row"><div class="form-field"><label>Upload File (PDF / CBZ / CBR / ZIP)</label><input type="file" id="mn-file" accept=".pdf,.cbz,.cbr,.zip"></div></div>
+          <div class="form-row">
+            <div class="form-field"><label>Upload File (PDF / CBZ / CBR / ZIP)</label><input type="file" id="mn-file" accept=".pdf,.cbz,.cbr,.zip"></div>
+            <div class="form-field">
+              <label>Add to Folder <span style="font-weight:400;color:#aaa;font-size:11px">— optional</span></label>
+              <select id="mn-folder" style="width:100%;padding:11px 14px;border:1.5px solid #ddd;border-radius:5px;font-family:'DM Sans',sans-serif;font-size:14px">
+                <option value="">— No folder (show individually) —</option>
+              </select>
+              <button type="button" onclick="openCreateFolderModal('manga')" style="margin-top:6px;font-size:12px;color:#1a3a5c;background:none;border:none;cursor:pointer;text-decoration:underline">+ Create new folder</button>
+            </div>
+          </div>
           <button class="btn-admin" id="manga-upload-btn" onclick="uploadManga()">Upload Manga</button>
           <p class="success-msg" id="manga-upload-success">✓ Manga uploaded successfully!</p>
         </div>
@@ -689,6 +763,34 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
         <button class="btn-ink" onclick="closeModal()">Close</button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ══ FOLDER MODAL ══ -->
+<div class="modal-overlay" id="folder-modal">
+  <div class="modal" style="max-width:860px;max-height:85vh;overflow-y:auto">
+    <button class="modal-close" onclick="closeFolderModal()">✕</button>
+    <div class="folder-modal-header">
+      <div class="folder-modal-icon" id="fml-icon" style="background:#4a3728">📁</div>
+      <div>
+        <div class="folder-modal-title" id="fml-title">Folder</div>
+        <div class="folder-modal-sub" id="fml-sub"></div>
+      </div>
+    </div>
+    <div class="folder-books-grid" id="fml-grid"></div>
+  </div>
+</div>
+
+<!-- ══ CREATE FOLDER QUICK MODAL ══ -->
+<div class="modal-overlay" id="create-folder-modal">
+  <div class="modal" style="max-width:420px">
+    <button class="modal-close" onclick="document.getElementById('create-folder-modal').classList.remove('open')">✕</button>
+    <div class="modal-title">📁 New Folder</div>
+    <div class="modal-sub" id="cfm-type-label">For Books</div>
+    <div class="form-group" style="margin-top:20px"><label>Folder Name *</label><input type="text" id="cfm-name" placeholder="e.g. Lord of the Rings Series"></div>
+    <div class="form-group"><label>Color</label><input type="color" id="cfm-color" value="#4a3728" style="width:60px;height:36px;border:none;cursor:pointer"></div>
+    <p class="modal-err" id="cfm-err"></p>
+    <button class="btn-ink" id="cfm-btn" onclick="quickCreateFolder()">Create Folder</button>
   </div>
 </div>
 
@@ -1610,6 +1712,8 @@ function adminTab(section,el){
   if(section==='dashboard'){loadAdminStats();loadDonationBadge();loadBreqBadge();}
   if(section==='donations')loadAdminDonations('pending');
   if(section==='book-requests')loadAdminBookRequests('pending');
+  if(section==='folders')loadAdminFolders('book');
+  if(section==='upload'){refreshFolderDropdowns();}
 }
 
 async function uploadBook(){
@@ -1625,6 +1729,8 @@ async function uploadBook(){
     fd.append('year',document.getElementById('up-year').value);
     fd.append('color',document.getElementById('up-color').value);
     fd.append('description',document.getElementById('up-desc').value);
+    const folderId=document.getElementById('up-folder')?.value;
+    if(folderId)fd.append('folder_id',folderId);
     const fi=document.getElementById('up-file');
     if(fi.files[0])fd.append('file',fi.files[0]);
     const ci=document.getElementById('up-cover');
@@ -1665,6 +1771,8 @@ async function uploadManga(){
     fd.append('status',document.getElementById('mn-status').value);
     fd.append('color',document.getElementById('mn-color').value);
     fd.append('description',document.getElementById('mn-desc').value);
+    const mnFolderId=document.getElementById('mn-folder')?.value;
+    if(mnFolderId)fd.append('folder_id',mnFolderId);
     const fi=document.getElementById('mn-file');
     if(fi.files[0])fd.append('file',fi.files[0]);
     const ci=document.getElementById('mn-cover');
@@ -1834,6 +1942,246 @@ async function workerUploadManga(){
   }catch(e){showToast('Upload failed: '+e.message);}
   finally{btn.disabled=false;btn.textContent='Upload Manga';}
 }
+
+// ══════════════════════════════════════════════════════════
+// ── FOLDER SYSTEM ─────────────────────────────────────────
+// ══════════════════════════════════════════════════════════
+let allFolders = [];
+let _cfmType = 'book'; // track which type the quick-create modal is for
+
+// ── Customer: load and render folders mixed into the grid ──
+async function loadBooks(){
+  try{allBooks=await fetch('/api/books').then(r=>r.json());}catch(e){allBooks=[];}
+  try{allFolders=await fetch('/api/folders?type=book').then(r=>r.json());}catch(e){allFolders=[];}
+  buildMarquee(allBooks);renderGenreFilters();renderBooks();
+}
+async function loadManga(){
+  try{allManga=await fetch('/api/manga').then(r=>r.json());}catch(e){allManga=[];}
+  try{allFolders._manga=await fetch('/api/folders?type=manga').then(r=>r.json());}catch(e){allFolders._manga=[];}
+  renderMangaGenreFilters();renderMangaGrid();
+}
+
+// Override renderBooks to show folders + loose books
+function renderBooks(){
+  const q=(document.getElementById('search-input')?.value||'').toLowerCase();
+  const grid=document.getElementById('books-grid');
+
+  // Books NOT in any folder
+  const looseBooks=allBooks.filter(b=>!b.folder_id).filter(b=>{
+    const mg=activeGenre==='All'||b.genre===activeGenre;
+    const mq=!q||b.title.toLowerCase().includes(q)||b.author.toLowerCase().includes(q)||(b.genre||'').toLowerCase().includes(q);
+    return mg&&mq;
+  });
+
+  // Folders that match the search (by folder name or any book inside)
+  const matchedFolders=(allFolders||[]).filter(f=>{
+    if(activeGenre!=='All') return false; // genres filter shows loose books only
+    if(!q) return true;
+    return f.name.toLowerCase().includes(q)||f.items.some(b=>b.title.toLowerCase().includes(q)||b.author.toLowerCase().includes(q));
+  });
+
+  if(!looseBooks.length && !matchedFolders.length){
+    grid.innerHTML='<p style="color:#999;font-size:15px;grid-column:1/-1">No books found.</p>';return;
+  }
+
+  const folderHTML=matchedFolders.map(f=>folderCardHTML(f)).join('');
+  const bookHTML=looseBooks.map(b=>`
+    <div class="book-item" onclick="openItem('book',${b.id})">
+      <div class="book-cover" style="background:${b.color};${b.cover_url?`background-image:url('${b.cover_url}');background-size:cover;background-position:center;`:''}">
+        <div class="hover-overlay"><div class="hover-icon">📖</div><div class="hover-text">Read Now</div></div>
+        ${b.cover_url?'':`<div class="book-title-cover">${b.title}</div><div class="book-author-cover">${b.author}</div>`}
+      </div>
+      <div class="book-meta"><div class="book-meta-title">${b.title}</div><div class="book-meta-genre">${b.genre||''}${b.year?' · '+b.year:''}</div></div>
+    </div>`).join('');
+  grid.innerHTML=folderHTML+bookHTML;
+}
+
+function renderMangaGrid(){
+  const q=(document.getElementById('search-input')?.value||'').toLowerCase();
+  const mangaFolders=(allFolders._manga||[]);
+  const looseManga=allManga.filter(m=>!m.folder_id).filter(m=>{
+    const mg=activeMangaGenre==='All'||m.genre===activeMangaGenre;
+    const mq=!q||m.title.toLowerCase().includes(q)||m.author.toLowerCase().includes(q)||(m.genre||'').toLowerCase().includes(q);
+    return mg&&mq;
+  });
+  const matchedFolders=mangaFolders.filter(f=>{
+    if(activeMangaGenre!=='All') return false;
+    if(!q) return true;
+    return f.name.toLowerCase().includes(q)||f.items.some(m=>m.title.toLowerCase().includes(q)||m.author.toLowerCase().includes(q));
+  });
+  const grid=document.getElementById('manga-grid');
+  if(!looseManga.length&&!matchedFolders.length){grid.innerHTML='<p style="color:#999;font-size:15px;grid-column:1/-1">No manga found.</p>';return;}
+  const folderHTML=matchedFolders.map(f=>folderCardHTML(f)).join('');
+  const mangaHTML=looseManga.map(m=>`
+    <div class="book-item" onclick="openItem('manga',${m.id})">
+      <div class="book-cover" style="background:${m.color};${m.cover_url?`background-image:url('${m.cover_url}');background-size:cover;background-position:center;`:''}">
+        <div class="hover-overlay"><div class="hover-icon">📖</div><div class="hover-text">Read Now</div></div>
+        ${m.cover_url?'':`<div class="book-title-cover">${m.title}</div><div class="book-author-cover">${m.author}</div>`}
+      </div>
+      <div class="book-meta">
+        <div class="book-meta-title">${m.title}</div>
+        <div class="book-meta-genre">${m.genre||''}${m.chapters!=null?' · '+m.chapters+' ch':''} · <span style="color:${m.status==='Completed'?'#2e7d32':'#9a6e00'}">${m.status}</span></div>
+      </div>
+    </div>`).join('');
+  grid.innerHTML=folderHTML+mangaHTML;
+}
+
+function folderCardHTML(f){
+  return `<div class="folder-item" onclick="openFolderModal(${f.id})">
+    <div class="folder-cover" style="background:${f.color}">
+      <div class="folder-tab" style="background:${f.color};filter:brightness(1.3)"></div>
+      <div class="folder-body" style="background:${f.color};filter:brightness(0.85)"></div>
+      <div class="folder-stack-line"></div>
+      <div class="folder-stack-line"></div>
+      ${f.cover_url
+        ? `<img src="${f.cover_url}" style="position:absolute;inset:10px 0 0 0;width:100%;height:calc(100% - 10px);object-fit:cover;border-radius:0 0 8px 8px;opacity:.85">`
+        : `<div class="folder-icon">📁</div>`}
+      <div class="folder-count-badge">${f.count} ${f.item_type==='manga'?'manga':'books'}</div>
+    </div>
+    <div class="folder-meta">
+      <div class="folder-meta-title">${f.name}</div>
+      <div class="folder-meta-sub">${f.description||'Click to browse'}</div>
+    </div>
+  </div>`;
+}
+
+function openFolderModal(folderId){
+  const allF=[...(allFolders||[]),...(allFolders._manga||[])];
+  const f=allF.find(x=>x.id===folderId);
+  if(!f)return;
+  document.getElementById('fml-icon').style.background=f.color;
+  document.getElementById('fml-icon').innerHTML=f.cover_url?`<img src="${f.cover_url}" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`:'📁';
+  document.getElementById('fml-title').textContent=f.name;
+  document.getElementById('fml-sub').textContent=`${f.count} ${f.item_type==='manga'?'manga':'books'}${f.description?' · '+f.description:''}`;
+  if(!f.items.length){
+    document.getElementById('fml-grid').innerHTML='<p style="color:#999;grid-column:1/-1;text-align:center;padding:30px">No items in this folder yet.</p>';
+  } else {
+    document.getElementById('fml-grid').innerHTML=f.items.map(b=>`
+      <div class="book-item" onclick="openItem('${f.item_type}',${b.id});closeFolderModal()">
+        <div class="book-cover" style="background:${b.color};${b.cover_url?`background-image:url('${b.cover_url}');background-size:cover;background-position:center;`:''}">
+          <div class="hover-overlay"><div class="hover-icon">📖</div><div class="hover-text">Read Now</div></div>
+          ${b.cover_url?'':`<div class="book-title-cover">${b.title}</div><div class="book-author-cover">${b.author}</div>`}
+        </div>
+        <div class="book-meta"><div class="book-meta-title">${b.title}</div><div class="book-meta-genre">${b.author}</div></div>
+      </div>`).join('');
+  }
+  document.getElementById('folder-modal').classList.add('open');
+}
+function closeFolderModal(){document.getElementById('folder-modal').classList.remove('open');}
+document.addEventListener('DOMContentLoaded',()=>{
+  const fm=document.getElementById('folder-modal');
+  if(fm) fm.addEventListener('click',e=>{if(e.target===fm)closeFolderModal();});
+  const cfm=document.getElementById('create-folder-modal');
+  if(cfm) cfm.addEventListener('click',e=>{if(e.target===cfm)cfm.classList.remove('open');});
+});
+
+// ── Admin: create folder ───────────────────────────────────
+async function adminCreateFolder(){
+  const name=document.getElementById('fl-name').value.trim();
+  if(!name){showToast('Folder name required');return;}
+  const btn=document.getElementById('create-folder-btn');
+  btn.disabled=true;btn.textContent='Creating…';
+  try{
+    const fd=new FormData();
+    fd.append('name',name);
+    fd.append('description',document.getElementById('fl-desc').value.trim());
+    fd.append('color',document.getElementById('fl-color').value);
+    fd.append('item_type',document.getElementById('fl-type').value);
+    const res=await fetch('/api/admin/folders',{method:'POST',headers:{Authorization:'Bearer '+token},body:fd});
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error);
+    document.getElementById('fl-name').value='';
+    document.getElementById('fl-desc').value='';
+    const s=document.getElementById('folder-create-success');s.style.display='block';setTimeout(()=>s.style.display='none',3000);
+    await loadAdminFolders(document.getElementById('fl-type').value);
+    await refreshFolderDropdowns();
+  }catch(e){showToast('Error: '+e.message);}
+  finally{btn.disabled=false;btn.textContent='📁 Create Folder';}
+}
+
+let _flFilter='book';
+async function loadAdminFolders(type='book'){
+  _flFilter=type;
+  ['book','manga'].forEach(t=>{
+    const b=document.getElementById('fl-filter-'+t);
+    if(b) b.style.background=t===type?'#1a3a5c':'#555';
+  });
+  try{
+    const folders=await api('/api/admin/folders?type='+type);
+    const t=document.getElementById('admin-folders-table');
+    const noMsg=document.getElementById('no-folders-msg');
+    t.innerHTML='<tr><th>#</th><th>Name</th><th>Type</th><th>Items</th><th>Action</th></tr>';
+    if(!folders.length){noMsg.style.display='block';t.style.display='none';return;}
+    noMsg.style.display='none';t.style.display='';
+    // Get full folder data with counts
+    const full=await fetch('/api/folders?type='+type).then(r=>r.json());
+    t.innerHTML+= full.map((f,i)=>`<tr>
+      <td>${i+1}</td>
+      <td><strong>${f.name}</strong>${f.description?`<br><span style="font-size:11px;color:#aaa">${f.description}</span>`:''}</td>
+      <td>${f.item_type==='manga'?'🎌 Manga':'📚 Books'}</td>
+      <td><span style="background:#e8f5e9;color:#2e7d32;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:700">${f.count} items</span></td>
+      <td><button onclick="adminDeleteFolder(${f.id})" style="background:#fee;border:1px solid #fcc;color:#c00;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px">Delete</button></td>
+    </tr>`).join('');
+  }catch(e){showToast('Failed to load folders');}
+}
+async function adminDeleteFolder(id){
+  if(!confirm('Delete folder? Books inside will become loose (not deleted).'))return;
+  try{await api('/api/admin/folders/'+id,{method:'DELETE'});showToast('Folder deleted');loadAdminFolders(_flFilter);refreshFolderDropdowns();}
+  catch(e){showToast('Error: '+e.message);}
+}
+
+// Populate folder dropdowns in upload forms
+async function refreshFolderDropdowns(){
+  try{
+    const [bookFolders, mangaFolders]=await Promise.all([
+      api('/api/admin/folders?type=book').catch(()=>[]),
+      api('/api/admin/folders?type=manga').catch(()=>[])
+    ]);
+    const upSel=document.getElementById('up-folder');
+    if(upSel){
+      upSel.innerHTML='<option value="">— No folder (show individually) —</option>'
+        +bookFolders.map(f=>`<option value="${f.id}">${f.name}</option>`).join('');
+    }
+    const mnSel=document.getElementById('mn-folder');
+    if(mnSel){
+      mnSel.innerHTML='<option value="">— No folder (show individually) —</option>'
+        +mangaFolders.map(f=>`<option value="${f.id}">${f.name}</option>`).join('');
+    }
+  }catch(e){}
+}
+
+// Quick-create folder modal (from upload form)
+function openCreateFolderModal(type){
+  _cfmType=type;
+  document.getElementById('cfm-type-label').textContent='For '+(type==='manga'?'Manga':'Books');
+  document.getElementById('cfm-name').value='';
+  document.getElementById('cfm-err').style.display='none';
+  document.getElementById('create-folder-modal').classList.add('open');
+}
+async function quickCreateFolder(){
+  const name=document.getElementById('cfm-name').value.trim();
+  const err=document.getElementById('cfm-err');
+  if(!name){err.textContent='Name required';err.style.display='block';return;}
+  const btn=document.getElementById('cfm-btn');
+  btn.disabled=true;btn.textContent='Creating…';
+  try{
+    const fd=new FormData();
+    fd.append('name',name);
+    fd.append('color',document.getElementById('cfm-color').value);
+    fd.append('item_type',_cfmType);
+    const res=await fetch('/api/admin/folders',{method:'POST',headers:{Authorization:'Bearer '+token},body:fd});
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error);
+    document.getElementById('create-folder-modal').classList.remove('open');
+    showToast('✓ Folder "'+data.name+'" created!');
+    await refreshFolderDropdowns();
+    // Auto-select the new folder in the dropdown
+    const sel=document.getElementById(_cfmType==='manga'?'mn-folder':'up-folder');
+    if(sel) sel.value=data.id;
+  }catch(e){err.textContent=e.message;err.style.display='block';}
+  finally{btn.disabled=false;btn.textContent='Create Folder';}
+}
+
 // ── Donate Modal ───────────────────────────────────────────
 function openDonateModal(){
   document.getElementById('donate-modal').classList.add('open');
