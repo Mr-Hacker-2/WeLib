@@ -11,13 +11,23 @@ from flask_jwt_extended import (
 from datetime import timedelta
 from botocore.client import Config
 from werkzeug.utils import secure_filename
+from functools import lru_cache
+
+# ── Env Validation ─────────────────────────────────────────
+def _require_env(key):
+    val = os.environ.get(key)
+    if not val:
+        raise RuntimeError(f"Missing required environment variable: {key}")
+    return val
 
 # ── App Setup ──────────────────────────────────────────────
 app = Flask(__name__, static_folder='.', template_folder='.')
 
-app.config['SQLALCHEMY_DATABASE_URI']        = os.environ.get('DATABASE_URL', 'sqlite:///bookvault.db').replace('postgres://', 'postgresql://')
+_raw_db_url = os.environ.get('DATABASE_URL', 'sqlite:///bookvault.db')
+# Handle both legacy postgres:// and standard postgresql:// schemes
+app.config['SQLALCHEMY_DATABASE_URI']        = _raw_db_url.replace('postgres://', 'postgresql://', 1)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY']                 = os.environ.get('JWT_SECRET', 'bookvault-super-secret-key-change-in-production-2026')
+app.config['JWT_SECRET_KEY']                 = _require_env('JWT_SECRET')
 app.config['JWT_ACCESS_TOKEN_EXPIRES']       = timedelta(days=7)
 app.config['MAX_CONTENT_LENGTH']             = 200 * 1024 * 1024  # 200 MB
 
@@ -31,6 +41,8 @@ B2_APP_KEY     = os.environ.get('B2_APP_KEY', '')
 B2_BUCKET_NAME = os.environ.get('B2_BUCKET_NAME', '')
 B2_ENDPOINT    = os.environ.get('B2_ENDPOINT', '')
 
+# Cache the client — no need to recreate it on every request
+@lru_cache(maxsize=1)
 def get_b2_client():
     return boto3.client(
         's3',
@@ -39,6 +51,11 @@ def get_b2_client():
         aws_secret_access_key=B2_APP_KEY,
         config=Config(signature_version='s3v4'),
     )
+
+# ── Admin credentials from env ─────────────────────────────
+ADMIN_EMAIL    = os.environ.get('ADMIN_EMAIL',    'admin@bookvault.com')
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin1')   # override in production!
+CASHAPP_HANDLE = os.environ.get('CASHAPP_HANDLE', '$YourCashAppHandle')
 
 # ── Models ─────────────────────────────────────────────────
 class User(db.Model):
@@ -80,19 +97,19 @@ class Manga(db.Model):
 def init_db():
     db.create_all()
 
-    # ── Step 1: seed admin in its own transaction ──
+    # ── Seed admin ──
     try:
-        if not User.query.filter_by(email='admin@bookvault.com').first():
+        if not User.query.filter_by(email=ADMIN_EMAIL).first():
             db.session.add(User(
-                name='Admin', email='admin@bookvault.com',
-                password=bcrypt.generate_password_hash('admin1').decode(),
+                name='Admin', email=ADMIN_EMAIL,
+                password=bcrypt.generate_password_hash(ADMIN_PASSWORD).decode(),
                 tier=0, is_admin=True, status='active'
             ))
             db.session.commit()
     except Exception:
-        db.session.rollback()  # another worker beat us to it — fine
+        db.session.rollback()
 
-    # ── Step 2: seed books in its own transaction ──
+    # ── Seed books ──
     try:
         if Book.query.count() == 0:
             seeds = [
@@ -112,7 +129,7 @@ def init_db():
             db.session.add_all(seeds)
             db.session.commit()
     except Exception:
-        db.session.rollback()  # another worker beat us to it — fine
+        db.session.rollback()
 
 with app.app_context():
     init_db()
@@ -128,7 +145,10 @@ def allowed_manga_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXT_MANGA
 
 def require_admin():
-    user = User.query.get(int(get_jwt_identity()))
+    uid = get_jwt_identity()
+    if not uid:
+        return None, (jsonify({'error': 'Unauthorized'}), 401)
+    user = User.query.get(int(uid))
     if not user or not user.is_admin:
         return None, (jsonify({'error': 'Admin only'}), 403)
     return user, None
@@ -138,6 +158,11 @@ def require_admin():
 def index():
     return send_from_directory('.', 'index.html')
 
+# ── Config endpoint (exposes safe public config to frontend) ──
+@app.route('/api/config', methods=['GET'])
+def public_config():
+    return jsonify({'cashapp_handle': CASHAPP_HANDLE})
+
 # ── Auth ───────────────────────────────────────────────────
 @app.route('/api/auth/login', methods=['POST'])
 def login():
@@ -145,7 +170,8 @@ def login():
     username = (data.get('username') or '').strip()
     password = (data.get('password') or '')
 
-    if username == 'admin' and password == 'admin1':
+    # Admin shortcut — uses env-configured credentials, not hardcoded
+    if username in ('admin', ADMIN_EMAIL) and password == ADMIN_PASSWORD:
         admin = User.query.filter_by(is_admin=True).first()
         if admin:
             return jsonify({'token': create_access_token(identity=str(admin.id)),
@@ -174,6 +200,10 @@ def register():
 
     if not name or not email or len(pw) < 4:
         return jsonify({'error': 'Name, email and password (min 4 chars) required'}), 400
+    if '@' not in email or '.' not in email.split('@')[-1]:
+        return jsonify({'error': 'Invalid email address'}), 400
+    if tier not in (1, 2):
+        return jsonify({'error': 'Invalid tier'}), 400
     if User.query.filter_by(email=email).first():
         return jsonify({'error': 'Email already registered'}), 409
 
@@ -225,6 +255,8 @@ def download_book(book_id):
     b = Book.query.get_or_404(book_id)
     if not b.file_key:
         return jsonify({'error': 'No file uploaded for this book'}), 404
+    if not B2_BUCKET_NAME or not B2_ENDPOINT:
+        return jsonify({'error': 'File storage not configured'}), 503
     try:
         url = get_b2_client().generate_presigned_url(
             'get_object',
@@ -251,6 +283,8 @@ def admin_upload_book():
     if 'file' in request.files:
         f = request.files['file']
         if f and f.filename and allowed_file(f.filename):
+            if not B2_BUCKET_NAME or not B2_ENDPOINT:
+                return jsonify({'error': 'File storage not configured — set B2 env vars'}), 503
             original  = secure_filename(f.filename)
             file_key  = f'books/{uuid.uuid4().hex}/{original}'
             file_name = original
@@ -279,7 +313,7 @@ def admin_delete_book(book_id):
     _, err = require_admin()
     if err: return err
     book = Book.query.get_or_404(book_id)
-    if book.file_key:
+    if book.file_key and B2_BUCKET_NAME:
         try: get_b2_client().delete_object(Bucket=B2_BUCKET_NAME, Key=book.file_key)
         except Exception: pass
     db.session.delete(book)
@@ -296,6 +330,7 @@ def admin_stats():
     tier2 = User.query.filter_by(tier=2, status='active').count()
     return jsonify({
         'total_books':     Book.query.count(),
+        'total_manga':     Manga.query.count(),
         'total_users':     User.query.filter_by(is_admin=False, status='active').count(),
         'pending_users':   User.query.filter_by(is_admin=False, status='pending').count(),
         'tier1_users':     tier1,
@@ -383,6 +418,8 @@ def admin_upload_manga():
     if 'file' in request.files:
         f = request.files['file']
         if f and f.filename and allowed_manga_file(f.filename):
+            if not B2_BUCKET_NAME or not B2_ENDPOINT:
+                return jsonify({'error': 'File storage not configured — set B2 env vars'}), 503
             original  = secure_filename(f.filename)
             file_key  = f'manga/{uuid.uuid4().hex}/{original}'
             file_name = original
@@ -412,7 +449,7 @@ def admin_delete_manga(manga_id):
     _, err = require_admin()
     if err: return err
     manga = Manga.query.get_or_404(manga_id)
-    if manga.file_key:
+    if manga.file_key and B2_BUCKET_NAME:
         try: get_b2_client().delete_object(Bucket=B2_BUCKET_NAME, Key=manga.file_key)
         except Exception: pass
     db.session.delete(manga)
