@@ -393,7 +393,7 @@ def admin_decline(user_id):
     db.session.commit()
     return jsonify({'declined': user_id})
 
-# ── Manga (public) ─────────────────────────────────────────
+# ── Manga (public list) ────────────────────────────────────
 @app.route('/api/manga', methods=['GET'])
 def list_manga():
     items = Manga.query.order_by(Manga.id.asc()).all()
@@ -402,6 +402,41 @@ def list_manga():
                      'color': m.color, 'description': m.description,
                      'has_file': bool(m.file_key)}
                     for m in items])
+
+# ── Manga read (tier 1+) ───────────────────────────────────
+@app.route('/api/manga/<int:manga_id>/read', methods=['GET'])
+@jwt_required()
+def read_manga(manga_id):
+    user = User.query.get(int(get_jwt_identity()))
+    if not user or user.tier < 1:
+        return jsonify({'error': 'Subscription required'}), 403
+    m = Manga.query.get_or_404(manga_id)
+    return jsonify({'id': m.id, 'title': m.title, 'author': m.author,
+                    'genre': m.genre, 'chapters': m.chapters, 'status': m.status,
+                    'description': m.description, 'has_file': bool(m.file_key)})
+
+# ── Manga download (tier 2 only) ───────────────────────────
+@app.route('/api/manga/<int:manga_id>/download', methods=['GET'])
+@jwt_required()
+def download_manga(manga_id):
+    user = User.query.get(int(get_jwt_identity()))
+    if not user or user.tier < 2:
+        return jsonify({'error': 'Scholar plan required to download'}), 403
+    m = Manga.query.get_or_404(manga_id)
+    if not m.file_key:
+        return jsonify({'error': 'No file uploaded for this manga'}), 404
+    if not B2_BUCKET_NAME or not B2_ENDPOINT:
+        return jsonify({'error': 'File storage not configured'}), 503
+    try:
+        url = get_b2_client().generate_presigned_url(
+            'get_object',
+            Params={'Bucket': B2_BUCKET_NAME, 'Key': m.file_key,
+                    'ResponseContentDisposition': f'attachment; filename="{m.file_name}"'},
+            ExpiresIn=300
+        )
+        return jsonify({'url': url})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # ── Manga (admin) ──────────────────────────────────────────
 @app.route('/api/admin/manga', methods=['POST'])
