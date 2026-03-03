@@ -270,6 +270,17 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
 .success-msg{color:#4a5e52;font-size:13px;margin-top:10px;display:none;font-weight:600;}
 .toast{position:fixed;bottom:28px;right:28px;background:var(--ink);color:#fff;padding:14px 22px;border-radius:7px;font-size:14px;z-index:9999;display:none;animation:fadeUp .2s ease;}
 
+
+/* ══ WORKER PORTAL ══ */
+#page-worker{background:#f9f9f9;}
+.worker-header{background:var(--ink);color:var(--paper);padding:18px 40px;display:flex;align-items:center;justify-content:space-between;}
+.worker-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;}
+.worker-title span{color:#e8b84b;}
+.worker-badge{background:linear-gradient(135deg,#4a5e52,#2e7d32);color:#fff;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.worker-body{max-width:900px;margin:0 auto;padding:40px 24px;}
+.worker-tabs{display:flex;gap:0;margin-bottom:32px;border-bottom:2px solid #e0dbd0;}
+.worker-tab{padding:12px 32px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;color:#999;transition:.2s;}
+.worker-tab.active{border-bottom-color:var(--ink);color:var(--ink);}
 @media(max-width:700px){
   .landing-nav{padding:20px 24px;}.hero{padding:60px 24px 40px;}
   .stats-bar{gap:30px;padding:32px 20px;}
@@ -677,6 +688,87 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
   </div>
 </div>
 
+
+<!-- ══ WORKER PORTAL ══ -->
+<div id="page-worker" class="page">
+  <div class="worker-header">
+    <div class="worker-title">Book<span>Vault</span> <span class="worker-badge">Employee Portal</span></div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <span id="worker-name" style="font-size:14px;color:rgba(255,255,255,0.7)"></span>
+      <button class="btn btn-outline btn-sm" onclick="logout()" style="color:#fff;border-color:rgba(255,255,255,0.3)">Sign Out</button>
+    </div>
+  </div>
+  <div class="worker-body">
+    <div class="worker-tabs">
+      <button class="worker-tab active" id="wtab-books" onclick="workerTab('books',this)">📚 Upload Book</button>
+      <button class="worker-tab" id="wtab-manga" onclick="workerTab('manga',this)">🎌 Upload Manga</button>
+    </div>
+
+    <!-- Upload Book -->
+    <div id="worker-section-books">
+      <div class="admin-card">
+        <h3 style="font-family:'Playfair Display',serif;font-size:22px;margin-bottom:20px;font-weight:700">Upload New Book</h3>
+        <div class="form-row">
+          <div class="form-field"><label>Title *</label><input type="text" id="wup-title" placeholder="e.g. Dune"></div>
+          <div class="form-field"><label>Author *</label><input type="text" id="wup-author" placeholder="e.g. Frank Herbert"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-field"><label>Genre</label><select id="wup-genre"><option>Classic Literature</option><option>Science Fiction</option><option>Fantasy</option><option>Mystery</option><option>Romance</option><option>History</option><option>Philosophy</option><option>Self-Help</option><option>Biography</option><option>Thriller</option></select></div>
+          <div class="form-field"><label>Year Published</label><input type="number" id="wup-year" placeholder="e.g. 1965"></div>
+          <div class="form-field"><label>Fallback Cover Color</label><input type="color" id="wup-color" value="#1a3a5c"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Cover Image (JPG / PNG / WEBP)</label>
+            <input type="file" id="wup-cover" accept=".jpg,.jpeg,.png,.webp" onchange="previewCover('wup-cover','wup-cover-preview')">
+            <div id="wup-cover-preview" style="margin-top:10px;display:none">
+              <img style="width:80px;height:120px;object-fit:cover;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.2)" id="wup-cover-img" src="">
+              <span style="font-size:12px;color:#4a5e52;margin-left:10px;vertical-align:middle">✓ Cover selected</span>
+              <button type="button" onclick="clearCover('wup-cover','wup-cover-preview')" style="font-size:11px;color:#c00;background:none;border:none;cursor:pointer;margin-left:6px">✕ Remove</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-row"><div class="form-field"><label>Description</label><textarea id="wup-desc" placeholder="Short description…" style="min-height:80px;width:100%;padding:10px 12px;border:1.5px solid #e0e0e0;border-radius:5px;font-family:'DM Sans',sans-serif;font-size:14px;resize:vertical"></textarea></div></div>
+        <div class="form-row"><div class="form-field"><label>Upload File (PDF / EPUB / TXT)</label><input type="file" id="wup-file" accept=".pdf,.epub,.txt"></div></div>
+        <button class="btn-admin" id="wup-btn" onclick="workerUploadBook()">Upload Book</button>
+        <p class="success-msg" id="wup-success" style="color:#4a5e52;font-size:13px;margin-top:10px;display:none">✓ Book uploaded successfully!</p>
+      </div>
+    </div>
+
+    <!-- Upload Manga -->
+    <div id="worker-section-manga" style="display:none">
+      <div class="admin-card">
+        <h3 style="font-family:'Playfair Display',serif;font-size:22px;margin-bottom:20px;font-weight:700">Upload New Manga</h3>
+        <div class="form-row">
+          <div class="form-field"><label>Title *</label><input type="text" id="wmn-title" placeholder="e.g. Naruto"></div>
+          <div class="form-field"><label>Author *</label><input type="text" id="wmn-author" placeholder="e.g. Masashi Kishimoto"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-field"><label>Genre</label><select id="wmn-genre"><option>Action</option><option>Adventure</option><option>Comedy</option><option>Drama</option><option>Fantasy</option><option>Horror</option><option>Romance</option><option>Sci-Fi</option><option>Slice of Life</option><option>Sports</option><option>Supernatural</option><option>Thriller</option></select></div>
+          <div class="form-field"><label>Chapters</label><input type="number" id="wmn-chapters" placeholder="e.g. 700"></div>
+          <div class="form-field"><label>Status</label><select id="wmn-status"><option value="Ongoing">Ongoing</option><option value="Completed">Completed</option><option value="Hiatus">Hiatus</option></select></div>
+          <div class="form-field"><label>Fallback Cover Color</label><input type="color" id="wmn-color" value="#1a1a2e"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Cover Image (JPG / PNG / WEBP)</label>
+            <input type="file" id="wmn-cover" accept=".jpg,.jpeg,.png,.webp" onchange="previewCover('wmn-cover','wmn-cover-preview')">
+            <div id="wmn-cover-preview" style="margin-top:10px;display:none">
+              <img style="width:80px;height:120px;object-fit:cover;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.2)" id="wmn-cover-img" src="">
+              <span style="font-size:12px;color:#4a5e52;margin-left:10px;vertical-align:middle">✓ Cover selected</span>
+              <button type="button" onclick="clearCover('wmn-cover','wmn-cover-preview')" style="font-size:11px;color:#c00;background:none;border:none;cursor:pointer;margin-left:6px">✕ Remove</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-row"><div class="form-field"><label>Description</label><textarea id="wmn-desc" placeholder="Short description…" style="min-height:80px;width:100%;padding:10px 12px;border:1.5px solid #e0e0e0;border-radius:5px;font-family:'DM Sans',sans-serif;font-size:14px;resize:vertical"></textarea></div></div>
+        <div class="form-row"><div class="form-field"><label>Upload File (PDF / CBZ / CBR / ZIP)</label><input type="file" id="wmn-file" accept=".pdf,.cbz,.cbr,.zip"></div></div>
+        <button class="btn-admin" id="wmn-btn" onclick="workerUploadManga()">Upload Manga</button>
+        <p class="success-msg" id="wmn-success" style="color:#4a5e52;font-size:13px;margin-top:10px;display:none">✓ Manga uploaded successfully!</p>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── PDF.js worker ──────────────────────────────────────────
 if(typeof pdfjsLib !== 'undefined'){
@@ -753,6 +845,8 @@ async function doLogin(){
     saveSession(data);closeModal();
     if(data.is_admin){
       showAdmin();
+    } else if(data.is_worker){
+      showWorker();
     } else if(data.membership_expired){
       showExpiredPage(data.tier);
     } else {
@@ -803,7 +897,7 @@ async function doSignup(){
 }
 function saveSession(data){
   token=data.token;
-  currentUser={name:data.name,tier:data.tier,isAdmin:data.is_admin};
+  currentUser={name:data.name,tier:data.tier,isAdmin:data.is_admin,isWorker:data.is_worker||false};
   localStorage.setItem('bv_token',token);
   localStorage.setItem('bv_user',JSON.stringify(currentUser));
 }
@@ -839,6 +933,10 @@ async function showLibrary(){
   await Promise.all([loadBooks(),loadManga()]);
 }
 async function showAdmin(){showPage('page-admin');await loadAdminStats();}
+function showWorker(){
+  showPage('page-worker');
+  document.getElementById('worker-name').textContent=currentUser.name;
+}
 
 // ── Tabs ───────────────────────────────────────────────────
 function switchTab(tab){
@@ -1464,6 +1562,71 @@ function renderStatsPanel(){
     </div>`;
 }
 
+
+// ── Worker Portal ─────────────────────────────────────────
+function workerTab(tab, el){
+  document.querySelectorAll('.worker-tab').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  document.getElementById('worker-section-books').style.display=tab==='books'?'block':'none';
+  document.getElementById('worker-section-manga').style.display=tab==='manga'?'block':'none';
+}
+
+async function workerUploadBook(){
+  const title=document.getElementById('wup-title').value.trim();
+  const author=document.getElementById('wup-author').value.trim();
+  if(!title||!author){showToast('Title and author required');return;}
+  const btn=document.getElementById('wup-btn');
+  btn.disabled=true;btn.textContent='Uploading…';
+  try{
+    const fd=new FormData();
+    fd.append('title',title);fd.append('author',author);
+    fd.append('genre',document.getElementById('wup-genre').value);
+    fd.append('year',document.getElementById('wup-year').value);
+    fd.append('color',document.getElementById('wup-color').value);
+    fd.append('description',document.getElementById('wup-desc').value);
+    const fi=document.getElementById('wup-file');
+    if(fi.files[0])fd.append('file',fi.files[0]);
+    const ci=document.getElementById('wup-cover');
+    if(ci&&ci.files[0])fd.append('cover',ci.files[0]);
+    const res=await fetch('/api/admin/books',{method:'POST',headers:{Authorization:'Bearer '+token},body:fd});
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error);
+    ['wup-title','wup-author','wup-year','wup-desc'].forEach(id=>document.getElementById(id).value='');
+    fi.value='';clearCover('wup-cover','wup-cover-preview');
+    const s=document.getElementById('wup-success');s.style.display='block';setTimeout(()=>s.style.display='none',3000);
+    showToast('✓ Book uploaded!');
+  }catch(e){showToast('Upload failed: '+e.message);}
+  finally{btn.disabled=false;btn.textContent='Upload Book';}
+}
+
+async function workerUploadManga(){
+  const title=document.getElementById('wmn-title').value.trim();
+  const author=document.getElementById('wmn-author').value.trim();
+  if(!title||!author){showToast('Title and author required');return;}
+  const btn=document.getElementById('wmn-btn');
+  btn.disabled=true;btn.textContent='Uploading…';
+  try{
+    const fd=new FormData();
+    fd.append('title',title);fd.append('author',author);
+    fd.append('genre',document.getElementById('wmn-genre').value);
+    fd.append('chapters',document.getElementById('wmn-chapters').value);
+    fd.append('status',document.getElementById('wmn-status').value);
+    fd.append('color',document.getElementById('wmn-color').value);
+    fd.append('description',document.getElementById('wmn-desc').value);
+    const fi=document.getElementById('wmn-file');
+    if(fi.files[0])fd.append('file',fi.files[0]);
+    const ci=document.getElementById('wmn-cover');
+    if(ci&&ci.files[0])fd.append('cover',ci.files[0]);
+    const res=await fetch('/api/admin/manga',{method:'POST',headers:{Authorization:'Bearer '+token},body:fd});
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error);
+    ['wmn-title','wmn-author','wmn-chapters','wmn-desc'].forEach(id=>document.getElementById(id).value='');
+    fi.value='';clearCover('wmn-cover','wmn-cover-preview');
+    const s=document.getElementById('wmn-success');s.style.display='block';setTimeout(()=>s.style.display='none',3000);
+    showToast('✓ Manga uploaded!');
+  }catch(e){showToast('Upload failed: '+e.message);}
+  finally{btn.disabled=false;btn.textContent='Upload Manga';}
+}
 // ── Keyboard nav ───────────────────────────────────────────
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){closeModal();closeReader();}
@@ -1480,6 +1643,7 @@ loadConfig();
 buildLandingMarquee();
 if(token&&currentUser){
   if(currentUser.isAdmin)showAdmin();
+  else if(currentUser.isWorker)showWorker();
   else showLibrary();
 }
 </script>
