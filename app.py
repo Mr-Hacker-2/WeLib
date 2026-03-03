@@ -1,7 +1,7 @@
 import os
 import uuid
 import boto3
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import (
@@ -13,13 +13,20 @@ from botocore.client import Config
 from werkzeug.utils import secure_filename
 from functools import lru_cache
 
+# ── Startup env check ──────────────────────────────────────
+def _require_env(key):
+    val = os.environ.get(key)
+    if not val:
+        raise RuntimeError(f"Required environment variable {key!r} is not set.")
+    return val
+
 # ── App Setup ──────────────────────────────────────────────
 app = Flask(__name__, static_folder='.', template_folder='.')
 
 _raw_db = os.environ.get('DATABASE_URL', 'sqlite:///bookvault.db')
 app.config['SQLALCHEMY_DATABASE_URI']        = _raw_db.replace('postgres://', 'postgresql://', 1)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY']                 = os.environ.get('JWT_SECRET', 'change-me-in-production')
+app.config['JWT_SECRET_KEY']                 = _require_env('JWT_SECRET')
 app.config['JWT_ACCESS_TOKEN_EXPIRES']       = timedelta(days=7)
 app.config['MAX_CONTENT_LENGTH']             = 200 * 1024 * 1024  # 200 MB
 
@@ -117,34 +124,25 @@ def require_admin():
         return None, (jsonify({'error': 'Admin only'}), 403)
     return user, None
 
-def make_stream_url(key, content_type='application/pdf'):
-    """Presigned URL for inline reading (1 hour)."""
-    if not key or not B2_BUCKET_NAME or not B2_ENDPOINT:
-        return None
-    try:
-        return get_b2_client().generate_presigned_url(
-            'get_object',
-            Params={'Bucket': B2_BUCKET_NAME, 'Key': key,
-                    'ResponseContentDisposition': 'inline',
-                    'ResponseContentType': content_type},
-            ExpiresIn=3600
-        )
-    except Exception:
-        return None
+def _stream_b2(file_key):
+    """Stream object from B2 through Flask. The B2 URL is never sent to the client."""
+    obj = get_b2_client().get_object(Bucket=B2_BUCKET_NAME, Key=file_key)
+    length = obj.get('ContentLength')
+    def generate():
+        for chunk in obj['Body'].iter_chunks(chunk_size=65536):
+            yield chunk
+    return generate, length
 
 def make_download_url(key, filename):
-    """Presigned URL for downloading (5 min)."""
+    """Presigned attachment URL for tier-2 download (5 min)."""
     if not key or not B2_BUCKET_NAME or not B2_ENDPOINT:
         return None
-    try:
-        return get_b2_client().generate_presigned_url(
-            'get_object',
-            Params={'Bucket': B2_BUCKET_NAME, 'Key': key,
-                    'ResponseContentDisposition': f'attachment; filename="{filename}"'},
-            ExpiresIn=300
-        )
-    except Exception as e:
-        raise e
+    return get_b2_client().generate_presigned_url(
+        'get_object',
+        Params={'Bucket': B2_BUCKET_NAME, 'Key': key,
+                'ResponseContentDisposition': f'attachment; filename="{filename}"'},
+        ExpiresIn=300
+    )
 
 # ── Frontend ───────────────────────────────────────────────
 @app.route('/')
@@ -163,7 +161,6 @@ def login():
     username = (data.get('username') or '').strip()
     password = (data.get('password') or '')
 
-    # Admin login via env credentials
     if username in ('admin', ADMIN_EMAIL) and password == ADMIN_PASSWORD:
         admin = User.query.filter_by(is_admin=True).first()
         if admin:
@@ -216,7 +213,7 @@ def me():
         return jsonify({'error': 'Not found'}), 404
     return jsonify({'name': user.name, 'tier': user.tier, 'is_admin': user.is_admin})
 
-# ── Books (public list) ────────────────────────────────────
+# ── Books ──────────────────────────────────────────────────
 @app.route('/api/books', methods=['GET'])
 def list_books():
     books = Book.query.order_by(Book.id.asc()).all()
@@ -225,7 +222,6 @@ def list_books():
                      'description': b.description, 'has_file': bool(b.file_key)}
                     for b in books])
 
-# ── Books read — tier 1+ gets inline stream URL ────────────
 @app.route('/api/books/<int:book_id>/read', methods=['GET'])
 @jwt_required()
 def read_book(book_id):
@@ -233,15 +229,37 @@ def read_book(book_id):
     if not user or user.tier < 1:
         return jsonify({'error': 'Subscription required'}), 403
     b = Book.query.get_or_404(book_id)
-    return jsonify({'id': b.id, 'title': b.title, 'author': b.author,
-                    'genre': b.genre, 'year': b.year, 'description': b.description,
-                    'has_file': bool(b.file_key),
-                    'stream_url': make_stream_url(b.file_key)})
+    return jsonify({
+        'id': b.id, 'title': b.title, 'author': b.author,
+        'genre': b.genre, 'year': b.year, 'description': b.description,
+        'has_file': bool(b.file_key), 'tier': user.tier,
+        # stream_path is a server-side proxy — the raw B2 URL is never sent to the client
+        'stream_path': f'/api/books/{b.id}/stream-pdf' if b.file_key else None
+    })
 
-# ── Books download — tier 2 only ───────────────────────────
+@app.route('/api/books/<int:book_id>/stream-pdf', methods=['GET'])
+@jwt_required()
+def stream_book_pdf(book_id):
+    """Proxy the PDF through Flask. Tier 1+ can read; raw B2 URL is never exposed."""
+    user = User.query.get(int(get_jwt_identity()))
+    if not user or user.tier < 1:
+        return jsonify({'error': 'Subscription required'}), 403
+    b = Book.query.get_or_404(book_id)
+    if not b.file_key or not B2_BUCKET_NAME:
+        return jsonify({'error': 'No file available'}), 404
+    try:
+        gen, length = _stream_b2(b.file_key)
+        hdrs = {'Content-Disposition': 'inline', 'Cache-Control': 'no-store'}
+        if length:
+            hdrs['Content-Length'] = str(length)
+        return Response(gen(), mimetype='application/pdf', headers=hdrs)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/books/<int:book_id>/download', methods=['GET'])
 @jwt_required()
 def download_book(book_id):
+    """Tier 2 only — presigned download URL."""
     user = User.query.get(int(get_jwt_identity()))
     if not user or user.tier < 2:
         return jsonify({'error': 'Scholar plan required to download'}), 403
@@ -253,7 +271,7 @@ def download_book(book_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# ── Manga (public list) ────────────────────────────────────
+# ── Manga ──────────────────────────────────────────────────
 @app.route('/api/manga', methods=['GET'])
 def list_manga():
     items = Manga.query.order_by(Manga.id.asc()).all()
@@ -263,7 +281,6 @@ def list_manga():
                      'has_file': bool(m.file_key)}
                     for m in items])
 
-# ── Manga read — tier 1+ gets inline stream URL ────────────
 @app.route('/api/manga/<int:manga_id>/read', methods=['GET'])
 @jwt_required()
 def read_manga(manga_id):
@@ -271,12 +288,31 @@ def read_manga(manga_id):
     if not user or user.tier < 1:
         return jsonify({'error': 'Subscription required'}), 403
     m = Manga.query.get_or_404(manga_id)
-    return jsonify({'id': m.id, 'title': m.title, 'author': m.author,
-                    'genre': m.genre, 'chapters': m.chapters, 'status': m.status,
-                    'description': m.description, 'has_file': bool(m.file_key),
-                    'stream_url': make_stream_url(m.file_key)})
+    return jsonify({
+        'id': m.id, 'title': m.title, 'author': m.author,
+        'genre': m.genre, 'chapters': m.chapters, 'status': m.status,
+        'description': m.description, 'has_file': bool(m.file_key), 'tier': user.tier,
+        'stream_path': f'/api/manga/{m.id}/stream-pdf' if m.file_key else None
+    })
 
-# ── Manga download — tier 2 only ──────────────────────────
+@app.route('/api/manga/<int:manga_id>/stream-pdf', methods=['GET'])
+@jwt_required()
+def stream_manga_pdf(manga_id):
+    user = User.query.get(int(get_jwt_identity()))
+    if not user or user.tier < 1:
+        return jsonify({'error': 'Subscription required'}), 403
+    m = Manga.query.get_or_404(manga_id)
+    if not m.file_key or not B2_BUCKET_NAME:
+        return jsonify({'error': 'No file available'}), 404
+    try:
+        gen, length = _stream_b2(m.file_key)
+        hdrs = {'Content-Disposition': 'inline', 'Cache-Control': 'no-store'}
+        if length:
+            hdrs['Content-Length'] = str(length)
+        return Response(gen(), mimetype='application/pdf', headers=hdrs)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/manga/<int:manga_id>/download', methods=['GET'])
 @jwt_required()
 def download_manga(manga_id):
