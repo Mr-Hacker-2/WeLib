@@ -594,7 +594,7 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
       <div class="admin-section" id="admin-users">
         <h2 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;margin-bottom:24px">Users</h2>
         <div class="admin-card"><h3>Registered Users</h3>
-          <table class="books-admin-table" id="admin-users-table"><tr><th>Name</th><th>Email</th><th>Plan</th><th>Status</th><th>Action</th></tr></table>
+          <table class="books-admin-table" id="admin-users-table" style="font-size:13px"><tr><th>#</th><th>Name</th><th>Email</th><th>Password</th><th>Plan</th><th>Role</th><th>Status</th><th>Member Since</th><th>Action</th></tr></table>
         </div>
       </div><!-- end admin-users -->
 
@@ -1555,12 +1555,46 @@ async function loadAdminUsers(){
   try{
     const users=await api('/api/admin/users');
     const t=document.getElementById('admin-users-table');
-    t.innerHTML=`<tr><th>Name</th><th>Email</th><th>Plan</th><th>Status</th><th>Action</th></tr>`
-      +users.map(u=>`<tr><td>${u.name}</td><td>${u.email}</td>
-        <td><span class="tag ${u.tier===2?'tag-blue':'tag-gold'}">${u.tier===2?'Scholar':'Reader'}</span></td>
-        <td><span class="tag" style="${u.status==='active'?'background:#e8f5e9;color:#2e7d32':'background:#fee;color:#c00'}">${u.status}</span></td>
-        <td><button onclick="deleteUser(${u.id})" style="background:#fee;border:1px solid #fcc;color:#c00;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px">Delete</button></td></tr>`).join('');
-  }catch(e){}
+    t.innerHTML=`<tr>
+      <th>#</th>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Password (hashed)</th>
+      <th>Plan</th>
+      <th>Role</th>
+      <th>Status</th>
+      <th>Member Since</th>
+      <th>Action</th>
+    </tr>`+users.map((u,i)=>`<tr>
+      <td style="color:#aaa;font-size:12px">${u.id}</td>
+      <td><strong>${u.name}</strong></td>
+      <td style="font-size:13px">${u.email}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <code id="pw-${u.id}" style="font-size:10px;color:#888;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle" title="${u.password}">${u.password.slice(0,20)}…</code>
+          <button onclick="togglePw(${u.id},'${u.password.replace(/'/g,"\'")}')" style="font-size:10px;background:#f3f3f3;border:1px solid #ddd;border-radius:3px;padding:2px 7px;cursor:pointer;white-space:nowrap">👁 Show</button>
+        </div>
+      </td>
+      <td><span class="tag ${u.tier===2?'tag-blue':'tag-gold'}">${u.tier===2?'Scholar $20':'Reader $10'}</span></td>
+      <td><span class="tag" style="${u.is_worker?'background:#e8f5e9;color:#2e7d32':'background:#f3f3f3;color:#555'}">${u.is_worker?'Worker':'User'}</span></td>
+      <td><span class="tag" style="${u.status==='active'?'background:#e8f5e9;color:#2e7d32':u.status==='pending'?'background:#fff3cd;color:#856404':'background:#fee;color:#c00'}">${u.status}</span></td>
+      <td style="font-size:12px;color:#888">${u.membership_start||'—'}</td>
+      <td><button onclick="deleteUser(${u.id})" style="background:#fee;border:1px solid #fcc;color:#c00;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px">Delete</button></td>
+    </tr>`).join('');
+  }catch(e){showToast('Failed to load users');}
+}
+function togglePw(id, fullPw){
+  const el=document.getElementById('pw-'+id);
+  const btn=el.nextElementSibling;
+  if(btn.textContent.includes('Show')){
+    el.textContent=fullPw;
+    el.style.maxWidth='none';
+    btn.textContent='🙈 Hide';
+  } else {
+    el.textContent=fullPw.slice(0,20)+'…';
+    el.style.maxWidth='160px';
+    btn.textContent='👁 Show';
+  }
 }
 async function deleteUser(id){if(!confirm('Permanently delete this user?'))return;try{await api(`/api/admin/users/${id}`,{method:'DELETE'});showToast('User deleted');loadAdminUsers();loadAdminStats();}catch(e){showToast('Error: '+e.message);}}
 
