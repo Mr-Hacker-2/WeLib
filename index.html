@@ -602,14 +602,9 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
         <!-- Scholar-only tools (hidden for tier 1) -->
         <div id="scholar-tools" style="display:none;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <div class="zoom-controls">
-            <button class="rdr-btn" onclick="adjustZoom(-0.15)" title="Zoom out">−</button>
+            <button class="rdr-btn" onclick="adjustZoom(-0.25)" title="Zoom out">−</button>
             <span class="zoom-val" id="zoom-val">100%</span>
-            <button class="rdr-btn" onclick="adjustZoom(0.15)" title="Zoom in">+</button>
-          </div>
-          <div class="zoom-controls" title="Font size (affects zoom scale)">
-            <button class="rdr-btn" onclick="adjustFontSize(-10)" title="Smaller">A−</button>
-            <span class="zoom-val" id="font-size-val">100%</span>
-            <button class="rdr-btn" onclick="adjustFontSize(10)" title="Larger">A+</button>
+            <button class="rdr-btn" onclick="adjustZoom(0.25)" title="Zoom in">+</button>
           </div>
           <button class="rdr-btn" id="btn-mode-day" onclick="setMode('day')" title="Day mode">☀️</button>
           <button class="rdr-btn active" id="btn-mode-night" onclick="setMode('night')" title="Night mode">🌙</button>
@@ -954,12 +949,13 @@ async function openItem(type, id){
   document.getElementById('tier1-upsell').style.display=isScholar?'none':'flex';
   document.getElementById('rdr-jump-wrap').style.display=isScholar?'flex':'none';
   document.getElementById('rdr-dl').style.display=(isScholar&&meta.has_file)?'inline-block':'none';
-  // Restore Scholar font size
+  // Restore Scholar zoom level
   if(isScholar){
-    scholarFontSize=parseInt(localStorage.getItem('bv_font_size')||'100');
-    document.getElementById('font-size-val').textContent=scholarFontSize+'%';
-    currentZoom=(scholarFontSize/100);
-    document.getElementById('zoom-val').textContent=scholarFontSize+'%';
+    const savedZoom=parseFloat(localStorage.getItem('bv_zoom')||'1.0');
+    currentZoom=Math.max(0.5,Math.min(3.0,savedZoom));
+    document.getElementById('zoom-val').textContent=Math.round(currentZoom*100)+'%';
+  } else {
+    currentZoom=1.0;
   }
   // Reset highlight
   highlightMode=false;
@@ -1107,10 +1103,12 @@ function saveProgress(){
 
 // ── Zoom (Scholar) ─────────────────────────────────────────
 function adjustZoom(delta){
-  if(currentUser.tier<2) return;
+  if(!currentUser||currentUser.tier<2) return;
   currentZoom=Math.max(0.5,Math.min(3.0,currentZoom+delta));
-  document.getElementById('zoom-val').textContent=Math.round(currentZoom*100)+'%';
-  renderPage(currentPage,'none');
+  const pct=Math.round(currentZoom*100);
+  document.getElementById('zoom-val').textContent=pct+'%';
+  localStorage.setItem('bv_zoom', currentZoom.toFixed(2));
+  if(pdfDoc) renderPage(currentPage,'none');
 }
 
 // ── Mode (Scholar) ─────────────────────────────────────────
@@ -1410,15 +1408,7 @@ function clearCover(inputId, previewId){
   if(preview)preview.style.display='none';
 }
 
-// ── Scholar: Font size ─────────────────────────────────────
-let scholarFontSize = parseInt(localStorage.getItem('bv_font_size')||'100');
-function adjustFontSize(delta){
-  if(!currentUser||currentUser.tier<2)return;
-  scholarFontSize=Math.max(70,Math.min(160,scholarFontSize+delta));
-  localStorage.setItem('bv_font_size',scholarFontSize);
-  document.getElementById('font-size-val').textContent=scholarFontSize+'%';
-  renderPage(currentPage,'none');
-}
+// ── Scholar: Font size merged into adjustZoom (see above) ──
 
 // ── Scholar: Highlight tool ────────────────────────────────
 let highlightMode=false;
