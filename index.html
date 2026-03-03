@@ -283,10 +283,51 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
 .worker-tabs{display:flex;gap:0;margin-bottom:32px;border-bottom:2px solid #e0dbd0;}
 .worker-tab{padding:12px 32px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;color:#999;transition:.2s;}
 .worker-tab.active{border-bottom-color:var(--ink);color:var(--ink);}
+/* ── DONATE & REQUEST BUTTONS in library ── */
+.lib-action-bar{display:flex;gap:12px;justify-content:flex-end;padding:0 48px 0;margin-bottom:-20px;flex-wrap:wrap;}
+.btn-donate{background:linear-gradient(135deg,#2e7d32,#4caf50);color:#fff;border:none;padding:10px 22px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;transition:.2s;font-family:'DM Sans',sans-serif;}
+.btn-donate:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(46,125,50,0.45);}
+.btn-request{background:linear-gradient(135deg,#1a3a5c,#2a5a8c);color:#fff;border:none;padding:10px 22px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;transition:.2s;font-family:'DM Sans',sans-serif;}
+.btn-request:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(26,58,92,0.45);}
+
+/* ── DONATE MODAL ── */
+#donate-modal .modal{max-width:480px;}
+.donate-header{text-align:center;margin-bottom:24px;}
+.donate-icon{font-size:44px;margin-bottom:10px;}
+.file-drop-zone{border:2px dashed #ccc;border-radius:8px;padding:28px;text-align:center;cursor:pointer;transition:.2s;position:relative;background:#fafafa;}
+.file-drop-zone:hover,.file-drop-zone.dragover{border-color:var(--gold);background:#fffbf0;}
+.file-drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.file-drop-icon{font-size:28px;margin-bottom:8px;}
+.file-drop-label{font-size:14px;color:#888;}
+.file-drop-label strong{color:var(--gold);}
+.file-selected-info{background:#f0faf0;border:1px solid #4caf50;border-radius:6px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-top:10px;font-size:13px;color:#2e7d32;font-weight:600;}
+
+/* ── REQUEST MODAL ── */
+#request-modal .modal{max-width:460px;}
+.request-header{text-align:center;margin-bottom:22px;}
+.request-icon{font-size:44px;margin-bottom:10px;}
+.status-pill{display:inline-block;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.status-pending{background:#fff3cd;color:#856404;}
+.status-approved,.status-published{background:#d4edda;color:#155724;}
+.status-declined{background:#f8d7da;color:#721c24;}
+
+/* ── MY REQUESTS tab in library ── */
+.my-requests-list{display:flex;flex-direction:column;gap:12px;max-width:700px;}
+.req-card{background:#fff;border-radius:8px;padding:20px 24px;box-shadow:0 2px 10px rgba(0,0,0,0.06);display:flex;justify-content:space-between;align-items:flex-start;gap:16px;}
+.req-card-info .req-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;}
+.req-card-info .req-meta{font-size:12px;color:#888;margin-top:4px;}
+
+/* ── Admin donation & request tables ── */
+.admin-action-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.btn-approve{background:#e8f5e9;border:1px solid #4caf50;color:#2e7d32;padding:5px 14px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:700;}
+.btn-decline-sm{background:#fee;border:1px solid #fcc;color:#c00;padding:5px 14px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:700;}
+.btn-publish{background:#ddf0ff;border:1px solid #2196f3;color:#005a99;padding:5px 14px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:700;}
+
 @media(max-width:700px){
   .landing-nav{padding:20px 24px;}.hero{padding:60px 24px 40px;}
   .stats-bar{gap:30px;padding:32px 20px;}
   .lib-header,.lib-content,.upsell-banner{padding-left:20px;padding-right:20px;}
+  .lib-action-bar{padding:0 20px;justify-content:center;}
   .books-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}
   .admin-sidebar{display:none;}.lib-tab{padding:10px 18px;font-size:13px;}
   canvas#rdr-canvas{max-width:calc(100vw - 80px);}
@@ -395,10 +436,16 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
       <button class="btn btn-gold" onclick="onSearch()">Search</button>
     </div>
   </div>
+  <!-- Action buttons -->
+  <div class="lib-action-bar" id="lib-action-bar">
+    <button class="btn-donate" onclick="openDonateModal()">📚 Donate a Book</button>
+    <button class="btn-request" onclick="openRequestModal()">🔍 Request a Book</button>
+  </div>
   <div class="lib-content">
     <div class="lib-tabs">
       <button class="lib-tab active" id="tab-books" onclick="switchTab('books')">📚 Books</button>
       <button class="lib-tab" id="tab-manga" onclick="switchTab('manga')">🎌 Manga</button>
+      <button class="lib-tab" id="tab-my-requests" onclick="switchTab('my-requests')">📋 My Requests</button>
     </div>
     <div id="section-books">
       <div class="genre-filters" id="genre-filters"></div>
@@ -407,6 +454,12 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
     <div id="section-manga" style="display:none">
       <div class="genre-filters" id="manga-genre-filters"></div>
       <div id="manga-grid" class="books-grid"></div>
+    </div>
+    <div id="section-my-requests" style="display:none">
+      <h3 style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:20px">My Book Requests</h3>
+      <div class="my-requests-list" id="my-requests-list">
+        <p style="color:#aaa;font-size:14px">Loading…</p>
+      </div>
     </div>
   </div>
 </div>
@@ -426,6 +479,8 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
       <div class="sidebar-item" data-sec="upload-manga" onclick="adminTab('upload-manga',this)">🗂 Upload Manga</div>
       <div class="sidebar-item" data-sec="manga" onclick="adminTab('manga',this)">🎌 Manage Manga</div>
       <div class="sidebar-item" data-sec="users" onclick="adminTab('users',this)">👤 Users</div>
+      <div class="sidebar-item" data-sec="donations" onclick="adminTab('donations',this)">📚 Donations <span id="donate-badge" style="background:#2e7d32;color:#fff;border-radius:20px;padding:1px 8px;font-size:11px;font-weight:900;margin-left:4px;display:none"></span></div>
+      <div class="sidebar-item" data-sec="book-requests" onclick="adminTab('book-requests',this)">🔍 Book Requests <span id="breq-badge" style="background:#1a3a5c;color:#fff;border-radius:20px;padding:1px 8px;font-size:11px;font-weight:900;margin-left:4px;display:none"></span></div>
     </div>
     <div class="admin-main">
 
@@ -541,12 +596,48 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
         <div class="admin-card"><h3>Registered Users</h3>
           <table class="books-admin-table" id="admin-users-table"><tr><th>Name</th><th>Email</th><th>Plan</th><th>Status</th><th>Action</th></tr></table>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
+      </div><!-- end admin-users -->
 
-<!-- ══ AUTH MODAL ══ -->
+      <!-- ══ ADMIN DONATIONS ══ -->
+      <div class="admin-section" id="admin-donations">
+        <h2 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;margin-bottom:24px">📚 Book Donations</h2>
+        <div style="display:flex;gap:10px;margin-bottom:20px">
+          <button class="btn-admin" id="donate-filter-pending" onclick="loadAdminDonations('pending')" style="background:#2e7d32">Pending</button>
+          <button class="btn-admin" id="donate-filter-approved" onclick="loadAdminDonations('approved')" style="background:#555">Approved</button>
+          <button class="btn-admin" id="donate-filter-declined" onclick="loadAdminDonations('declined')" style="background:#555">Declined</button>
+        </div>
+        <div class="admin-card">
+          <h3>Donated Books from Users</h3>
+          <p style="font-size:13px;color:#888;margin-bottom:20px">Users have submitted these PDF books. Review them and approve to publish to the library, or decline.</p>
+          <table class="books-admin-table" id="admin-donations-table">
+            <tr><th>Title</th><th>Author</th><th>From</th><th>Date</th><th>File</th><th>Actions</th></tr>
+          </table>
+          <p id="no-donations-msg" style="color:#aaa;font-size:14px;margin-top:16px;display:none">No donations in this category. 🎉</p>
+        </div>
+      </div>
+
+      <!-- ══ ADMIN BOOK REQUESTS ══ -->
+      <div class="admin-section" id="admin-book-requests">
+        <h2 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;margin-bottom:24px">🔍 Book Requests</h2>
+        <div style="display:flex;gap:10px;margin-bottom:20px">
+          <button class="btn-admin" id="breq-filter-pending" onclick="loadAdminBookRequests('pending')" style="background:#1a3a5c">Pending</button>
+          <button class="btn-admin" id="breq-filter-published" onclick="loadAdminBookRequests('published')" style="background:#555">Published</button>
+          <button class="btn-admin" id="breq-filter-declined" onclick="loadAdminBookRequests('declined')" style="background:#555">Declined</button>
+        </div>
+        <div class="admin-card">
+          <h3>Requested Books from Users</h3>
+          <p style="font-size:13px;color:#888;margin-bottom:20px">Users are requesting books not yet in the library. Mark as <em>Published</em> once you've uploaded the book, or decline if unavailable.</p>
+          <table class="books-admin-table" id="admin-breq-table">
+            <tr><th>Title</th><th>Author</th><th>Genre</th><th>Reason</th><th>From</th><th>Date</th><th>Actions</th></tr>
+          </table>
+          <p id="no-breq-msg" style="color:#aaa;font-size:14px;margin-top:16px;display:none">No requests in this category.</p>
+        </div>
+      </div>
+
+    </div><!-- end admin-main -->
+  </div><!-- end admin-body -->
+</div><!-- end page-admin -->
+
 <div class="modal-overlay" id="auth-modal">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
@@ -597,6 +688,79 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
         <div style="margin:16px 0;font-size:15px;line-height:1.7;color:#555">Your account request has been received.<br>Admin will review your CashApp payment and activate your account.</div>
         <button class="btn-ink" onclick="closeModal()">Close</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DONATE MODAL ══ -->
+<div class="modal-overlay" id="donate-modal">
+  <div class="modal" style="max-width:480px">
+    <button class="modal-close" onclick="closeDonateModal()">✕</button>
+    <div id="donate-step1">
+      <div class="donate-header">
+        <div class="donate-icon">📚</div>
+        <div class="modal-title">Donate a Book</div>
+        <div class="modal-sub">Share a PDF with the community — admin will review before publishing.</div>
+      </div>
+      <div class="form-group"><label>Book Title *</label><input type="text" id="don-title" placeholder="e.g. The Great Gatsby"></div>
+      <div class="form-group"><label>Author</label><input type="text" id="don-author" placeholder="e.g. F. Scott Fitzgerald"></div>
+      <div class="form-group"><label>Description (optional)</label><textarea id="don-desc" style="width:100%;padding:10px 12px;border:1.5px solid #ddd;border-radius:5px;font-family:'DM Sans',sans-serif;font-size:14px;resize:vertical;min-height:70px" placeholder="Brief description of the book…"></textarea></div>
+      <div class="form-group">
+        <label>Upload PDF *</label>
+        <div class="file-drop-zone" id="don-drop-zone">
+          <input type="file" id="don-file" accept=".pdf" onchange="handleDonateFile(this)">
+          <div class="file-drop-icon">📄</div>
+          <div class="file-drop-label">Drop your PDF here or <strong>click to browse</strong></div>
+          <div style="font-size:11px;color:#bbb;margin-top:4px">PDF files only • Max 200 MB</div>
+        </div>
+        <div class="file-selected-info" id="don-file-info" style="display:none">
+          <span>📄</span><span id="don-file-name"></span>
+        </div>
+      </div>
+      <p class="modal-err" id="donate-err"></p>
+      <button class="btn-ink" id="donate-btn" onclick="submitDonation()" style="background:#2e7d32">📚 Submit Donation</button>
+    </div>
+    <div id="donate-step2" style="display:none;text-align:center;padding:20px 0">
+      <div style="font-size:52px;margin-bottom:16px">🎉</div>
+      <div class="modal-title">Donation Submitted!</div>
+      <div style="margin:16px 0;font-size:15px;line-height:1.7;color:#555">Thank you for donating! Admin will review your PDF and publish it to the library once approved.</div>
+      <button class="btn-ink" onclick="closeDonateModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ REQUEST MODAL ══ -->
+<div class="modal-overlay" id="request-modal">
+  <div class="modal" style="max-width:460px">
+    <button class="modal-close" onclick="closeRequestModal()">✕</button>
+    <div id="request-step1">
+      <div class="request-header">
+        <div class="request-icon">🔍</div>
+        <div class="modal-title">Request a Book</div>
+        <div class="modal-sub">Can't find what you're looking for? Request it and we'll try to add it!</div>
+      </div>
+      <div class="form-group"><label>Book Title *</label><input type="text" id="req-title" placeholder="e.g. Atomic Habits"></div>
+      <div class="form-group"><label>Author (if known)</label><input type="text" id="req-author" placeholder="e.g. James Clear"></div>
+      <div class="form-group"><label>Genre</label>
+        <select id="req-genre" style="width:100%;padding:12px 14px;border:1.5px solid #ddd;border-radius:5px;font-family:'DM Sans',sans-serif;font-size:15px">
+          <option value="">— Select a genre —</option>
+          <option>Classic Literature</option><option>Science Fiction</option><option>Fantasy</option>
+          <option>Mystery</option><option>Romance</option><option>History</option>
+          <option>Philosophy</option><option>Self-Help</option><option>Biography</option>
+          <option>Thriller</option><option>Action</option><option>Science</option><option>Other</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Why do you want this book?</label>
+        <textarea id="req-reason" style="width:100%;padding:10px 12px;border:1.5px solid #ddd;border-radius:5px;font-family:'DM Sans',sans-serif;font-size:14px;resize:vertical;min-height:80px" placeholder="e.g. It's a great productivity book I'd love to read…"></textarea>
+      </div>
+      <p class="modal-err" id="request-err"></p>
+      <button class="btn-ink" id="request-btn" onclick="submitBookRequest()" style="background:#1a3a5c">🔍 Submit Request</button>
+    </div>
+    <div id="request-step2" style="display:none;text-align:center;padding:20px 0">
+      <div style="font-size:52px;margin-bottom:16px">✅</div>
+      <div class="modal-title">Request Submitted!</div>
+      <div style="margin:16px 0;font-size:15px;line-height:1.7;color:#555">Your request has been received. You can track its status in the <strong>My Requests</strong> tab.</div>
+      <button class="btn-ink" onclick="closeRequestModal()">Got it</button>
     </div>
   </div>
 </div>
@@ -934,7 +1098,7 @@ async function showLibrary(){
   document.getElementById('upsell-banner').style.display=currentUser.tier===1?'flex':'none';
   await Promise.all([loadBooks(),loadManga()]);
 }
-async function showAdmin(){showPage('page-admin');await loadAdminStats();}
+async function showAdmin(){showPage('page-admin');await loadAdminStats();loadDonationBadge();loadBreqBadge();}
 function showWorker(){
   showPage('page-worker');
   document.getElementById('worker-name').textContent=currentUser.name;
@@ -945,10 +1109,15 @@ function switchTab(tab){
   activeTab=tab;
   document.getElementById('section-books').style.display=tab==='books'?'block':'none';
   document.getElementById('section-manga').style.display=tab==='manga'?'block':'none';
+  document.getElementById('section-my-requests').style.display=tab==='my-requests'?'block':'none';
   document.getElementById('tab-books').className='lib-tab'+(tab==='books'?' active':'');
   document.getElementById('tab-manga').className='lib-tab'+(tab==='manga'?' active':'');
-  document.getElementById('search-input').value='';
-  if(tab==='manga')renderMangaGrid();else renderBooks();
+  const mrt=document.getElementById('tab-my-requests');
+  if(mrt) mrt.className='lib-tab'+(tab==='my-requests'?' active':'');
+  if(tab!=='my-requests') document.getElementById('search-input').value='';
+  if(tab==='manga') renderMangaGrid();
+  else if(tab==='books') renderBooks();
+  else if(tab==='my-requests') loadMyRequests();
 }
 function onSearch(){if(activeTab==='manga')renderMangaGrid();else renderBooks();}
 
@@ -1404,7 +1573,9 @@ function adminTab(section,el){
   if(section==='users')loadAdminUsers();
   if(section==='manga')loadAdminManga();
   if(section==='requests')loadAdminRequests();
-  if(section==='dashboard')loadAdminStats();
+  if(section==='dashboard'){loadAdminStats();loadDonationBadge();loadBreqBadge();}
+  if(section==='donations')loadAdminDonations('pending');
+  if(section==='book-requests')loadAdminBookRequests('pending');
 }
 
 async function uploadBook(){
@@ -1629,6 +1800,224 @@ async function workerUploadManga(){
   }catch(e){showToast('Upload failed: '+e.message);}
   finally{btn.disabled=false;btn.textContent='Upload Manga';}
 }
+// ── Donate Modal ───────────────────────────────────────────
+function openDonateModal(){
+  document.getElementById('donate-modal').classList.add('open');
+  document.getElementById('donate-step1').style.display='block';
+  document.getElementById('donate-step2').style.display='none';
+  document.getElementById('donate-err').style.display='none';
+  document.getElementById('don-title').value='';
+  document.getElementById('don-author').value='';
+  document.getElementById('don-desc').value='';
+  document.getElementById('don-file').value='';
+  document.getElementById('don-file-info').style.display='none';
+}
+function closeDonateModal(){document.getElementById('donate-modal').classList.remove('open');}
+function handleDonateFile(input){
+  const f=input.files[0];
+  if(!f) return;
+  if(!f.name.toLowerCase().endsWith('.pdf')){
+    document.getElementById('donate-err').textContent='Only PDF files are accepted.';
+    document.getElementById('donate-err').style.display='block';
+    input.value=''; return;
+  }
+  document.getElementById('donate-err').style.display='none';
+  document.getElementById('don-file-name').textContent=f.name+' ('+Math.round(f.size/1024/1024*10)/10+' MB)';
+  document.getElementById('don-file-info').style.display='flex';
+}
+async function submitDonation(){
+  const title=document.getElementById('don-title').value.trim();
+  const file=document.getElementById('don-file').files[0];
+  const err=document.getElementById('donate-err');
+  if(!title){err.textContent='Book title is required.';err.style.display='block';return;}
+  if(!file){err.textContent='Please select a PDF file.';err.style.display='block';return;}
+  const btn=document.getElementById('donate-btn');
+  btn.disabled=true;btn.textContent='Uploading…';
+  try{
+    const fd=new FormData();
+    fd.append('title',title);
+    fd.append('author',document.getElementById('don-author').value.trim());
+    fd.append('description',document.getElementById('don-desc').value.trim());
+    fd.append('file',file);
+    const res=await fetch('/api/donate',{method:'POST',headers:{Authorization:'Bearer '+token},body:fd});
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.error);
+    document.getElementById('donate-step1').style.display='none';
+    document.getElementById('donate-step2').style.display='block';
+  }catch(e){err.textContent=e.message;err.style.display='block';}
+  finally{btn.disabled=false;btn.textContent='📚 Submit Donation';}
+}
+
+// ── Request Modal ──────────────────────────────────────────
+function openRequestModal(){
+  document.getElementById('request-modal').classList.add('open');
+  document.getElementById('request-step1').style.display='block';
+  document.getElementById('request-step2').style.display='none';
+  document.getElementById('request-err').style.display='none';
+  document.getElementById('req-title').value='';
+  document.getElementById('req-author').value='';
+  document.getElementById('req-genre').value='';
+  document.getElementById('req-reason').value='';
+}
+function closeRequestModal(){document.getElementById('request-modal').classList.remove('open');}
+async function submitBookRequest(){
+  const title=document.getElementById('req-title').value.trim();
+  const err=document.getElementById('request-err');
+  if(!title){err.textContent='Book title is required.';err.style.display='block';return;}
+  const btn=document.getElementById('request-btn');
+  btn.disabled=true;btn.textContent='Submitting…';
+  try{
+    await api('/api/requests',{method:'POST',body:JSON.stringify({
+      title,
+      author:document.getElementById('req-author').value.trim(),
+      genre:document.getElementById('req-genre').value,
+      reason:document.getElementById('req-reason').value.trim()
+    })});
+    document.getElementById('request-step1').style.display='none';
+    document.getElementById('request-step2').style.display='block';
+  }catch(e){err.textContent=e.message;err.style.display='block';}
+  finally{btn.disabled=false;btn.textContent='🔍 Submit Request';}
+}
+
+// ── My Requests tab ────────────────────────────────────────
+async function loadMyRequests(){
+  const list=document.getElementById('my-requests-list');
+  list.innerHTML='<p style="color:#aaa;font-size:14px">Loading…</p>';
+  try{
+    const items=await api('/api/requests/mine');
+    if(!items.length){
+      list.innerHTML=`<div style="text-align:center;padding:48px 20px">
+        <div style="font-size:48px;margin-bottom:16px">🔍</div>
+        <p style="color:#999;font-size:15px">You haven't requested any books yet.</p>
+        <button class="btn-request" style="margin:20px auto;display:inline-flex" onclick="openRequestModal()">Request a Book</button>
+      </div>`;
+      return;
+    }
+    const statusClass={pending:'status-pending',published:'status-published',declined:'status-declined'};
+    const statusLabel={pending:'⏳ Pending',published:'✅ Published',declined:'✗ Declined'};
+    list.innerHTML=items.map(r=>`
+      <div class="req-card">
+        <div class="req-card-info">
+          <div class="req-title">${r.title}</div>
+          <div class="req-meta">${r.author?'by '+r.author+' · ':''}${r.genre?r.genre+' · ':''}Submitted ${r.submitted_at}</div>
+          ${r.reason?`<div style="font-size:13px;color:#666;margin-top:6px;font-style:italic">"${r.reason}"</div>`:''}
+        </div>
+        <span class="status-pill ${statusClass[r.status]||'status-pending'}">${statusLabel[r.status]||r.status}</span>
+      </div>`).join('');
+  }catch(e){list.innerHTML='<p style="color:#c00">Could not load requests.</p>';}
+}
+
+// ── Admin: Donations ───────────────────────────────────────
+let _donateFilter='pending';
+async function loadAdminDonations(status='pending'){
+  _donateFilter=status;
+  // Update button styles
+  ['pending','approved','declined'].forEach(s=>{
+    const b=document.getElementById('donate-filter-'+s);
+    if(b) b.style.background=s===status?'#2e7d32':'#555';
+  });
+  try{
+    const items=await api('/api/admin/donations?status='+status);
+    const t=document.getElementById('admin-donations-table');
+    const noMsg=document.getElementById('no-donations-msg');
+    t.innerHTML='<tr><th>Title</th><th>Author</th><th>From</th><th>Date</th><th>File</th><th>Actions</th></tr>';
+    if(!items.length){noMsg.style.display='block';return;}
+    noMsg.style.display='none';
+    t.innerHTML+=items.map(d=>`<tr>
+      <td><strong>${d.title}</strong>${d.description?`<br><span style="font-size:11px;color:#999">${d.description.slice(0,60)}…</span>`:''}</td>
+      <td>${d.author||'—'}</td>
+      <td>${d.user_name}<br><span style="font-size:11px;color:#aaa">${d.user_email}</span></td>
+      <td>${d.submitted_at}</td>
+      <td>${d.has_file?'<span style="color:#2e7d32;font-weight:700">✅ PDF</span>':'—'}</td>
+      <td><div class="admin-action-btns">
+        ${status==='pending'?`
+          <button class="btn-approve" onclick="approveDonation(${d.id})">✓ Approve & Publish</button>
+          <button class="btn-decline-sm" onclick="declineDonation(${d.id})">✗ Decline</button>
+        `:`<span class="status-pill ${status==='approved'?'status-approved':'status-declined'}">${status}</span>`}
+      </div></td>
+    </tr>`).join('');
+    // Update badge count
+    if(status==='pending'){
+      const badge=document.getElementById('donate-badge');
+      if(items.length>0){badge.textContent=items.length;badge.style.display='inline';}
+      else badge.style.display='none';
+    }
+  }catch(e){showToast('Failed to load donations');}
+}
+async function approveDonation(id){
+  if(!confirm('Approve this donation and publish it to the library?'))return;
+  try{await api('/api/donate/'+id+'/approve',{method:'POST'});showToast('✓ Book published to library!');loadAdminDonations(_donateFilter);loadAdminStats();}
+  catch(e){showToast('Error: '+e.message);}
+}
+async function declineDonation(id){
+  if(!confirm('Decline this donation?'))return;
+  try{await api('/api/donate/'+id+'/decline',{method:'POST'});showToast('Donation declined.');loadAdminDonations(_donateFilter);}
+  catch(e){showToast('Error: '+e.message);}
+}
+
+// ── Admin: Book Requests ───────────────────────────────────
+let _breqFilter='pending';
+async function loadAdminBookRequests(status='pending'){
+  _breqFilter=status;
+  ['pending','published','declined'].forEach(s=>{
+    const b=document.getElementById('breq-filter-'+s);
+    if(b) b.style.background=s===status?'#1a3a5c':'#555';
+  });
+  try{
+    const items=await api('/api/admin/book-requests?status='+status);
+    const t=document.getElementById('admin-breq-table');
+    const noMsg=document.getElementById('no-breq-msg');
+    t.innerHTML='<tr><th>Title</th><th>Author</th><th>Genre</th><th>Reason</th><th>From</th><th>Date</th><th>Actions</th></tr>';
+    if(!items.length){noMsg.style.display='block';return;}
+    noMsg.style.display='none';
+    t.innerHTML+=items.map(r=>`<tr>
+      <td><strong>${r.title}</strong></td>
+      <td>${r.author||'—'}</td>
+      <td>${r.genre||'—'}</td>
+      <td style="max-width:180px;font-size:12px;color:#666">${r.reason?r.reason.slice(0,80)+'…':'—'}</td>
+      <td>${r.user_name}<br><span style="font-size:11px;color:#aaa">${r.user_email}</span></td>
+      <td>${r.submitted_at}</td>
+      <td><div class="admin-action-btns">
+        ${status==='pending'?`
+          <button class="btn-publish" onclick="publishBookRequest(${r.id})">✓ Mark Published</button>
+          <button class="btn-decline-sm" onclick="declineBookRequest(${r.id})">✗ Decline</button>
+        `:`<span class="status-pill ${status==='published'?'status-published':'status-declined'}">${status}</span>`}
+      </div></td>
+    </tr>`).join('');
+    if(status==='pending'){
+      const badge=document.getElementById('breq-badge');
+      if(items.length>0){badge.textContent=items.length;badge.style.display='inline';}
+      else badge.style.display='none';
+    }
+  }catch(e){showToast('Failed to load book requests');}
+}
+async function publishBookRequest(id){
+  try{await api('/api/admin/book-requests/'+id+'/publish',{method:'POST'});showToast('✓ Marked as published!');loadAdminBookRequests(_breqFilter);}
+  catch(e){showToast('Error: '+e.message);}
+}
+async function declineBookRequest(id){
+  if(!confirm('Decline this book request?'))return;
+  try{await api('/api/admin/book-requests/'+id+'/decline',{method:'POST'});showToast('Request declined.');loadAdminBookRequests(_breqFilter);}
+  catch(e){showToast('Error: '+e.message);}
+}
+
+async function loadDonationBadge(){
+  try{
+    const items=await api('/api/admin/donations?status=pending');
+    const b=document.getElementById('donate-badge');
+    if(items.length>0){b.textContent=items.length;b.style.display='inline';}
+    else b.style.display='none';
+  }catch(e){}
+}
+async function loadBreqBadge(){
+  try{
+    const items=await api('/api/admin/book-requests?status=pending');
+    const b=document.getElementById('breq-badge');
+    if(items.length>0){b.textContent=items.length;b.style.display='inline';}
+    else b.style.display='none';
+  }catch(e){}
+}
+
 // ── Keyboard nav ───────────────────────────────────────────
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){closeModal();closeReader();}
@@ -1637,6 +2026,8 @@ document.addEventListener('keydown',e=>{
     if(e.key==='ArrowLeft'||e.key==='ArrowUp') changePage(-1);
   }
 });
+document.getElementById('donate-modal').addEventListener('click',function(e){if(e.target===this)closeDonateModal();});
+document.getElementById('request-modal').addEventListener('click',function(e){if(e.target===this)closeRequestModal();});
 document.getElementById('auth-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
 document.getElementById('reader-modal').addEventListener('click',function(e){if(e.target===this)closeReader();});
 
