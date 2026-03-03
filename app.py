@@ -83,6 +83,33 @@ class Book(db.Model):
     file_name   = db.Column(db.String(300))
     cover_key   = db.Column(db.String(500), nullable=True)   # B2 key for cover image
 
+class DonatedBook(db.Model):
+    __tablename__ = 'donated_books'
+    id          = db.Column(db.Integer, primary_key=True)
+    user_id     = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user_name   = db.Column(db.String(120))
+    user_email  = db.Column(db.String(200))
+    title       = db.Column(db.String(300), nullable=False)
+    author      = db.Column(db.String(200))
+    description = db.Column(db.Text)
+    file_key    = db.Column(db.String(500))
+    file_name   = db.Column(db.String(300))
+    status      = db.Column(db.String(20), default='pending')  # pending | approved | declined
+    submitted_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+class BookRequest(db.Model):
+    __tablename__ = 'book_requests'
+    id          = db.Column(db.Integer, primary_key=True)
+    user_id     = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user_name   = db.Column(db.String(120))
+    user_email  = db.Column(db.String(200))
+    title       = db.Column(db.String(300), nullable=False)
+    author      = db.Column(db.String(200))
+    genre       = db.Column(db.String(100))
+    reason      = db.Column(db.Text)
+    status      = db.Column(db.String(20), default='pending')  # pending | published | declined
+    submitted_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
 class Manga(db.Model):
     __tablename__ = 'manga'
     id          = db.Column(db.Integer, primary_key=True)
@@ -106,6 +133,31 @@ def init_db():
         "ALTER TABLE books ADD COLUMN IF NOT EXISTS cover_key VARCHAR(500)",
         "ALTER TABLE manga ADD COLUMN IF NOT EXISTS cover_key VARCHAR(500)",
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS is_worker BOOLEAN DEFAULT FALSE",
+        """CREATE TABLE IF NOT EXISTS donated_books (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id),
+            user_name VARCHAR(120),
+            user_email VARCHAR(200),
+            title VARCHAR(300) NOT NULL,
+            author VARCHAR(200),
+            description TEXT,
+            file_key VARCHAR(500),
+            file_name VARCHAR(300),
+            status VARCHAR(20) DEFAULT 'pending',
+            submitted_at TIMESTAMP DEFAULT NOW()
+        )""",
+        """CREATE TABLE IF NOT EXISTS book_requests (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id),
+            user_name VARCHAR(120),
+            user_email VARCHAR(200),
+            title VARCHAR(300) NOT NULL,
+            author VARCHAR(200),
+            genre VARCHAR(100),
+            reason TEXT,
+            status VARCHAR(20) DEFAULT 'pending',
+            submitted_at TIMESTAMP DEFAULT NOW()
+        )""",
     ]
     with db.engine.connect() as conn:
         for sql in _migrations:
@@ -228,6 +280,173 @@ def make_download_url(key, filename):
                 'ResponseContentDisposition': f'attachment; filename="{filename}"'},
         ExpiresIn=300
     )
+
+# ── Customer — Donate Book ─────────────────────────────────
+@app.route('/api/donate', methods=['POST'])
+@jwt_required()
+def donate_book():
+    user = User.query.get(int(get_jwt_identity()))
+    if not user or user.status != 'active':
+        return jsonify({'error': 'Active account required'}), 403
+
+    title  = request.form.get('title', '').strip()
+    if not title:
+        return jsonify({'error': 'Title is required'}), 400
+
+    file_key = file_name = None
+    if 'file' in request.files:
+        f = request.files['file']
+        if f and f.filename:
+            ext = f.filename.rsplit('.', 1)[-1].lower() if '.' in f.filename else ''
+            if ext != 'pdf':
+                return jsonify({'error': 'Only PDF files are accepted for donations'}), 400
+            if not B2_BUCKET_NAME:
+                return jsonify({'error': 'File storage not configured'}), 503
+            original  = secure_filename(f.filename)
+            file_key  = f'donations/{uuid.uuid4().hex}/{original}'
+            file_name = original
+            try:
+                get_b2_client().upload_fileobj(f, B2_BUCKET_NAME, file_key)
+            except Exception as e:
+                return jsonify({'error': f'Upload failed: {e}'}), 500
+    else:
+        return jsonify({'error': 'A PDF file is required'}), 400
+
+    donation = DonatedBook(
+        user_id=user.id, user_name=user.name, user_email=user.email,
+        title=title,
+        author=request.form.get('author', '').strip(),
+        description=request.form.get('description', '').strip(),
+        file_key=file_key, file_name=file_name,
+        status='pending'
+    )
+    db.session.add(donation)
+    db.session.commit()
+    return jsonify({'status': 'pending', 'message': 'Thank you! Your donation is under review.'}), 201
+
+
+@app.route('/api/donate/<int:donation_id>/approve', methods=['POST'])
+@jwt_required()
+def approve_donation(donation_id):
+    _, err = require_admin()
+    if err: return err
+    d = DonatedBook.query.get_or_404(donation_id)
+    # Publish to library
+    book = Book(
+        title=d.title, author=d.author or 'Unknown',
+        genre='Donated', description=d.description or '',
+        file_key=d.file_key, file_name=d.file_name,
+        color='#2e4a2e'
+    )
+    db.session.add(book)
+    d.status = 'approved'
+    db.session.commit()
+    return jsonify({'approved': donation_id, 'book_id': book.id})
+
+
+@app.route('/api/donate/<int:donation_id>/decline', methods=['POST'])
+@jwt_required()
+def decline_donation(donation_id):
+    _, err = require_admin()
+    if err: return err
+    d = DonatedBook.query.get_or_404(donation_id)
+    d.status = 'declined'
+    db.session.commit()
+    return jsonify({'declined': donation_id})
+
+
+@app.route('/api/admin/donations', methods=['GET'])
+@jwt_required()
+def admin_donations():
+    _, err = require_admin()
+    if err: return err
+    status = request.args.get('status', 'pending')
+    items = DonatedBook.query.filter_by(status=status).order_by(DonatedBook.submitted_at.desc()).all()
+    return jsonify([{
+        'id': d.id, 'title': d.title, 'author': d.author,
+        'user_name': d.user_name, 'user_email': d.user_email,
+        'description': d.description, 'file_name': d.file_name,
+        'has_file': bool(d.file_key), 'status': d.status,
+        'submitted_at': d.submitted_at.strftime('%Y-%m-%d') if d.submitted_at else ''
+    } for d in items])
+
+
+# ── Customer — Book Requests ───────────────────────────────
+@app.route('/api/requests', methods=['POST'])
+@jwt_required()
+def submit_request():
+    user = User.query.get(int(get_jwt_identity()))
+    if not user or user.status != 'active':
+        return jsonify({'error': 'Active account required'}), 403
+
+    data  = request.get_json()
+    title = (data.get('title') or '').strip()
+    if not title:
+        return jsonify({'error': 'Book title is required'}), 400
+
+    req = BookRequest(
+        user_id=user.id, user_name=user.name, user_email=user.email,
+        title=title,
+        author=(data.get('author') or '').strip(),
+        genre=(data.get('genre') or '').strip(),
+        reason=(data.get('reason') or '').strip(),
+        status='pending'
+    )
+    db.session.add(req)
+    db.session.commit()
+    return jsonify({'status': 'pending', 'message': 'Your request has been submitted!'}), 201
+
+
+@app.route('/api/requests/mine', methods=['GET'])
+@jwt_required()
+def my_requests():
+    user = User.query.get(int(get_jwt_identity()))
+    if not user: return jsonify([])
+    items = BookRequest.query.filter_by(user_id=user.id).order_by(BookRequest.submitted_at.desc()).all()
+    return jsonify([{
+        'id': r.id, 'title': r.title, 'author': r.author,
+        'genre': r.genre, 'reason': r.reason, 'status': r.status,
+        'submitted_at': r.submitted_at.strftime('%Y-%m-%d') if r.submitted_at else ''
+    } for r in items])
+
+
+@app.route('/api/admin/book-requests', methods=['GET'])
+@jwt_required()
+def admin_book_requests():
+    _, err = require_admin()
+    if err: return err
+    status = request.args.get('status', 'pending')
+    items = BookRequest.query.filter_by(status=status).order_by(BookRequest.submitted_at.desc()).all()
+    return jsonify([{
+        'id': r.id, 'title': r.title, 'author': r.author,
+        'genre': r.genre, 'reason': r.reason,
+        'user_name': r.user_name, 'user_email': r.user_email,
+        'status': r.status,
+        'submitted_at': r.submitted_at.strftime('%Y-%m-%d') if r.submitted_at else ''
+    } for r in items])
+
+
+@app.route('/api/admin/book-requests/<int:req_id>/publish', methods=['POST'])
+@jwt_required()
+def publish_book_request(req_id):
+    _, err = require_admin()
+    if err: return err
+    r = BookRequest.query.get_or_404(req_id)
+    r.status = 'published'
+    db.session.commit()
+    return jsonify({'published': req_id})
+
+
+@app.route('/api/admin/book-requests/<int:req_id>/decline', methods=['POST'])
+@jwt_required()
+def decline_book_request(req_id):
+    _, err = require_admin()
+    if err: return err
+    r = BookRequest.query.get_or_404(req_id)
+    r.status = 'declined'
+    db.session.commit()
+    return jsonify({'declined': req_id})
+
 
 # ── Frontend ───────────────────────────────────────────────
 @app.route('/')
