@@ -8,7 +8,7 @@ from flask_jwt_extended import (
     JWTManager, create_access_token,
     jwt_required, get_jwt_identity
 )
-from datetime import timedelta
+from datetime import timedelta, datetime, timezone
 from botocore.client import Config
 from werkzeug.utils import secure_filename
 from functools import lru_cache
@@ -64,7 +64,8 @@ class User(db.Model):
     password = db.Column(db.String(200), nullable=False)
     tier     = db.Column(db.Integer, default=1)
     is_admin = db.Column(db.Boolean, default=False)
-    status   = db.Column(db.String(20), default='pending')
+    status           = db.Column(db.String(20), default='pending')
+    membership_start = db.Column(db.DateTime, nullable=True)
 
 class Book(db.Model):
     __tablename__ = 'books'
@@ -77,6 +78,7 @@ class Book(db.Model):
     description = db.Column(db.Text)
     file_key    = db.Column(db.String(500))
     file_name   = db.Column(db.String(300))
+    cover_key   = db.Column(db.String(500), nullable=True)   # B2 key for cover image
 
 class Manga(db.Model):
     __tablename__ = 'manga'
@@ -90,6 +92,7 @@ class Manga(db.Model):
     description = db.Column(db.Text)
     file_key    = db.Column(db.String(500))
     file_name   = db.Column(db.String(300))
+    cover_key   = db.Column(db.String(500), nullable=True)   # B2 key for cover image
 
 # ── DB Init ────────────────────────────────────────────────
 def init_db():
@@ -109,7 +112,53 @@ with app.app_context():
     init_db()
 
 # ── Helpers ────────────────────────────────────────────────
-ALLOWED_EXT       = {'pdf', 'epub', 'txt'}
+ALLOWED_COVER = {'jpg', 'jpeg', 'png', 'webp', 'gif'}
+
+def allowed_cover(fn):
+    return '.' in fn and fn.rsplit('.', 1)[1].lower() in ALLOWED_COVER
+
+def _upload_cover(file_obj, prefix):
+    """Upload a cover image to B2, return (key, mime_type) or (None, None)."""
+    if not file_obj or not file_obj.filename:
+        return None, None
+    if not allowed_cover(file_obj.filename):
+        return None, None
+    if not B2_BUCKET_NAME:
+        return None, None
+    ext = file_obj.filename.rsplit('.', 1)[1].lower()
+    key = f'covers/{prefix}/{uuid.uuid4().hex}.{ext}'
+    mime = 'image/jpeg' if ext in ('jpg','jpeg') else f'image/{ext}'
+    get_b2_client().upload_fileobj(
+        file_obj, B2_BUCKET_NAME, key,
+        ExtraArgs={'ContentType': mime, 'CacheControl': 'max-age=86400'}
+    )
+    return key, mime
+
+def cover_stream_url(cover_key):
+    """Internal route path used by the frontend to load cover images."""
+    if not cover_key:
+        return None
+    return f'/api/cover/{cover_key}'
+
+# ── Cover image proxy ──────────────────────────────────────
+@app.route('/api/cover/<path:cover_key>')
+def stream_cover(cover_key):
+    """Proxy cover images from B2 — no auth required (covers are decorative)."""
+    if not B2_BUCKET_NAME:
+        return '', 404
+    try:
+        obj = get_b2_client().get_object(Bucket=B2_BUCKET_NAME, Key=cover_key)
+        mime = obj.get('ContentType', 'image/jpeg')
+        data = obj['Body'].read()
+        from flask import make_response
+        resp = make_response(data)
+        resp.headers['Content-Type'] = mime
+        resp.headers['Cache-Control'] = 'public, max-age=86400'
+        return resp
+    except Exception:
+        return '', 404
+
+
 ALLOWED_EXT_MANGA = {'pdf', 'cbz', 'cbr', 'zip'}
 
 def allowed_file(fn):
@@ -175,8 +224,24 @@ def login():
     if user.status == 'declined':
         return jsonify({'error': 'Your account request was declined.'}), 403
 
+    # Check 30-day membership expiry
+    membership_expired = False
+    days_remaining = None
+    if user.membership_start:
+        now = datetime.now(timezone.utc)
+        start = user.membership_start
+        if start.tzinfo is None:
+            start = start.replace(tzinfo=timezone.utc)
+        elapsed = (now - start).days
+        if elapsed >= 30:
+            membership_expired = True
+        else:
+            days_remaining = 30 - elapsed
+
     return jsonify({'token': create_access_token(identity=str(user.id)),
-                    'name': user.name, 'tier': user.tier, 'is_admin': user.is_admin})
+                    'name': user.name, 'tier': user.tier, 'is_admin': user.is_admin,
+                    'membership_expired': membership_expired,
+                    'days_remaining': days_remaining})
 
 
 @app.route('/api/auth/register', methods=['POST'])
@@ -211,7 +276,20 @@ def me():
     user = User.query.get(int(get_jwt_identity()))
     if not user:
         return jsonify({'error': 'Not found'}), 404
-    return jsonify({'name': user.name, 'tier': user.tier, 'is_admin': user.is_admin})
+    membership_expired = False
+    days_remaining = None
+    if user.membership_start and not user.is_admin:
+        now = datetime.now(timezone.utc)
+        start = user.membership_start
+        if start.tzinfo is None:
+            start = start.replace(tzinfo=timezone.utc)
+        elapsed = (now - start).days
+        if elapsed >= 30:
+            membership_expired = True
+        else:
+            days_remaining = 30 - elapsed
+    return jsonify({'name': user.name, 'tier': user.tier, 'is_admin': user.is_admin,
+                    'membership_expired': membership_expired, 'days_remaining': days_remaining})
 
 # ── Books ──────────────────────────────────────────────────
 @app.route('/api/books', methods=['GET'])
@@ -219,7 +297,8 @@ def list_books():
     books = Book.query.order_by(Book.id.asc()).all()
     return jsonify([{'id': b.id, 'title': b.title, 'author': b.author,
                      'genre': b.genre, 'year': b.year, 'color': b.color,
-                     'description': b.description, 'has_file': bool(b.file_key)}
+                     'description': b.description, 'has_file': bool(b.file_key),
+                     'cover_url': cover_stream_url(b.cover_key)}
                     for b in books])
 
 @app.route('/api/books/<int:book_id>/read', methods=['GET'])
@@ -278,7 +357,8 @@ def list_manga():
     return jsonify([{'id': m.id, 'title': m.title, 'author': m.author,
                      'genre': m.genre, 'chapters': m.chapters, 'status': m.status,
                      'color': m.color, 'description': m.description,
-                     'has_file': bool(m.file_key)}
+                     'has_file': bool(m.file_key),
+                     'cover_url': cover_stream_url(m.cover_key)}
                     for m in items])
 
 @app.route('/api/manga/<int:manga_id>/read', methods=['GET'])
@@ -338,6 +418,15 @@ def admin_upload_book():
     if not title or not author:
         return jsonify({'error': 'Title and author required'}), 400
 
+    # Upload cover image
+    cover_key = None
+    if 'cover' in request.files:
+        cf = request.files['cover']
+        try:
+            cover_key, _ = _upload_cover(cf, 'books')
+        except Exception as e:
+            return jsonify({'error': f'Cover upload failed: {e}'}), 500
+
     file_key = file_name = None
     if 'file' in request.files:
         f = request.files['file']
@@ -359,7 +448,8 @@ def admin_upload_book():
         year=int(year) if year.isdigit() else None,
         color=request.form.get('color', '#1a3a5c'),
         description=request.form.get('description', ''),
-        file_key=file_key, file_name=file_name
+        file_key=file_key, file_name=file_name,
+        cover_key=cover_key
     )
     db.session.add(book)
     db.session.commit()
@@ -372,9 +462,11 @@ def admin_delete_book(book_id):
     _, err = require_admin()
     if err: return err
     book = Book.query.get_or_404(book_id)
-    if book.file_key and B2_BUCKET_NAME:
-        try: get_b2_client().delete_object(Bucket=B2_BUCKET_NAME, Key=book.file_key)
-        except Exception: pass
+    if B2_BUCKET_NAME:
+        for key in [book.file_key, book.cover_key]:
+            if key:
+                try: get_b2_client().delete_object(Bucket=B2_BUCKET_NAME, Key=key)
+                except Exception: pass
     db.session.delete(book)
     db.session.commit()
     return jsonify({'deleted': book_id})
@@ -389,6 +481,15 @@ def admin_upload_manga():
     author = request.form.get('author', '').strip()
     if not title or not author:
         return jsonify({'error': 'Title and author required'}), 400
+
+    # Upload cover image
+    cover_key = None
+    if 'cover' in request.files:
+        cf = request.files['cover']
+        try:
+            cover_key, _ = _upload_cover(cf, 'manga')
+        except Exception as e:
+            return jsonify({'error': f'Cover upload failed: {e}'}), 500
 
     file_key = file_name = None
     if 'file' in request.files:
@@ -412,7 +513,8 @@ def admin_upload_manga():
         status=request.form.get('status', 'Ongoing'),
         color=request.form.get('color', '#1a1a2e'),
         description=request.form.get('description', ''),
-        file_key=file_key, file_name=file_name
+        file_key=file_key, file_name=file_name,
+        cover_key=cover_key
     )
     db.session.add(manga)
     db.session.commit()
@@ -425,9 +527,11 @@ def admin_delete_manga(manga_id):
     _, err = require_admin()
     if err: return err
     manga = Manga.query.get_or_404(manga_id)
-    if manga.file_key and B2_BUCKET_NAME:
-        try: get_b2_client().delete_object(Bucket=B2_BUCKET_NAME, Key=manga.file_key)
-        except Exception: pass
+    if B2_BUCKET_NAME:
+        for key in [manga.file_key, manga.cover_key]:
+            if key:
+                try: get_b2_client().delete_object(Bucket=B2_BUCKET_NAME, Key=key)
+                except Exception: pass
     db.session.delete(manga)
     db.session.commit()
     return jsonify({'deleted': manga_id})
@@ -491,6 +595,8 @@ def admin_approve(user_id):
     if err: return err
     user = User.query.get_or_404(user_id)
     user.status = 'active'
+    if not user.membership_start:
+        user.membership_start = datetime.now(timezone.utc)
     db.session.commit()
     return jsonify({'approved': user_id})
 
@@ -504,6 +610,18 @@ def admin_decline(user_id):
     user.status = 'declined'
     db.session.commit()
     return jsonify({'declined': user_id})
+
+
+@app.route('/api/auth/renew', methods=['POST'])
+@jwt_required()
+def renew_membership():
+    """User submits renewal payment — sets status back to pending for admin to re-approve."""
+    user = User.query.get(int(get_jwt_identity()))
+    if not user:
+        return jsonify({'error': 'Not found'}), 404
+    user.status = 'pending'
+    db.session.commit()
+    return jsonify({'status': 'pending', 'message': 'Renewal request submitted! Admin will verify your payment and reactivate your account.'})
 
 
 if __name__ == '__main__':
