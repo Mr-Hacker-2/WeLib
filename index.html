@@ -1586,6 +1586,14 @@ async function showLibrary(){
   else{badge.textContent='Reader';badge.classList.remove('scholar');}
   document.getElementById('upsell-banner').style.display=currentUser.tier===1?'flex':'none';
   await Promise.all([loadBooks(),loadManga()]);
+  // Update profile avatar initials
+  if(currentUser){
+    const name=currentUser.name||'?';
+    const initials=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const btn=document.getElementById('profile-avatar-btn');
+    if(btn) btn.textContent=initials;
+  }
+  renderContinueReading();
 }
 async function showAdmin(){showPage('page-admin');await loadAdminStats();loadDonationBadge();loadBreqBadge();}
 function showWorker(){
@@ -1607,6 +1615,7 @@ function switchTab(tab){
   if(tab==='manga') renderMangaGrid();
   else if(tab==='books') renderBooks();
   else if(tab==='my-requests') loadMyRequests();
+  renderContinueReading();
 }
 function onSearch(){if(activeTab==='manga')renderMangaGrid();else renderBooks();}
 
@@ -3443,26 +3452,6 @@ document.getElementById('profile-modal').addEventListener('click',function(e){
   if(e.target===this) closeProfileModal();
 });
 
-// Patch showLibrary to render continue reading after load
-const _origShowLibrary = showLibrary;
-async function showLibrary(){
-  await _origShowLibrary();
-  // Update profile avatar initials
-  if(currentUser){
-    const name=currentUser.name||'?';
-    const initials=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-    const btn=document.getElementById('profile-avatar-btn');
-    if(btn) btn.textContent=initials;
-  }
-  renderContinueReading();
-}
-
-// Also re-render continue reading when switching tabs
-const _origSwitchTab = switchTab;
-function switchTab(tab){
-  _origSwitchTab(tab);
-  renderContinueReading();
-}
 </script>
 
 </html>
