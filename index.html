@@ -1694,6 +1694,13 @@ function renderMangaGrid(){
 // ══════════════════════════════════════════════════════════
 
 async function openItem(type, id){
+  // Save to reading history
+  let hist=getReadingHistory();
+  hist=hist.filter(h=>!(h.type===type&&h.id===id));
+  hist.unshift({type,id,ts:Date.now()});
+  if(hist.length>20) hist=hist.slice(0,20);
+  localStorage.setItem('bv_history',JSON.stringify(hist));
+
   const endpoint=type==='manga'?`/api/manga/${id}/read`:`/api/books/${id}/read`;
   let meta;
   try{meta=await api(endpoint);}
@@ -1826,7 +1833,9 @@ async function renderPage(pageNum, flipDir='none'){
 
   currentPage=pageNum;
   updateFooter();
-  saveProgress();
+  if(currentItemMeta && totalPages>0){
+    saveProgress(currentItemMeta.type, currentItemMeta.id, pageNum, totalPages);
+  }
 }
 
 async function changePage(delta){
@@ -1860,12 +1869,6 @@ function updateFooter(){
   // Nav buttons
   document.getElementById('rdr-prev').disabled=currentPage<=1;
   document.getElementById('rdr-next').disabled=currentPage>=totalPages;
-}
-
-function saveProgress(){
-  if(!currentItemMeta||currentUser.tier<2) return;
-  const{type,id}=currentItemMeta;
-  localStorage.setItem(`bv_page_${type}_${id}`,currentPage);
 }
 
 // ── Zoom (Scholar) ─────────────────────────────────────────
@@ -3162,26 +3165,7 @@ function renderContinueReading(){
   else section.classList.remove('visible');
 }
 
-// Patch openItem to also save progress and total pages
-const _origOpenItem = openItem;
-async function openItem(type, id){
-  // Add to history
-  let hist=getReadingHistory();
-  hist=hist.filter(h=>!(h.type===type&&h.id===id));
-  hist.unshift({type,id,ts:Date.now()});
-  if(hist.length>20) hist=hist.slice(0,20);
-  localStorage.setItem('bv_history',JSON.stringify(hist));
-  await _origOpenItem(type,id);
-}
 
-// Patch renderPage to save current page + total to localStorage
-const _origRenderPage = renderPage;
-async function renderPage(pageNum, flipDir='none'){
-  await _origRenderPage(pageNum, flipDir);
-  if(currentItemMeta && totalPages>0){
-    saveProgress(currentItemMeta.type, currentItemMeta.id, pageNum, totalPages);
-  }
-}
 
 // ══════════════════════════════════════════════════════════
 // FEATURE 3 — SERIES DETAIL PAGE MODAL
