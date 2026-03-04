@@ -959,6 +959,9 @@ def admin_delete_user(user_id):
     user = User.query.get_or_404(user_id)
     if user.is_admin:
         return jsonify({'error': 'Cannot delete admin'}), 400
+    # Delete child rows first to avoid FK violations
+    BookRequest.query.filter_by(user_id=user_id).delete()
+    DonatedBook.query.filter_by(user_id=user_id).delete()
     db.session.delete(user)
     db.session.commit()
     return jsonify({'deleted': user_id})
