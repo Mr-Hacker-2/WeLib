@@ -357,6 +357,220 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
   .rdr-tools{gap:4px;}.rdr-btn{padding:5px 9px;font-size:11px;}
   .scholar-bar{padding:6px 12px;}
 }
+
+/* ══════════════════════════════════════════════════════════
+   FEATURE 1 — ENHANCED LANDING PAGE
+══════════════════════════════════════════════════════════ */
+
+/* Features section */
+.features-section{padding:90px 40px;background:#0d0d0d;border-top:1px solid rgba(255,255,255,0.06);}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:28px;max-width:1100px;margin:52px auto 0;}
+.feature-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:32px 28px;transition:.3s;}
+.feature-card:hover{border-color:var(--gold);background:rgba(201,150,60,0.05);transform:translateY(-4px);}
+.feature-icon{font-size:36px;margin-bottom:16px;}
+.feature-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:10px;color:var(--paper);}
+.feature-desc{font-size:14px;line-height:1.7;color:rgba(245,240,232,0.55);}
+
+/* Screenshot / app preview mockup */
+.preview-section{padding:80px 40px;background:var(--ink);overflow:hidden;}
+.preview-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:60px;flex-wrap:wrap;}
+.preview-text{flex:1;min-width:260px;}
+.preview-text h2{font-family:'Playfair Display',serif;font-size:40px;font-weight:900;line-height:1.1;margin-bottom:18px;}
+.preview-text p{color:rgba(245,240,232,0.6);font-size:16px;line-height:1.7;margin-bottom:32px;}
+.preview-feature-list{list-style:none;}
+.preview-feature-list li{padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.07);font-size:14px;color:rgba(245,240,232,0.7);display:flex;align-items:center;gap:12px;}
+.preview-feature-list li span.check{color:var(--gold);font-weight:700;font-size:16px;}
+.preview-mockup{flex:1;min-width:300px;max-width:480px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:20px;position:relative;}
+.mockup-bar{display:flex;gap:7px;margin-bottom:16px;}
+.mockup-dot{width:12px;height:12px;border-radius:50%;}
+.mockup-dot:nth-child(1){background:#ff5f57;}
+.mockup-dot:nth-child(2){background:#febc2e;}
+.mockup-dot:nth-child(3){background:#28c840;}
+.mockup-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.mockup-book{border-radius:4px;aspect-ratio:2/3;display:flex;align-items:flex-end;padding:6px;font-size:7px;font-weight:700;color:rgba(255,255,255,0.8);line-height:1.1;opacity:.85;transition:.2s;}
+.mockup-book:hover{opacity:1;transform:translateY(-3px);}
+
+/* Testimonials */
+.testimonials-section{padding:80px 40px;background:#0a0a0a;border-top:1px solid rgba(255,255,255,0.06);}
+.testimonials-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;max-width:1100px;margin:52px auto 0;}
+.testimonial-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:32px 28px;}
+.testimonial-stars{color:var(--gold);font-size:14px;margin-bottom:14px;letter-spacing:2px;}
+.testimonial-text{font-size:15px;line-height:1.7;color:rgba(245,240,232,0.75);margin-bottom:20px;font-style:italic;}
+.testimonial-author{display:flex;align-items:center;gap:12px;}
+.testimonial-avatar{width:40px;height:40px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--ink);}
+.testimonial-name{font-size:14px;font-weight:700;color:var(--paper);}
+.testimonial-role{font-size:12px;color:rgba(245,240,232,0.4);margin-top:2px;}
+
+/* Footer improvements */
+.landing-footer{background:#050505;padding:60px 40px 40px;border-top:1px solid rgba(255,255,255,0.06);}
+.footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px;flex-wrap:wrap;}
+.footer-brand .logo{font-size:24px;margin-bottom:12px;display:block;}
+.footer-brand p{font-size:13px;color:rgba(255,255,255,0.4);line-height:1.7;max-width:260px;}
+.footer-col h4{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:16px;}
+.footer-col a{display:block;font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;margin-bottom:10px;transition:.2s;cursor:pointer;}
+.footer-col a:hover{color:var(--gold);}
+.footer-bottom{border-top:1px solid rgba(255,255,255,0.06);padding-top:24px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:rgba(255,255,255,0.25);}
+
+/* ══════════════════════════════════════════════════════════
+   FEATURE 2 — SEARCH FILTERS & DISCOVERY
+══════════════════════════════════════════════════════════ */
+.lib-controls{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px;flex-wrap:wrap;}
+.lib-controls-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.sort-select{padding:8px 14px;border-radius:5px;border:1.5px solid #ddd;font-family:'DM Sans',sans-serif;font-size:13px;background:#fff;cursor:pointer;appearance:none;padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
+.sort-select:focus{outline:none;border-color:var(--ink);}
+.controls-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888;}
+.results-count{font-size:13px;color:#aaa;font-style:italic;}
+.author-filter{padding:8px 14px;border-radius:5px;border:1.5px solid #ddd;font-family:'DM Sans',sans-serif;font-size:13px;background:#fff;width:200px;}
+.author-filter:focus{outline:none;border-color:var(--ink);}
+
+/* Continue Reading banner */
+.continue-reading{background:#fff;border-radius:10px;padding:28px 32px;margin-bottom:36px;box-shadow:0 2px 12px rgba(0,0,0,0.07);display:none;}
+.continue-reading.visible{display:block;}
+.continue-reading h3{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:10px;}
+.continue-reading h3 span{font-size:18px;}
+.continue-cards{display:flex;gap:16px;overflow-x:auto;padding-bottom:4px;}
+.continue-card{display:flex;align-items:center;gap:14px;background:var(--cream);border-radius:8px;padding:14px 18px;min-width:260px;max-width:320px;cursor:pointer;transition:.2s;border:1.5px solid transparent;flex-shrink:0;}
+.continue-card:hover{border-color:var(--gold);transform:translateY(-2px);}
+.continue-card-cover{width:44px;height:66px;border-radius:4px;flex-shrink:0;background-size:cover;background-position:center;}
+.continue-card-info{flex:1;min-width:0;}
+.continue-card-title{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.continue-card-sub{font-size:11px;color:#888;margin-top:2px;margin-bottom:8px;}
+.continue-progress-bar{height:4px;background:#e0dbd0;border-radius:2px;overflow:hidden;}
+.continue-progress-fill{height:100%;background:var(--gold);border-radius:2px;transition:.3s;}
+.continue-pct{font-size:11px;color:var(--gold);font-weight:700;margin-top:4px;}
+
+/* Progress bar on book cards */
+.book-progress{height:3px;background:#e0dbd0;border-radius:2px;overflow:hidden;margin-top:5px;}
+.book-progress-fill{height:100%;background:var(--gold);border-radius:2px;}
+
+/* Recommendation section */
+.section-subtitle{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:20px;color:var(--ink);display:flex;align-items:center;gap:12px;}
+.section-subtitle::after{content:'';flex:1;height:1px;background:#e0dbd0;}
+
+/* ══════════════════════════════════════════════════════════
+   FEATURE 3 — SERIES / DETAIL PAGE MODAL
+══════════════════════════════════════════════════════════ */
+.detail-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:900;align-items:center;justify-content:center;padding:20px;overflow-y:auto;}
+.detail-modal-overlay.open{display:flex;}
+.detail-modal{background:var(--cream);border-radius:14px;width:100%;max-width:860px;overflow:hidden;animation:fadeUp .3s ease;position:relative;max-height:90vh;overflow-y:auto;}
+.detail-hero{display:flex;gap:0;min-height:300px;}
+.detail-cover-side{width:220px;flex-shrink:0;background-size:cover;background-position:center;position:relative;}
+.detail-cover-side::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,transparent 70%,var(--cream));}
+.detail-cover-fallback{width:220px;flex-shrink:0;display:flex;align-items:flex-end;padding:24px 20px;position:relative;}
+.detail-cover-fallback::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,transparent 60%,var(--cream));}
+.detail-info{flex:1;padding:36px 36px 28px;}
+.detail-type-badge{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.detail-title{font-family:'Playfair Display',serif;font-size:clamp(22px,3vw,36px);font-weight:900;line-height:1.1;margin-bottom:8px;}
+.detail-author{font-size:15px;color:#666;margin-bottom:16px;}
+.detail-meta-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;}
+.detail-pill{background:#f0ede6;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600;color:#555;}
+.detail-pill.status-ongoing{background:#fff8e7;color:#7a5c00;}
+.detail-pill.status-completed{background:#e8f5e9;color:#1b5e20;}
+.detail-pill.status-hiatus{background:#fce4ec;color:#880e4f;}
+.detail-desc{font-size:14px;line-height:1.75;color:#555;margin-bottom:24px;max-height:100px;overflow:hidden;position:relative;}
+.detail-desc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:30px;background:linear-gradient(transparent,var(--cream));}
+.detail-cta-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
+.btn-read-now{background:var(--ink);color:var(--paper);padding:13px 32px;border-radius:6px;font-size:15px;font-weight:700;cursor:pointer;border:none;transition:.2s;display:flex;align-items:center;gap:8px;}
+.btn-read-now:hover{background:#222;transform:translateY(-1px);}
+.btn-read-now.continue{background:var(--gold);color:var(--ink);}
+.btn-read-now.continue:hover{background:var(--gold-light);}
+.btn-save-book{background:transparent;border:1.5px solid #ccc;padding:12px 20px;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;transition:.2s;color:#555;}
+.btn-save-book:hover,.btn-save-book.saved{border-color:var(--gold);color:var(--gold);}
+.detail-body{padding:28px 36px 36px;}
+.detail-progress-section{background:#fff;border-radius:8px;padding:20px 24px;margin-bottom:24px;display:none;}
+.detail-progress-section.visible{display:block;}
+.detail-progress-label{font-size:13px;font-weight:700;color:#555;margin-bottom:8px;}
+.detail-progress-bar{height:8px;background:#e0dbd0;border-radius:4px;overflow:hidden;margin-bottom:6px;}
+.detail-progress-fill{height:100%;background:linear-gradient(to right,var(--gold),var(--gold-light));border-radius:4px;transition:.5s;}
+.detail-progress-stats{display:flex;justify-content:space-between;font-size:12px;color:#aaa;}
+
+/* Ratings & Reviews */
+.detail-rating-section{margin-bottom:28px;}
+.detail-section-heading{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:14px;color:var(--ink);}
+.star-rating{display:flex;gap:4px;align-items:center;margin-bottom:8px;}
+.star{font-size:24px;cursor:pointer;color:#ddd;transition:.15s;line-height:1;}
+.star.filled,.star:hover,.star.hover{color:var(--gold);}
+.rating-summary{font-size:13px;color:#888;margin-left:8px;}
+.rating-cta{font-size:13px;color:#aaa;margin-top:4px;}
+
+/* Comments */
+.detail-comments{border-top:1px solid #e8e3db;padding-top:24px;margin-top:4px;}
+.comment-list{display:flex;flex-direction:column;gap:14px;margin-bottom:20px;}
+.comment-item{background:#fff;border-radius:8px;padding:16px 18px;}
+.comment-user{font-weight:700;font-size:13px;color:var(--ink);}
+.comment-date{font-size:11px;color:#bbb;margin-left:8px;}
+.comment-text{font-size:14px;color:#555;margin-top:6px;line-height:1.6;}
+.comment-input-row{display:flex;gap:10px;}
+.comment-input{flex:1;padding:11px 14px;border:1.5px solid #ddd;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:14px;resize:none;height:42px;transition:.2s;}
+.comment-input:focus{outline:none;border-color:var(--ink);height:72px;}
+.btn-comment{background:var(--ink);color:var(--paper);border:none;padding:11px 20px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.btn-comment:hover{background:#222;}
+.no-comments{color:#bbb;font-size:13px;font-style:italic;margin-bottom:16px;}
+.detail-close{position:sticky;top:0;display:flex;justify-content:flex-end;padding:16px 20px 0;background:var(--cream);z-index:10;}
+.detail-close-btn{background:rgba(0,0,0,0.08);border:none;width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;}
+.detail-close-btn:hover{background:rgba(0,0,0,0.15);}
+
+/* ══════════════════════════════════════════════════════════
+   FEATURE 4 — USER PROFILE
+══════════════════════════════════════════════════════════ */
+.profile-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;font-weight:700;color:var(--paper);transition:.2s;flex-shrink:0;}
+.profile-btn:hover{background:rgba(255,255,255,0.15);border-color:var(--gold);color:var(--gold);}
+.profile-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:flex-start;justify-content:flex-end;padding:20px;}
+.profile-modal-overlay.open{display:flex;}
+.profile-modal{background:var(--cream);border-radius:14px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;animation:slideInRight .3s ease;}
+@keyframes slideInRight{from{opacity:0;transform:translateX(30px);}to{opacity:1;transform:translateX(0);}}
+.profile-header{background:var(--ink);color:var(--paper);padding:28px 28px 24px;border-radius:14px 14px 0 0;}
+.profile-avatar-large{width:70px;height:70px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--ink);margin-bottom:14px;border:3px solid rgba(255,255,255,0.15);}
+.profile-display-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;}
+.profile-plan{font-size:12px;color:rgba(255,255,255,0.5);margin-top:4px;text-transform:uppercase;letter-spacing:1.5px;}
+.profile-stats-row{display:flex;gap:0;border-top:1px solid rgba(255,255,255,0.1);margin-top:20px;padding-top:20px;}
+.profile-stat{flex:1;text-align:center;}
+.profile-stat+.profile-stat{border-left:1px solid rgba(255,255,255,0.1);}
+.profile-stat-num{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--gold);}
+.profile-stat-label{font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+.profile-body{padding:24px 28px;}
+.profile-section-title{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#999;margin-bottom:14px;margin-top:20px;}
+.profile-section-title:first-child{margin-top:0;}
+.reading-history-list{display:flex;flex-direction:column;gap:10px;}
+.history-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border-radius:8px;cursor:pointer;transition:.2s;border:1.5px solid transparent;}
+.history-item:hover{border-color:var(--gold);transform:translateX(3px);}
+.history-cover{width:36px;height:54px;border-radius:3px;flex-shrink:0;background-size:cover;background-position:center;}
+.history-info{flex:1;min-width:0;}
+.history-title{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.history-meta{font-size:11px;color:#999;margin-top:2px;}
+.history-progress{font-size:11px;color:var(--gold);font-weight:700;margin-top:3px;}
+.achievements-row{display:flex;gap:10px;flex-wrap:wrap;}
+.achievement{background:#fff;border-radius:8px;padding:12px 14px;text-align:center;min-width:90px;border:1.5px solid #e8e3db;transition:.2s;}
+.achievement:hover{border-color:var(--gold);}
+.achievement-icon{font-size:24px;margin-bottom:6px;}
+.achievement-label{font-size:11px;font-weight:700;color:#666;}
+.achievement.locked{opacity:.4;}
+.profile-close-row{display:flex;justify-content:flex-end;padding:16px 20px 0;}
+.profile-close-btn{background:none;border:none;font-size:22px;cursor:pointer;color:#888;}
+.saved-section{margin-top:4px;}
+.saved-list{display:flex;flex-direction:column;gap:8px;}
+.saved-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:#fff;border-radius:8px;cursor:pointer;transition:.2s;}
+.saved-item:hover{background:var(--cream);}
+.saved-item-cover{width:30px;height:44px;border-radius:3px;background-size:cover;background-position:center;flex-shrink:0;}
+.saved-item-title{font-size:13px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* ══════════════════════════════════════════════════════════
+   FEATURE 5 — READING PROGRESS (card overlays)
+══════════════════════════════════════════════════════════ */
+.book-item{position:relative;}
+.progress-overlay{position:absolute;bottom:0;left:0;right:0;height:3px;background:#e0dbd0;border-radius:0 0 5px 5px;overflow:hidden;}
+.progress-overlay-fill{height:100%;background:var(--gold);}
+.page-badge{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:3px 7px;border-radius:10px;z-index:5;display:none;}
+
+/* ══════════════════════════════════════════════════════════
+   MISC QUALITY-OF-LIFE
+══════════════════════════════════════════════════════════ */
+.empty-state{text-align:center;padding:60px 20px;color:#bbb;}
+.empty-state-icon{font-size:48px;margin-bottom:12px;opacity:.5;}
+.empty-state p{font-size:15px;}
+.tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:28px;}
+.tag{background:#f0ede6;border:1px solid #e0dbd0;border-radius:20px;padding:5px 14px;font-size:12px;cursor:pointer;transition:.2s;font-weight:600;color:#666;}
+.tag:hover,.tag.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
 </style>
 </head>
 <body>
@@ -431,7 +645,145 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
       </div>
     </div>
   </div>
-  <div style="text-align:center;padding:40px;border-top:1px solid rgba(255,255,255,0.08);font-size:13px;color:rgba(255,255,255,0.3)">© 2026 BookVault. All rights reserved.</div>
+  <!-- FEATURES SECTION -->
+  <div class="features-section">
+    <h2 class="section-title">Everything You Need to Read</h2>
+    <p class="section-sub">A reading experience built for readers who take their library seriously.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📚</div>
+        <div class="feature-title">Massive Library</div>
+        <div class="feature-desc">15 million+ titles across every genre — from timeless classics to the latest bestsellers, rare manuscripts, and academic texts.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎌</div>
+        <div class="feature-title">Manga & Comics</div>
+        <div class="feature-desc">Complete series pages with chapter lists, status tracking, cover art, and seamless reading with full scroll or page-by-page modes.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <div class="feature-title">Progress Sync</div>
+        <div class="feature-desc">Pick up exactly where you left off. Reading progress is tracked per book, per chapter — with visual progress bars on every card.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌙</div>
+        <div class="feature-title">Beautiful Reading Modes</div>
+        <div class="feature-desc">Day, Night, and Sepia modes. Zoom controls, full scroll mode, jump-to-page, bookmarks — every Scholar feature you expect.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⬇</div>
+        <div class="feature-title">Download & Keep</div>
+        <div class="feature-desc">Scholar members can download any PDF to keep forever — no DRM, no expiry. Your books, yours for life.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⭐</div>
+        <div class="feature-title">Ratings & Reviews</div>
+        <div class="feature-desc">Rate books, leave comments, and see what the community thinks before you dive in. Your library, alive with opinions.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP PREVIEW MOCKUP -->
+  <div class="preview-section">
+    <div class="preview-inner">
+      <div class="preview-text">
+        <h2>A library that feels like yours.</h2>
+        <p>Beautifully designed reading interfaces, intelligent progress tracking, and a discovery engine that surfaces the right books at the right time.</p>
+        <ul class="preview-feature-list">
+          <li><span class="check">✦</span> Continue reading from any device, any time</li>
+          <li><span class="check">✦</span> Genre filters, author search, and smart sorting</li>
+          <li><span class="check">✦</span> Personal reading stats and achievements</li>
+          <li><span class="check">✦</span> Donate books to grow the community library</li>
+          <li><span class="check">✦</span> Request titles directly from the admin</li>
+        </ul>
+      </div>
+      <div class="preview-mockup">
+        <div class="mockup-bar">
+          <div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:14px;letter-spacing:1px;text-transform:uppercase">📚 Books · 🎌 Manga · 📋 My Requests</div>
+        <div class="mockup-grid">
+          <div class="mockup-book" style="background:#1a3a5c">Dune</div>
+          <div class="mockup-book" style="background:#4a2a1a">Tolkien</div>
+          <div class="mockup-book" style="background:#1a1a2e">Naruto</div>
+          <div class="mockup-book" style="background:#2a3a1a">Gatsby</div>
+          <div class="mockup-book" style="background:#3a1a2a">Austen</div>
+          <div class="mockup-book" style="background:#1a2a3a">Asimov</div>
+          <div class="mockup-book" style="background:#2e1a10">DBZ</div>
+          <div class="mockup-book" style="background:#1a3a2a">Orwell</div>
+        </div>
+        <div style="margin-top:16px;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden">
+          <div style="height:100%;width:62%;background:var(--gold);border-radius:2px"></div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:6px">Reading Dune · Page 391 of 604 · 62%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TESTIMONIALS -->
+  <div class="testimonials-section">
+    <h2 class="section-title">Loved by Readers Worldwide</h2>
+    <p class="section-sub">Join over 2 million readers already on BookVault.</p>
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-text">"I've tried every reading app out there — BookVault is the first one that actually feels built for serious readers. The Scholar plan is worth every penny."</div>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">MR</div>
+          <div><div class="testimonial-name">Marcus R.</div><div class="testimonial-role">Software Engineer · Chicago</div></div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-text">"The manga library alone is insane. Full series, proper cover art, chapter tracking — it replaced three other apps I was paying for."</div>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">YT</div>
+          <div><div class="testimonial-name">Yuki T.</div><div class="testimonial-role">Graphic Designer · Tokyo</div></div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-text">"Night mode, bookmarks, reading stats — everything I wanted. Being able to download PDFs and keep them forever is a game changer."</div>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">AK</div>
+          <div><div class="testimonial-name">Amara K.</div><div class="testimonial-role">PhD Student · London</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="landing-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="logo">Book<span>Vault</span></span>
+        <p>The world's largest digital reading platform. Every book ever written, available the moment you sign up.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <a onclick="openModal('signup')">Get Started</a>
+        <a onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Pricing</a>
+        <a onclick="openModal('login')">Sign In</a>
+      </div>
+      <div class="footer-col">
+        <h4>Features</h4>
+        <a>Books Library</a>
+        <a>Manga Series</a>
+        <a>Scholar Tools</a>
+        <a>Progress Sync</a>
+      </div>
+      <div class="footer-col">
+        <h4>Community</h4>
+        <a>Donate a Book</a>
+        <a>Request Titles</a>
+        <a>Ratings & Reviews</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 BookVault. All rights reserved.</span>
+      <span>Built for readers who take reading seriously.</span>
+    </div>
+  </div>
 </div>
 
 <!-- ══ LIBRARY ══ -->
@@ -448,6 +800,7 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
     <div class="user-info">
       <span id="user-display-name"></span>
       <span class="user-badge" id="user-tier-badge">Reader</span>
+      <button class="profile-btn" id="profile-avatar-btn" onclick="openProfileModal()" title="Your Profile">?</button>
       <button class="btn btn-outline btn-sm" onclick="logout()">Sign Out</button>
     </div>
   </div>
@@ -470,11 +823,45 @@ canvas#rdr-canvas{display:block;box-shadow:0 8px 60px rgba(0,0,0,0.6);border-rad
       <button class="lib-tab" id="tab-manga" onclick="switchTab('manga')">🎌 Manga</button>
       <button class="lib-tab" id="tab-my-requests" onclick="switchTab('my-requests')">📋 My Requests</button>
     </div>
+
+    <!-- Continue Reading -->
+    <div class="continue-reading" id="continue-reading-section">
+      <h3><span>🔖</span> Continue Reading</h3>
+      <div class="continue-cards" id="continue-cards"></div>
+    </div>
+
     <div id="section-books">
+      <div class="lib-controls">
+        <div class="lib-controls-left">
+          <span class="controls-label">Sort:</span>
+          <select class="sort-select" id="books-sort" onchange="renderBooks()">
+            <option value="default">Default</option>
+            <option value="az">A → Z</option>
+            <option value="za">Z → A</option>
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+          </select>
+          <input class="author-filter" id="books-author-filter" placeholder="Filter by author…" oninput="renderBooks()">
+        </div>
+        <span class="results-count" id="books-results-count"></span>
+      </div>
       <div class="genre-filters" id="genre-filters"></div>
       <div id="books-grid" class="books-grid"></div>
     </div>
     <div id="section-manga" style="display:none">
+      <div class="lib-controls">
+        <div class="lib-controls-left">
+          <span class="controls-label">Sort:</span>
+          <select class="sort-select" id="manga-sort" onchange="renderMangaGrid()">
+            <option value="default">Default</option>
+            <option value="az">A → Z</option>
+            <option value="za">Z → A</option>
+            <option value="chapters-desc">Most Chapters</option>
+          </select>
+          <input class="author-filter" id="manga-author-filter" placeholder="Filter by author…" oninput="renderMangaGrid()">
+        </div>
+        <span class="results-count" id="manga-results-count"></span>
+      </div>
       <div class="genre-filters" id="manga-genre-filters"></div>
       <div id="manga-grid" class="books-grid"></div>
     </div>
@@ -2462,6 +2849,103 @@ if(token&&currentUser){
   </div>
 </div>
 
+<!-- ══ SERIES DETAIL MODAL ══ -->
+<div class="detail-modal-overlay" id="detail-modal">
+  <div class="detail-modal">
+    <div class="detail-close">
+      <button class="detail-close-btn" onclick="closeDetailModal()">✕</button>
+    </div>
+    <div class="detail-hero">
+      <div id="detail-cover-side" class="detail-cover-fallback">
+        <div id="detail-cover-spine" style="width:100%;height:180px;border-radius:6px;display:flex;align-items:flex-end;padding:12px 10px;">
+          <span id="detail-cover-title-text" style="color:#fff;font-size:11px;font-weight:700;line-height:1.2"></span>
+        </div>
+      </div>
+      <div class="detail-info">
+        <div class="detail-type-badge" id="detail-type-badge">BOOK</div>
+        <div class="detail-title" id="detail-title">Title</div>
+        <div class="detail-author" id="detail-author">Author</div>
+        <div class="detail-meta-row" id="detail-meta-row"></div>
+        <div class="detail-desc" id="detail-desc"></div>
+        <div class="detail-cta-row">
+          <button class="btn-read-now" id="detail-read-btn" onclick="openFromDetail()">📖 Start Reading</button>
+          <button class="btn-save-book" id="detail-save-btn" onclick="toggleSaveBook()">♡ Save</button>
+        </div>
+      </div>
+    </div>
+    <div class="detail-body">
+      <!-- Progress -->
+      <div class="detail-progress-section" id="detail-progress-section">
+        <div class="detail-progress-label">Your Progress</div>
+        <div class="detail-progress-bar"><div class="detail-progress-fill" id="detail-progress-fill"></div></div>
+        <div class="detail-progress-stats">
+          <span id="detail-progress-page-text"></span>
+          <span id="detail-progress-pct"></span>
+        </div>
+      </div>
+      <!-- Rating -->
+      <div class="detail-rating-section">
+        <div class="detail-section-heading">Rate This</div>
+        <div class="star-rating" id="star-rating-row">
+          <span class="star" data-val="1" onclick="setRating(1)" onmouseenter="hoverRating(1)" onmouseleave="unhoverRating()">★</span>
+          <span class="star" data-val="2" onclick="setRating(2)" onmouseenter="hoverRating(2)" onmouseleave="unhoverRating()">★</span>
+          <span class="star" data-val="3" onclick="setRating(3)" onmouseenter="hoverRating(3)" onmouseleave="unhoverRating()">★</span>
+          <span class="star" data-val="4" onclick="setRating(4)" onmouseenter="hoverRating(4)" onmouseleave="unhoverRating()">★</span>
+          <span class="star" data-val="5" onclick="setRating(5)" onmouseenter="hoverRating(5)" onmouseleave="unhoverRating()">★</span>
+          <span class="rating-summary" id="rating-summary-text">Tap to rate</span>
+        </div>
+      </div>
+      <!-- Comments -->
+      <div class="detail-comments">
+        <div class="detail-section-heading">Community Notes</div>
+        <div class="comment-list" id="comment-list"></div>
+        <div class="no-comments" id="no-comments-msg">No comments yet. Be the first!</div>
+        <div class="comment-input-row" id="comment-input-row">
+          <textarea class="comment-input" id="comment-input" placeholder="Share your thoughts…" maxlength="500"></textarea>
+          <button class="btn-comment" onclick="submitComment()">Post</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PROFILE MODAL ══ -->
+<div class="profile-modal-overlay" id="profile-modal">
+  <div class="profile-modal">
+    <div class="profile-close-row">
+      <button class="profile-close-btn" onclick="closeProfileModal()">✕</button>
+    </div>
+    <div class="profile-header">
+      <div class="profile-avatar-large" id="profile-avatar-large">?</div>
+      <div class="profile-display-name" id="profile-display-name">Reader</div>
+      <div class="profile-plan" id="profile-plan">Reader Plan</div>
+      <div class="profile-stats-row">
+        <div class="profile-stat"><div class="profile-stat-num" id="pstat-opened">0</div><div class="profile-stat-label">Opened</div></div>
+        <div class="profile-stat"><div class="profile-stat-num" id="pstat-saved">0</div><div class="profile-stat-label">Saved</div></div>
+        <div class="profile-stat"><div class="profile-stat-num" id="pstat-rated">0</div><div class="profile-stat-label">Rated</div></div>
+      </div>
+    </div>
+    <div class="profile-body">
+      <div class="profile-section-title">Continue Reading</div>
+      <div class="reading-history-list" id="profile-history-list">
+        <div style="color:#bbb;font-size:13px;font-style:italic">Nothing started yet — dive into the library!</div>
+      </div>
+      <div class="profile-section-title" style="margin-top:24px">Saved Books</div>
+      <div class="saved-list" id="profile-saved-list">
+        <div style="color:#bbb;font-size:13px;font-style:italic">No saved books yet.</div>
+      </div>
+      <div class="profile-section-title" style="margin-top:24px">Achievements</div>
+      <div class="achievements-row" id="profile-achievements">
+        <div class="achievement" id="ach-first"><div class="achievement-icon">📖</div><div class="achievement-label">First Read</div></div>
+        <div class="achievement locked" id="ach-five"><div class="achievement-icon">🔥</div><div class="achievement-label">5 Books</div></div>
+        <div class="achievement locked" id="ach-ten"><div class="achievement-icon">🏆</div><div class="achievement-label">10 Books</div></div>
+        <div class="achievement locked" id="ach-rated"><div class="achievement-icon">⭐</div><div class="achievement-label">Rated 5</div></div>
+        <div class="achievement locked" id="ach-saved"><div class="achievement-icon">❤️</div><div class="achievement-label">Saved 3</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── Membership expiry helpers ──────────────────────────────
 function showExpiredPage(tier){
@@ -2496,6 +2980,489 @@ async function doRenewal(){
 
 // Close renewal modal on outside click
 document.getElementById('renewal-modal').addEventListener('click',function(e){if(e.target===this)closeRenewalModal();});
+</script>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// FEATURE 2 — SEARCH FILTERS & DISCOVERY
+// ══════════════════════════════════════════════════════════
+
+// Override renderBooks to support sorting + author filter + progress bars + folders
+const _origRenderBooks = renderBooks;
+function renderBooks(){
+  const q=(document.getElementById('search-input')?.value||'').toLowerCase();
+  const authorQ=(document.getElementById('books-author-filter')?.value||'').toLowerCase();
+  const sort=document.getElementById('books-sort')?.value||'default';
+  const grid=document.getElementById('books-grid');
+
+  // Loose books (not in folders)
+  let looseBooks=allBooks.filter(b=>!b.folder_id).filter(b=>{
+    const mg=activeGenre==='All'||b.genre===activeGenre;
+    const mq=!q||b.title.toLowerCase().includes(q)||b.author.toLowerCase().includes(q)||(b.genre||'').toLowerCase().includes(q);
+    const ma=!authorQ||b.author.toLowerCase().includes(authorQ);
+    return mg&&mq&&ma;
+  });
+
+  // Sort
+  if(sort==='az') looseBooks=[...looseBooks].sort((a,b)=>a.title.localeCompare(b.title));
+  else if(sort==='za') looseBooks=[...looseBooks].sort((a,b)=>b.title.localeCompare(a.title));
+  else if(sort==='newest') looseBooks=[...looseBooks].sort((a,b)=>(b.year||0)-(a.year||0));
+  else if(sort==='oldest') looseBooks=[...looseBooks].sort((a,b)=>(a.year||0)-(b.year||0));
+
+  // Matched folders
+  const matchedFolders=(allFolders||[]).filter(f=>{
+    if(activeGenre!=='All') return false;
+    if(!q&&!authorQ) return true;
+    return f.name.toLowerCase().includes(q)||f.items.some(b=>b.title.toLowerCase().includes(q)||b.author.toLowerCase().includes(q)||b.author.toLowerCase().includes(authorQ));
+  });
+
+  const total=looseBooks.length+matchedFolders.length;
+  const countEl=document.getElementById('books-results-count');
+  if(countEl) countEl.textContent=total===allBooks.length?'':`${total} result${total!==1?'s':''}`;
+
+  if(!looseBooks.length&&!matchedFolders.length){grid.innerHTML='<p style="color:#999;font-size:15px;grid-column:1/-1">No books found.</p>';return;}
+
+  const folderHTML=matchedFolders.map(f=>folderCardHTML(f)).join('');
+  const bookHTML=looseBooks.map(b=>{
+    const prog=getProgress('book',b.id);
+    const pct=prog&&prog.total>0?Math.round((prog.page/prog.total)*100):0;
+    const progressBar=pct>0?`<div class="book-progress"><div class="book-progress-fill" style="width:${pct}%"></div></div>`:'';
+    const pageBadge=pct>0&&pct<100?`<div class="page-badge" style="display:block">p.${prog.page}</div>`:'';
+    const rating=getRating('book',b.id);
+    const ratingStars=rating?`<div style="font-size:10px;color:var(--gold);letter-spacing:1px;margin-top:2px">${'★'.repeat(rating)}${'☆'.repeat(5-rating)}</div>`:'';
+    return `<div class="book-item" onclick="openDetailModal('book',${b.id})">
+      ${pageBadge}
+      <div class="book-cover" style="background:${b.color};${b.cover_url?`background-image:url('${b.cover_url}');background-size:cover;background-position:center;`:''}">
+        <div class="hover-overlay"><div class="hover-icon">📖</div><div class="hover-text">View</div></div>
+        ${b.cover_url?'':`<div class="book-title-cover">${b.title}</div><div class="book-author-cover">${b.author}</div>`}
+      </div>
+      <div class="book-meta"><div class="book-meta-title">${b.title}</div><div class="book-meta-genre">${b.genre||''}${b.year?' · '+b.year:''}</div>${ratingStars}${progressBar}</div>
+    </div>`;
+  }).join('');
+  grid.innerHTML=folderHTML+bookHTML;
+}
+
+// Override renderMangaGrid to support sorting + author filter + progress bars + folders
+function renderMangaGrid(){
+  const q=(document.getElementById('search-input')?.value||'').toLowerCase();
+  const authorQ=(document.getElementById('manga-author-filter')?.value||'').toLowerCase();
+  const sort=document.getElementById('manga-sort')?.value||'default';
+  const grid=document.getElementById('manga-grid');
+
+  const mangaFolders=(allFolders&&allFolders._manga)||[];
+  let looseManga=allManga.filter(m=>!m.folder_id).filter(m=>{
+    const mg=activeMangaGenre==='All'||m.genre===activeMangaGenre;
+    const mq=!q||m.title.toLowerCase().includes(q)||m.author.toLowerCase().includes(q)||(m.genre||'').toLowerCase().includes(q);
+    const ma=!authorQ||m.author.toLowerCase().includes(authorQ);
+    return mg&&mq&&ma;
+  });
+
+  if(sort==='az') looseManga=[...looseManga].sort((a,b)=>a.title.localeCompare(b.title));
+  else if(sort==='za') looseManga=[...looseManga].sort((a,b)=>b.title.localeCompare(a.title));
+  else if(sort==='chapters-desc') looseManga=[...looseManga].sort((a,b)=>(b.chapters||0)-(a.chapters||0));
+
+  const matchedFolders=mangaFolders.filter(f=>{
+    if(activeMangaGenre!=='All') return false;
+    if(!q&&!authorQ) return true;
+    return f.name.toLowerCase().includes(q)||f.items.some(m=>m.title.toLowerCase().includes(q)||m.author.toLowerCase().includes(authorQ));
+  });
+
+  const total=looseManga.length+matchedFolders.length;
+  const countEl=document.getElementById('manga-results-count');
+  if(countEl) countEl.textContent=total===allManga.length?'':`${total} result${total!==1?'s':''}`;
+
+  if(!looseManga.length&&!matchedFolders.length){grid.innerHTML='<p style="color:#999;font-size:15px;grid-column:1/-1">No manga found.</p>';return;}
+
+  const folderHTML=matchedFolders.map(f=>folderCardHTML(f)).join('');
+  const mangaHTML=looseManga.map(m=>{
+    const prog=getProgress('manga',m.id);
+    const pct=prog&&prog.total>0?Math.round((prog.page/prog.total)*100):0;
+    const progressBar=pct>0?`<div class="book-progress"><div class="book-progress-fill" style="width:${pct}%"></div></div>`:'';
+    const pageBadge=pct>0&&pct<100?`<div class="page-badge" style="display:block">p.${prog.page}</div>`:'';
+    const rating=getRating('manga',m.id);
+    const ratingStars=rating?`<div style="font-size:10px;color:var(--gold);letter-spacing:1px;margin-top:2px">${'\u2605'.repeat(rating)}${'\u2606'.repeat(5-rating)}</div>`:'';
+    return `<div class="book-item" onclick="openDetailModal('manga',${m.id})">
+      ${pageBadge}
+      <div class="book-cover" style="background:${m.color};${m.cover_url?`background-image:url('${m.cover_url}');background-size:cover;background-position:center;`:''}">
+        <div class="hover-overlay"><div class="hover-icon">\ud83d\udcd6</div><div class="hover-text">View</div></div>
+        ${m.cover_url?'':`<div class="book-title-cover">${m.title}</div><div class="book-author-cover">${m.author}</div>`}
+      </div>
+      <div class="book-meta">
+        <div class="book-meta-title">${m.title}</div>
+        <div class="book-meta-genre">${m.genre||''}${m.chapters!=null?' · '+m.chapters+' ch':''} · <span style="color:${m.status==='Completed'?'#2e7d32':'#9a6e00'}">${m.status}</span></div>
+        ${ratingStars}${progressBar}
+      </div>
+    </div>`;
+  }).join('');
+  grid.innerHTML=folderHTML+mangaHTML;
+}
+
+// ══════════════════════════════════════════════════════════
+// FEATURE 5 — READING PROGRESS SYNC
+// ══════════════════════════════════════════════════════════
+
+function getProgress(type, id){
+  const page=parseInt(localStorage.getItem(`bv_page_${type}_${id}`)||'0');
+  const total=parseInt(localStorage.getItem(`bv_total_${type}_${id}`)||'0');
+  if(!page||!total) return null;
+  return {page,total};
+}
+
+function saveProgress(type,id,page,total){
+  if(page>0) localStorage.setItem(`bv_page_${type}_${id}`,page);
+  if(total>0) localStorage.setItem(`bv_total_${type}_${id}`,total);
+  // save reading history
+  let hist=getReadingHistory();
+  hist=hist.filter(h=>!(h.type===type&&h.id===id));
+  const item={type,id,ts:Date.now()};
+  hist.unshift(item);
+  if(hist.length>20) hist=hist.slice(0,20);
+  localStorage.setItem('bv_history',JSON.stringify(hist));
+}
+
+function getReadingHistory(){
+  try{return JSON.parse(localStorage.getItem('bv_history')||'[]');}catch{return[];}
+}
+
+// Build Continue Reading cards
+function renderContinueReading(){
+  const hist=getReadingHistory();
+  const section=document.getElementById('continue-reading-section');
+  const container=document.getElementById('continue-cards');
+  if(!section||!container) return;
+  const recent=hist.slice(0,5);
+  if(!recent.length){section.classList.remove('visible');return;}
+
+  const cards=recent.map(h=>{
+    const book=h.type==='book'?allBooks.find(b=>b.id===h.id):allManga.find(m=>m.id===h.id);
+    if(!book) return '';
+    const prog=getProgress(h.type,h.id);
+    const pct=prog&&prog.total>0?Math.round((prog.page/prog.total)*100):0;
+    const coverStyle=book.cover_url?`background-image:url('${book.cover_url}');background-size:cover;background-position:center;`:`background:${book.color}`;
+    return `<div class="continue-card" onclick="openDetailModal('${h.type}',${h.id})">
+      <div class="continue-card-cover" style="${coverStyle}"></div>
+      <div class="continue-card-info">
+        <div class="continue-card-title">${book.title}</div>
+        <div class="continue-card-sub">${book.author}${h.type==='manga'?' · '+h.type:''}</div>
+        ${pct>0?`<div class="continue-progress-bar"><div class="continue-progress-fill" style="width:${pct}%"></div></div><div class="continue-pct">${pct}% read</div>`:'<div style="font-size:11px;color:#bbb;margin-top:2px">Not started</div>'}
+      </div>
+    </div>`;
+  }).join('');
+  container.innerHTML=cards;
+  if(cards.trim()) section.classList.add('visible');
+  else section.classList.remove('visible');
+}
+
+// Patch openItem to also save progress and total pages
+const _origOpenItem = openItem;
+async function openItem(type, id){
+  // Add to history
+  let hist=getReadingHistory();
+  hist=hist.filter(h=>!(h.type===type&&h.id===id));
+  hist.unshift({type,id,ts:Date.now()});
+  if(hist.length>20) hist=hist.slice(0,20);
+  localStorage.setItem('bv_history',JSON.stringify(hist));
+  await _origOpenItem(type,id);
+}
+
+// Patch renderPage to save current page + total to localStorage
+const _origRenderPage = renderPage;
+async function renderPage(pageNum, flipDir='none'){
+  await _origRenderPage(pageNum, flipDir);
+  if(currentItemMeta && totalPages>0){
+    saveProgress(currentItemMeta.type, currentItemMeta.id, pageNum, totalPages);
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// FEATURE 3 — SERIES DETAIL PAGE MODAL
+// ══════════════════════════════════════════════════════════
+
+let _detailCurrent={type:null,id:null};
+
+async function openDetailModal(type, id){
+  const book=type==='book'?allBooks.find(b=>b.id===id):allManga.find(m=>m.id===id);
+  if(!book){openItem(type,id);return;}
+
+  _detailCurrent={type,id};
+  document.getElementById('detail-type-badge').textContent=type==='manga'?'MANGA':'BOOK';
+
+  // Cover
+  const coverSide=document.getElementById('detail-cover-side');
+  if(book.cover_url){
+    coverSide.className='detail-cover-side';
+    coverSide.style.backgroundImage=`url('${book.cover_url}')`;
+    document.getElementById('detail-cover-spine').style.display='none';
+  } else {
+    coverSide.className='detail-cover-fallback';
+    coverSide.style.backgroundImage='none';
+    const spine=document.getElementById('detail-cover-spine');
+    spine.style.background=book.color||'#1a3a5c';
+    spine.style.display='flex';
+    document.getElementById('detail-cover-title-text').textContent=book.title;
+  }
+
+  document.getElementById('detail-title').textContent=book.title;
+  document.getElementById('detail-author').textContent=book.author||'';
+  document.getElementById('detail-desc').textContent=book.description||'No description available.';
+
+  // Meta pills
+  const metaRow=document.getElementById('detail-meta-row');
+  let pills=[];
+  if(book.genre) pills.push(`<span class="detail-pill">${book.genre}</span>`);
+  if(book.year) pills.push(`<span class="detail-pill">${book.year}</span>`);
+  if(book.chapters!=null) pills.push(`<span class="detail-pill">${book.chapters} chapters</span>`);
+  if(book.status) pills.push(`<span class="detail-pill status-${(book.status||'').toLowerCase()}">${book.status}</span>`);
+  metaRow.innerHTML=pills.join('');
+
+  // Progress
+  const prog=getProgress(type,id);
+  const progSection=document.getElementById('detail-progress-section');
+  if(prog&&prog.total>0){
+    const pct=Math.round((prog.page/prog.total)*100);
+    progSection.classList.add('visible');
+    document.getElementById('detail-progress-fill').style.width=pct+'%';
+    document.getElementById('detail-progress-page-text').textContent=`Page ${prog.page} of ${prog.total}`;
+    document.getElementById('detail-progress-pct').textContent=pct+'%';
+    const readBtn=document.getElementById('detail-read-btn');
+    readBtn.textContent=`▶ Continue Reading`;
+    readBtn.className='btn-read-now continue';
+  } else {
+    progSection.classList.remove('visible');
+    const readBtn=document.getElementById('detail-read-btn');
+    readBtn.textContent='📖 Start Reading';
+    readBtn.className='btn-read-now';
+  }
+
+  // Save button
+  const saved=isBookSaved(type,id);
+  const saveBtn=document.getElementById('detail-save-btn');
+  saveBtn.textContent=saved?'♥ Saved':'♡ Save';
+  saveBtn.className='btn-save-book'+(saved?' saved':'');
+
+  // Rating
+  renderDetailRating(type,id);
+
+  // Comments
+  renderComments(type,id);
+
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+function closeDetailModal(){
+  document.getElementById('detail-modal').classList.remove('open');
+  renderContinueReading();
+  renderBooks();
+  renderMangaGrid();
+}
+
+function openFromDetail(){
+  const {type,id}=_detailCurrent;
+  if(!type||!id) return;
+  closeDetailModal();
+  setTimeout(()=>openItem(type,id),100);
+}
+
+document.getElementById('detail-modal').addEventListener('click',function(e){
+  if(e.target===this) closeDetailModal();
+});
+
+// ══════════════════════════════════════════════════════════
+// FEATURE 6 — RATINGS & COMMENTS
+// ══════════════════════════════════════════════════════════
+
+function getRatingKey(type,id){return `bv_rating_${type}_${id}`;}
+function getRating(type,id){return parseInt(localStorage.getItem(getRatingKey(type,id))||'0');}
+function saveRating(type,id,val){localStorage.setItem(getRatingKey(type,id),val);}
+
+function renderDetailRating(type,id){
+  const stars=document.querySelectorAll('#star-rating-row .star');
+  const current=getRating(type,id);
+  stars.forEach((s,i)=>{
+    s.classList.toggle('filled',i<current);
+  });
+  const txt=document.getElementById('rating-summary-text');
+  if(current){
+    const labels=['','Disliked','It was OK','Liked it','Really liked it','Loved it!'];
+    txt.textContent=labels[current]||'Rated!';
+  } else {
+    txt.textContent='Tap to rate';
+  }
+}
+
+function setRating(val){
+  const {type,id}=_detailCurrent;
+  if(!type||!id) return;
+  saveRating(type,id,val);
+  renderDetailRating(type,id);
+  showToast('Rating saved ★'.repeat(val));
+}
+
+function hoverRating(val){
+  document.querySelectorAll('#star-rating-row .star').forEach((s,i)=>{
+    s.classList.toggle('hover',i<val);
+  });
+}
+function unhoverRating(){
+  document.querySelectorAll('#star-rating-row .star').forEach(s=>s.classList.remove('hover'));
+}
+
+// Comments stored per-item in localStorage
+function getCommentsKey(type,id){return `bv_comments_${type}_${id}`;}
+function getComments(type,id){
+  try{return JSON.parse(localStorage.getItem(getCommentsKey(type,id))||'[]');}catch{return[];}
+}
+function saveComments(type,id,arr){localStorage.setItem(getCommentsKey(type,id),JSON.stringify(arr));}
+
+function renderComments(type,id){
+  const comments=getComments(type,id);
+  const list=document.getElementById('comment-list');
+  const none=document.getElementById('no-comments-msg');
+  if(!comments.length){list.innerHTML='';none.style.display='block';return;}
+  none.style.display='none';
+  list.innerHTML=comments.map(c=>`
+    <div class="comment-item">
+      <div><span class="comment-user">${escHtml(c.user)}</span><span class="comment-date">${c.date}</span></div>
+      <div class="comment-text">${escHtml(c.text)}</div>
+    </div>`).join('');
+}
+
+function submitComment(){
+  const {type,id}=_detailCurrent;
+  if(!type||!id||!currentUser) return;
+  const input=document.getElementById('comment-input');
+  const text=(input.value||'').trim();
+  if(!text) return;
+  const comments=getComments(type,id);
+  const now=new Date();
+  const date=now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  comments.push({user:currentUser.name,text,date});
+  saveComments(type,id,comments);
+  input.value='';
+  renderComments(type,id);
+}
+
+function escHtml(str){return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ══════════════════════════════════════════════════════════
+// FEATURE 4 — USER PROFILE
+// ══════════════════════════════════════════════════════════
+
+function getSavedKey(){return 'bv_saved_books';}
+function getSavedBooks(){try{return JSON.parse(localStorage.getItem(getSavedKey())||'[]');}catch{return[];}}
+function saveSavedBooks(arr){localStorage.setItem(getSavedKey(),JSON.stringify(arr));}
+function isBookSaved(type,id){return getSavedBooks().some(s=>s.type===type&&s.id===id);}
+function toggleSaveBook(){
+  const {type,id}=_detailCurrent;
+  if(!type||!id) return;
+  let saved=getSavedBooks();
+  if(isBookSaved(type,id)){
+    saved=saved.filter(s=>!(s.type===type&&s.id===id));
+    showToast('Removed from saved');
+  } else {
+    saved.push({type,id});
+    showToast('Saved! ♥');
+  }
+  saveSavedBooks(saved);
+  const btn=document.getElementById('detail-save-btn');
+  const nowSaved=isBookSaved(type,id);
+  btn.textContent=nowSaved?'♥ Saved':'♡ Save';
+  btn.className='btn-save-book'+(nowSaved?' saved':'');
+}
+
+function openProfileModal(){
+  if(!currentUser) return;
+  const name=currentUser.name||'Reader';
+  const initials=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('profile-avatar-large').textContent=initials;
+  document.getElementById('profile-avatar-btn').textContent=initials;
+  document.getElementById('profile-display-name').textContent=name;
+  document.getElementById('profile-plan').textContent=currentUser.tier===2?'Scholar Plan':'Reader Plan';
+
+  // Stats
+  const hist=getReadingHistory();
+  const saved=getSavedBooks();
+  const allRatings=[...allBooks.map(b=>getRating('book',b.id)),...allManga.map(m=>getRating('manga',m.id))].filter(r=>r>0);
+  document.getElementById('pstat-opened').textContent=hist.length;
+  document.getElementById('pstat-saved').textContent=saved.length;
+  document.getElementById('pstat-rated').textContent=allRatings.length;
+
+  // History list
+  const histList=document.getElementById('profile-history-list');
+  if(!hist.length){
+    histList.innerHTML='<div style="color:#bbb;font-size:13px;font-style:italic">Nothing started yet!</div>';
+  } else {
+    histList.innerHTML=hist.slice(0,6).map(h=>{
+      const book=h.type==='book'?allBooks.find(b=>b.id===h.id):allManga.find(m=>m.id===h.id);
+      if(!book) return '';
+      const prog=getProgress(h.type,h.id);
+      const pct=prog&&prog.total>0?Math.round((prog.page/prog.total)*100):0;
+      const coverStyle=book.cover_url?`background-image:url('${book.cover_url}');background-size:cover;background-position:center;`:`background:${book.color}`;
+      return `<div class="history-item" onclick="closeProfileModal();openDetailModal('${h.type}',${h.id})">
+        <div class="history-cover" style="${coverStyle}"></div>
+        <div class="history-info">
+          <div class="history-title">${book.title}</div>
+          <div class="history-meta">${book.author}${h.type==='manga'?' · Manga':''}</div>
+          ${pct>0?`<div class="history-progress">${pct}% read</div>`:'<div class="history-meta">Not started</div>'}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Saved list
+  const savedList=document.getElementById('profile-saved-list');
+  if(!saved.length){
+    savedList.innerHTML='<div style="color:#bbb;font-size:13px;font-style:italic">No saved books yet.</div>';
+  } else {
+    savedList.innerHTML=saved.slice(0,6).map(s=>{
+      const book=s.type==='book'?allBooks.find(b=>b.id===s.id):allManga.find(m=>m.id===s.id);
+      if(!book) return '';
+      const coverStyle=book.cover_url?`background-image:url('${book.cover_url}');background-size:cover;background-position:center;`:`background:${book.color}`;
+      return `<div class="saved-item" onclick="closeProfileModal();openDetailModal('${s.type}',${s.id})">
+        <div class="saved-item-cover" style="${coverStyle}"></div>
+        <span class="saved-item-title">${book.title}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // Achievements
+  document.getElementById('ach-first').classList.toggle('locked',hist.length===0);
+  document.getElementById('ach-five').classList.toggle('locked',hist.length<5);
+  document.getElementById('ach-ten').classList.toggle('locked',hist.length<10);
+  document.getElementById('ach-rated').classList.toggle('locked',allRatings.length<5);
+  document.getElementById('ach-saved').classList.toggle('locked',saved.length<3);
+
+  document.getElementById('profile-modal').classList.add('open');
+}
+
+function closeProfileModal(){
+  document.getElementById('profile-modal').classList.remove('open');
+}
+
+document.getElementById('profile-modal').addEventListener('click',function(e){
+  if(e.target===this) closeProfileModal();
+});
+
+// Patch showLibrary to render continue reading after load
+const _origShowLibrary = showLibrary;
+async function showLibrary(){
+  await _origShowLibrary();
+  // Update profile avatar initials
+  if(currentUser){
+    const name=currentUser.name||'?';
+    const initials=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const btn=document.getElementById('profile-avatar-btn');
+    if(btn) btn.textContent=initials;
+  }
+  renderContinueReading();
+}
+
+// Also re-render continue reading when switching tabs
+const _origSwitchTab = switchTab;
+function switchTab(tab){
+  _origSwitchTab(tab);
+  renderContinueReading();
+}
 </script>
 
 </html>
