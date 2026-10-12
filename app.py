@@ -51,11 +51,12 @@ def get_b2_client():
     )
 
 # ── Admin config from env ──────────────────────────────────
-ADMIN_EMAIL    = os.environ.get('ADMIN_EMAIL',    'admin@bookvault.com')
-ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin1')
+ADMIN_EMAIL    = os.environ.get('ADMIN_EMAIL', 'admin@bookvault.com')
+# Do not seed privileged accounts with public, guessable default passwords.
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', '')
 CASHAPP_HANDLE = os.environ.get('CASHAPP_HANDLE', '$YourCashAppHandle')
-WORKER_EMAIL   = os.environ.get('WORKER_EMAIL',   'worker@bookvault.com')
-WORKER_PASSWORD= os.environ.get('WORKER_PASSWORD','worker')
+WORKER_EMAIL   = os.environ.get('WORKER_EMAIL', 'worker@bookvault.com')
+WORKER_PASSWORD= os.environ.get('WORKER_PASSWORD', '')
 
 # ── Models ─────────────────────────────────────────────────
 class User(db.Model):
@@ -191,7 +192,7 @@ def init_db():
                 conn.rollback()
     # ── Seed admin user ───────────────────────────────────────────
     try:
-        if not User.query.filter_by(email=ADMIN_EMAIL).first():
+        if ADMIN_PASSWORD and not User.query.filter_by(email=ADMIN_EMAIL).first():
             db.session.add(User(
                 name='Admin', email=ADMIN_EMAIL,
                 password=bcrypt.generate_password_hash(ADMIN_PASSWORD).decode(),
@@ -202,7 +203,7 @@ def init_db():
         db.session.rollback()
     # ── Seed worker account ───────────────────────────────────────
     try:
-        if not User.query.filter_by(email=WORKER_EMAIL).first():
+        if WORKER_PASSWORD and not User.query.filter_by(email=WORKER_EMAIL).first():
             db.session.add(User(
                 name='Worker', email=WORKER_EMAIL,
                 password=bcrypt.generate_password_hash(WORKER_PASSWORD).decode(),
@@ -330,8 +331,9 @@ def donate_book():
             file_name = original
             try:
                 get_b2_client().upload_fileobj(f, B2_BUCKET_NAME, file_key)
-            except Exception as e:
-                return jsonify({'error': f'Upload failed: {e}'}), 500
+            except Exception:
+                app.logger.exception("Donation PDF upload failed")
+                return jsonify({'error': 'Upload failed. Check server logs for details.'}), 500
     else:
         return jsonify({'error': 'A PDF file is required'}), 400
 
